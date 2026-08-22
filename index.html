@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusOps · 企业智能运维管理平台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg0:oklch(.13 .01 250);--bg1:oklch(.16 .012 250);--bg2:oklch(.19 .014 250);--bg3:oklch(.22 .016 250);--bg4:oklch(.25 .018 250);
+--ac:oklch(.72 .14 195);--acd:oklch(.55 .1 195);--acg:oklch(.72 .14 195/.15);--acs:oklch(.72 .14 195/.08);
+--gn:oklch(.72 .18 155);--gns:oklch(.72 .18 155/.12);--wn:oklch(.78 .16 80);--wns:oklch(.78 .16 80/.12);
+--dn:oklch(.65 .2 25);--dns:oklch(.65 .2 25/.12);--in:oklch(.68 .15 260);--ins:oklch(.68 .15 260/.12);
+--pp:oklch(.65 .18 300);--pps:oklch(.65 .18 300/.12);
+--t1:oklch(.93 .005 250);--t2:oklch(.68 .01 250);--t3:oklch(.5 .01 250);--ti:oklch(.13 .01 250);
+--bd:oklch(.28 .016 250);--bds:oklch(.23 .014 250);
+--sw:260px;--sc:72px;--th:60px;--r:.625rem;--rl:1rem;--rs:.375rem;
+--fs:'Plus Jakarta Sans','Inter',system-ui,sans-serif;--fm:'JetBrains Mono','Fira Code',monospace;
+--eo:cubic-bezier(.16,1,.3,1);--es:cubic-bezier(.34,1.56,.64,1);
+}
+html{font-size:14px}body{font-family:var(--fs);background:var(--bg0);color:var(--t1);line-height:1.6;overflow:hidden;height:100vh}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:10px}
+.L{display:grid;grid-template-columns:var(--sw) 1fr;grid-template-rows:var(--th) 1fr;grid-template-areas:"s t""s m";height:100vh;transition:grid-template-columns .35s var(--eo)}.L.c{grid-template-columns:var(--sc) 1fr}
+.s{grid-area:s;background:var(--bg1);border-right:1px solid var(--bds);display:flex;flex-direction:column;overflow:hidden;z-index:100}
+.sb{height:var(--th);display:flex;align-items:center;padding:0 20px;gap:12px;border-bottom:1px solid var(--bds);flex-shrink:0}
+.si{width:34px;height:34px;background:linear-gradient(135deg,var(--ac),oklch(.65 .18 220));border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:var(--ti);flex-shrink:0}
+.st{font-weight:700;font-size:16px;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;transition:opacity .2s}.st span{color:var(--ac)}.c .st{opacity:0;width:0}
+.sn{flex:1;padding:16px 12px;overflow-y:auto;overflow-x:hidden}
+.sl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);padding:12px 12px 6px;white-space:nowrap;transition:opacity .2s}.c .sl{opacity:0;height:0;padding:0}
+.ni{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:var(--r);color:var(--t2);cursor:pointer;transition:all .18s;position:relative;margin-bottom:2px;white-space:nowrap;text-decoration:none}
+.ni:hover{background:var(--bg4);color:var(--t1)}.ni.a{background:var(--acs);color:var(--ac)}
+.ni.a::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--ac);border-radius:0 3px 3px 0}
+.ni i{width:20px;height:20px;flex-shrink:0}.nl{overflow:hidden;transition:opacity .2s}.c .nl{opacity:0;width:0}
+.nb{margin-left:auto;background:var(--dn);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px}.c .nb{opacity:0}
+.sf{padding:12px;border-top:1px solid var(--bds);flex-shrink:0}
+.ev{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--gns);border:1px solid oklch(.72 .18 155/.2);border-radius:var(--r);font-size:12px;font-weight:600;color:var(--gn);white-space:nowrap;overflow:hidden}
+.ed{width:7px;height:7px;background:var(--gn);border-radius:50%;flex-shrink:0;animation:pd 2s ease-in-out infinite}
+@keyframes pd{0%,100%{opacity:1;box-shadow:0 0 0 0 oklch(.72 .18 155/.4)}50%{opacity:.7;box-shadow:0 0 0 4px oklch(.72 .18 155/0)}}
+.t{grid-area:t;background:var(--bg1);border-bottom:1px solid var(--bds);display:flex;align-items:center;padding:0 24px;gap:16px;z-index:90}
+.tb{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:var(--r);cursor:pointer;color:var(--t2);background:none;border:none;transition:all .15s}.tb:hover{background:var(--bg4);color:var(--t1)}
+.bc{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--t3)}.bc .cur{color:var(--t1);font-weight:600}
+.ts{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:7px 14px;width:280px;transition:all .2s}
+.ts:focus-within{border-color:var(--acd);box-shadow:0 0 0 3px var(--acg);width:340px}
+.ts input{background:none;border:none;outline:none;color:var(--t1);font-family:var(--fs);font-size:13px;width:100%}.ts input::placeholder{color:var(--t3)}
+.ts kbd{font-family:var(--fm);font-size:10px;background:var(--bg3);padding:2px 6px;border-radius:4px;color:var(--t3);border:1px solid var(--bd)}
+.ta{display:flex;align-items:center;gap:4px}
+.tn{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:var(--r);cursor:pointer;color:var(--t2);position:relative;background:none;border:none;transition:all .15s}.tn:hover{background:var(--bg4);color:var(--t1)}
+.bd{position:absolute;top:8px;right:8px;width:7px;height:7px;background:var(--dn);border-radius:50%;border:2px solid var(--bg1)}
+.av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--acd),oklch(.55 .15 260));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;cursor:pointer;margin-left:8px}
+.m{grid-area:m;overflow-y:auto;padding:24px;background:var(--bg0)}
+.pg{display:none}.pg.a{display:block;animation:fi .3s var(--eo)}
+@keyframes fi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ph{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px}
+.ph h1{font-size:24px;font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,var(--t1),var(--t2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ph p{color:var(--t3);font-size:13px;margin-top:4px}.pa{display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--r);font-family:var(--fs);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid transparent;white-space:nowrap}.btn svg{width:16px;height:16px}
+.bp{background:var(--ac);color:var(--ti);box-shadow:0 1px 3px oklch(.72 .14 195/.3)}.bp:hover{background:oklch(.76 .14 195);transform:translateY(-1px)}
+.bg{background:var(--bg2);color:var(--t2);border-color:var(--bd)}.bg:hover{background:var(--bg3);color:var(--t1);border-color:var(--t3)}
+.bs{padding:5px 10px;font-size:12px}
+.lb{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--gn);padding:3px 10px;background:var(--gns);border-radius:20px}.lb::before{content:'';width:6px;height:6px;background:var(--gn);border-radius:50%;animation:pd 1.5s ease-in-out infinite}
+.cd{background:var(--bg2);border:1px solid var(--bds);border-radius:var(--rl);overflow:hidden;transition:border-color .2s}.cd:hover{border-color:var(--bd)}
+.ch{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--bds)}
+.ct{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}.ct .d{width:8px;height:8px;border-radius:50%}.ct .d.l{background:var(--gn);box-shadow:0 0 6px var(--gn);animation:pd 2s ease-in-out infinite}
+.ca{display:flex;gap:4px}.cb{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:var(--rs);color:var(--t3);cursor:pointer;background:none;border:none;transition:all .15s}.cb:hover{background:var(--bg4);color:var(--t1)}.cb svg{width:15px;height:15px}
+.cbd{padding:20px}.cbd.f{padding:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}.g23{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px}
+.mc{background:var(--bg2);border:1px solid var(--bds);border-radius:var(--rl);padding:20px;position:relative;overflow:hidden;transition:all .25s var(--eo)}.mc:hover{border-color:var(--bd);transform:translateY(-2px);box-shadow:0 4px 12px oklch(0 0 0/.35)}
+.mc::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--rl) var(--rl) 0 0}
+.mc.ac::after{background:var(--ac)}.mc.gn::after{background:var(--gn)}.mc.am::after{background:var(--wn)}.mc.rd::after{background:var(--dn)}.mc.pp::after{background:var(--pp)}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.mi{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center}.mi svg{width:20px;height:20px}
+.mi.cy{background:var(--acs);color:var(--ac)}.mi.gn{background:var(--gns);color:var(--gn)}.mi.am{background:var(--wns);color:var(--wn)}.mi.rd{background:var(--dns);color:var(--dn)}.mi.pp{background:var(--pps);color:var(--pp)}
+.mt{display:flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px}.mt.up{background:var(--gns);color:var(--gn)}.mt.dn{background:var(--dns);color:var(--dn)}.mt svg{width:12px;height:12px}
+.mv{font-size:28px;font-weight:800;letter-spacing:-.03em;line-height:1.1;font-family:var(--fm)}.ml{font-size:12px;color:var(--t3);margin-top:4px;font-weight:500}
+.dt{width:100%;border-collapse:collapse}
+.dt th{text-align:left;padding:10px 20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);border-bottom:1px solid var(--bds);background:var(--bg3);position:sticky;top:0;z-index:2}
+.dt td{padding:12px 20px;border-bottom:1px solid var(--bds);font-size:13px;vertical-align:middle}.dt tr:hover td{background:var(--bg3)}.dt tr:last-child td{border-bottom:none}
+.tg{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;text-transform:uppercase;white-space:nowrap}
+.tg-p{background:var(--acs);color:var(--ac)}.tg-s{background:var(--wns);color:var(--wn)}.tg-d{background:var(--ins);color:var(--in)}.tg-g{background:var(--gns);color:var(--gn)}.tg-r{background:var(--dns);color:var(--dn)}.tg-w{background:var(--wns);color:var(--wn)}
+.pb{width:80px;height:5px;background:var(--bg4);border-radius:10px;overflow:hidden}.pf{height:100%;border-radius:10px;transition:width .6s var(--eo)}
+.pf-g{background:var(--gn)}.pf-a{background:var(--wn)}.pf-r{background:var(--dn)}.pf-c{background:var(--ac)}.pf-p{background:var(--pp)}
+.sd{width:9px;height:9px;border-radius:50%;flex-shrink:0}.sd.on{background:var(--gn);box-shadow:0 0 6px oklch(.72 .18 155/.4)}.sd.wn{background:var(--wn);box-shadow:0 0 6px oklch(.78 .16 80/.4)}.sd.of{background:var(--dn);box-shadow:0 0 6px oklch(.65 .2 25/.4)}
+.tbar{display:flex;gap:2px;padding:0 20px;border-bottom:1px solid var(--bds)}
+.ti{padding:10px 16px;font-size:12px;font-weight:600;color:var(--t3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;background:none;border-left:none;border-right:none;border-top:none;font-family:var(--fs)}.ti:hover{color:var(--t2)}.ti.a{color:var(--ac);border-bottom-color:var(--ac)}
+.fb{display:flex;align-items:center;gap:10px;padding:16px 20px;flex-wrap:wrap}
+.fi{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r);padding:6px 12px;transition:all .2s}.fi:focus-within{border-color:var(--acd);box-shadow:0 0 0 3px var(--acg)}
+.fi input{background:none;border:none;outline:none;color:var(--t1);font-family:var(--fs);font-size:12px;width:160px}.fi input::placeholder{color:var(--t3)}
+.fs{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r);padding:6px 12px;font-size:12px;color:var(--t2);font-family:var(--fs);cursor:pointer;outline:none}
+.fc{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:var(--acs);border:1px solid oklch(.72 .14 195/.2);border-radius:20px;font-size:11px;font-weight:600;color:var(--ac);cursor:pointer}
+.tl{list-style:none}.tl-i{display:flex;gap:14px;padding:0 20px 20px;position:relative}.tl-i:last-child{padding-bottom:0}
+.tl-i::before{content:'';position:absolute;left:35px;top:28px;bottom:0;width:1px;background:var(--bds)}.tl-i:last-child::before{display:none}
+.td{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0;z-index:1}
+.dc{background:var(--ac);box-shadow:0 0 6px var(--acg)}.dg{background:var(--gn)}.dw{background:var(--wn)}.dr{background:var(--dn)}
+.tc{flex:1}.tt{font-size:13px;font-weight:500;line-height:1.5}.tt strong{font-weight:700;color:var(--ac)}.tm{font-size:11px;color:var(--t3);font-family:var(--fm);margin-top:2px}
+.ai{display:flex;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid var(--bds);transition:background .15s;cursor:pointer}.ai:last-child{border-bottom:none}.ai:hover{background:var(--bg3)}
+.as{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.as svg{width:16px;height:16px}
+.as.cr{background:var(--dns);color:var(--dn)}.as.wn{background:var(--wns);color:var(--wn)}.as.if{background:var(--ins);color:var(--in)}
+.lv{background:oklch(.11 .008 250);font-family:var(--fm);font-size:12px;line-height:1.8;padding:16px 20px;max-height:400px;overflow-y:auto}
+.ll{display:flex;gap:12px;padding:1px 0}.ll:hover{background:var(--bg3)}
+.lt{color:var(--t3);flex-shrink:0;width:80px}.ll-l{flex-shrink:0;width:50px;font-weight:600}
+.ll-l.i{color:var(--in)}.ll-l.w{color:var(--wn)}.ll-l.e{color:var(--dn)}.ll-l.d{color:var(--t3)}
+.lm{color:var(--t2);word-break:break-all}.lm .h{color:var(--ac);font-weight:500}
+.si2{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;border:2px solid var(--bd);background:var(--bg3)}.si2 svg{width:20px;height:20px}
+.si2.dn{border-color:var(--gn);background:var(--gns);color:var(--gn)}.si2.rn{border-color:var(--ac);background:var(--acs);color:var(--ac);animation:sp 1.5s ease-in-out infinite}.si2.pd{border-color:var(--bd);color:var(--t3)}.si2.fl{border-color:var(--dn);background:var(--dns);color:var(--dn)}
+@keyframes sp{0%,100%{box-shadow:0 0 0 0 var(--acg)}50%{box-shadow:0 0 0 8px transparent}}
+.fg{margin-bottom:16px}.fl{display:block;font-size:12px;font-weight:600;color:var(--t2);margin-bottom:6px}
+.fip{width:100%;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r);padding:9px 14px;font-size:13px;color:var(--t1);font-family:var(--fs);outline:none;transition:all .2s}.fip:focus{border-color:var(--acd);box-shadow:0 0 0 3px var(--acg)}.fip::placeholder{color:var(--t3)}
+textarea.fip{min-height:80px;resize:vertical}
+.tog{position:relative;width:40px;height:22px;background:var(--bg4);border-radius:11px;cursor:pointer;transition:background .2s;border:none}.tog.on{background:var(--ac)}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s}.tog.on::after{transform:translateX(18px)}
+.sr{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--bds)}.sr:last-child{border-bottom:none}
+.srt{font-size:13px;font-weight:600}.srd{font-size:11px;color:var(--t3)}
+.tc2{width:100%;position:relative}.tc2 svg{width:100%;height:100%}
+.tn2{cursor:pointer;transition:transform .2s var(--es)}.tn2:hover{transform:scale(1.08)}
+.tla{font-size:10px;font-weight:600;fill:var(--t2);text-anchor:middle}
+@media(max-width:1200px){.g4{grid-template-columns:repeat(2,1fr)}.g2,.g23{grid-template-columns:1fr}}
+@media(max-width:768px){.g4{grid-template-columns:1fr}.L{grid-template-columns:var(--sc) 1fr}.ts{width:180px}}
+</style>
+</head>
+<body>
+<div class="L" id="L">
+<aside class="s">
+<div class="sb"><div class="si">N</div><div class="st">Nexus<span>Ops</span></div></div>
+<nav class="sn">
+<div class="sl">核心概览</div>
+<a class="ni a" data-page="dashboard" data-name="运维仪表盘"><i data-lucide="layout-dashboard"></i><span class="nl">运维仪表盘</span></a>
+<a class="ni" data-page="monitor" data-name="实时监控"><i data-lucide="activity"></i><span class="nl">实时监控</span><span class="nb">3</span></a>
+<a class="ni" data-page="servers" data-name="服务器管理"><i data-lucide="server"></i><span class="nl">服务器管理</span></a>
+<div class="sl">基础设施</div>
+<a class="ni" data-page="network" data-name="网络拓扑"><i data-lucide="network"></i><span class="nl">网络拓扑</span></a>
+<a class="ni" data-page="database" data-name="数据库集群"><i data-lucide="database"></i><span class="nl">数据库集群</span></a>
+<a class="ni" data-page="storage" data-name="存储管理"><i data-lucide="hard-drive"></i><span class="nl">存储管理</span></a>
+<a class="ni" data-page="cloud" data-name="混合云管理"><i data-lucide="cloud"></i><span class="nl">混合云管理</span></a>
+<div class="sl">安全与告警</div>
+<a class="ni" data-page="alerts" data-name="告警中心"><i data-lucide="bell-ring"></i><span class="nl">告警中心</span><span class="nb">7</span></a>
+<a class="ni" data-page="security" data-name="安全审计"><i data-lucide="shield-check"></i><span class="nl">安全审计</span></a>
+<a class="ni" data-page="logs" data-name="日志分析"><i data-lucide="file-text"></i><span class="nl">日志分析</span></a>
+<div class="sl">自动化</div>
+<a class="ni" data-page="pipeline" data-name="CI/CD 流水线"><i data-lucide="git-branch"></i><span class="nl">CI/CD 流水线</span></a>
+<a class="ni" data-page="scripts" data-name="自动化脚本"><i data-lucide="bot"></i><span class="nl">自动化脚本</span></a>
+<a class="ni" data-page="cron" data-name="定时任务"><i data-lucide="calendar-clock"></i><span class="nl">定时任务</span></a>
+<div class="sl">系统</div>
+<a class="ni" data-page="team" data-name="团队与权限"><i data-lucide="users"></i><span class="nl">团队与权限</span></a>
+<a class="ni" data-page="settings" data-name="系统设置"><i data-lucide="settings"></i><span class="nl">系统设置</span></a>
+</nav>
+<div class="sf"><div class="ev"><span class="ed"></span><span>生产环境 · 正常运行</span></div></div>
+</aside>
+<header class="t">
+<button class="tb" onclick="document.getElementById('L').classList.toggle('c')"><i data-lucide="panel-left"></i></button>
+<div class="bc"><span>运维中心</span> <i data-lucide="chevron-right" style="width:14px;height:14px"></i> <span class="cur" id="bc">运维仪表盘</span></div>
+<div class="ts"><i data-lucide="search" style="width:15px;height:15px;color:var(--t3);flex-shrink:0"></i><input type="text" placeholder="搜索服务器、告警、日志…"><kbd>⌘K</kbd></div>
+<div class="ta">
+<button class="tn"><i data-lucide="bell"></i><span class="bd"></span></button>
+<button class="tn"><i data-lucide="terminal-square"></i></button>
+<button class="tn"><i data-lucide="circle-help"></i></button>
+<div class="av">陈</div>
+</div>
+</header>
+<main class="m" id="mc">
+
+<!-- ═══ PAGE: Dashboard ═══ -->
+<div class="pg a" id="pg-dashboard">
+<div class="ph"><div><h1>运维仪表盘</h1><p>全局基础设施状态总览 · 最后刷新 <span id="rf" style="color:var(--ac);font-family:var(--fm)">刚刚</span></p></div><div class="pa"><span class="lb">实时</span><button class="btn bg"><i data-lucide="download"></i>导出报告</button><button class="btn bp"><i data-lucide="refresh-cw"></i>刷新数据</button></div></div>
+<div class="g4">
+<div class="mc ac"><div class="mh"><div class="mi cy"><i data-lucide="server"></i></div><div class="mt up"><i data-lucide="trending-up"></i>2.1%</div></div><div class="mv">1,284</div><div class="ml">在线服务器</div><svg viewBox="0 0 200 32" preserveAspectRatio="none" style="margin-top:12px;width:100%;height:32px"><path d="M0,28Q20,24 40,20T80,16T120,12T160,14T200,8" fill="none" stroke="var(--ac)" stroke-width="2" opacity=".6"/><path d="M0,28Q20,24 40,20T80,16T120,12T160,14T200,8V32H0Z" fill="url(#s1)" opacity=".15"/><defs><linearGradient id="s1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--ac)"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div>
+<div class="mc gn"><div class="mh"><div class="mi gn"><i data-lucide="cpu"></i></div><div class="mt dn"><i data-lucide="trending-down"></i>5.3%</div></div><div class="mv">42.6<span style="font-size:16px;color:var(--t3)">%</span></div><div class="ml">平均 CPU 使用率</div><svg viewBox="0 0 200 32" preserveAspectRatio="none" style="margin-top:12px;width:100%;height:32px"><path d="M0,16C30,12 50,20 80,14S130,18 160,10S190,16 200,12" fill="none" stroke="var(--gn)" stroke-width="2" opacity=".6"/></svg></div>
+<div class="mc am"><div class="mh"><div class="mi am"><i data-lucide="bell-ring"></i></div><div class="mt dn" style="background:var(--dns);color:var(--dn)"><i data-lucide="trending-up"></i>12</div></div><div class="mv">23</div><div class="ml">活跃告警</div></div>
+<div class="mc rd"><div class="mh"><div class="mi rd"><i data-lucide="clock"></i></div><div class="mt up"><i data-lucide="trending-up"></i>0.02%</div></div><div class="mv">99.97<span style="font-size:16px;color:var(--t3)">%</span></div><div class="ml">服务可用性 (SLA)</div></div>
+</div>
+<div class="g23">
+<div class="cd"><div class="ch"><div class="ct"><span class="d l"></span>网络流量 · 实时</div></div><div class="tbar"><button class="ti a">入站流量</button><button class="ti">出站流量</button><button class="ti">丢包率</button><button class="ti">延迟</button></div><div class="cbd"><svg viewBox="0 0 700 200" style="width:100%;height:200px"><line x1="0" y1="50" x2="700" y2="50" stroke="var(--bds)" stroke-dasharray="4,4"/><line x1="0" y1="100" x2="700" y2="100" stroke="var(--bds)" stroke-dasharray="4,4"/><line x1="0" y1="150" x2="700" y2="150" stroke="var(--bds)" stroke-dasharray="4,4"/><text x="4" y="48" fill="var(--t3)" font-size="10" font-family="var(--fm)">750 Mbps</text><text x="4" y="98" fill="var(--t3)" font-size="10" font-family="var(--fm)">500 Mbps</text><text x="4" y="148" fill="var(--t3)" font-size="10" font-family="var(--fm)">250 Mbps</text><path d="M0,160C40,150 80,130 120,120S200,90 260,100S340,70 400,80S480,60 540,70S620,50 680,55L700,58V200H0Z" fill="url(#ag1)" opacity=".4"/><path d="M0,160C40,150 80,130 120,120S200,90 260,100S340,70 400,80S480,60 540,70S620,50 680,55L700,58" fill="none" stroke="var(--ac)" stroke-width="2.5" stroke-linecap="round"/><circle cx="540" cy="70" r="5" fill="var(--ac)" stroke="var(--bg2)" stroke-width="2"/><circle cx="540" cy="70" r="10" fill="var(--ac)" opacity=".15"/><g transform="translate(540,30)"><rect x="-50" y="-12" width="100" height="28" rx="6" fill="var(--bg3)" stroke="var(--bd)"/><text x="0" y="5" text-anchor="middle" fill="var(--t1)" font-size="11" font-weight="600" font-family="var(--fm)">623 Mbps</text></g><text x="0" y="196" fill="var(--t3)" font-size="10" font-family="var(--fm)">00:00</text><text x="170" y="196" fill="var(--t3)" font-size="10" font-family="var(--fm)">06:00</text><text x="345" y="196" fill="var(--t3)" font-size="10" font-family="var(--fm)">12:00</text><text x="520" y="196" fill="var(--t3)" font-size="10" font-family="var(--fm)">18:00</text><text x="670" y="196" fill="var(--t3)" font-size="10" font-family="var(--fm)">24:00</text><defs><linearGradient id="ag1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--ac)" stop-opacity=".3"/><stop offset="100%" stop-color="var(--ac)" stop-opacity="0"/></linearGradient></defs></svg></div></div>
+<div class="cd"><div class="ch"><div class="ct"><span class="d" style="background:var(--dn);box-shadow:0 0 6px var(--dn)"></span>告警动态</div></div><div class="cbd f">
+<div class="ai"><div class="as cr"><i data-lucide="alert-triangle"></i></div><div style="flex:1"><div style="font-size:13px;font-weight:600">数据库主节点响应超时 <span style="font-size:11px;color:var(--t3);font-family:var(--fm)">2m</span></div><div style="font-size:12px;color:var(--t3);margin-top:2px">MySQL-Primary-01 连接池耗尽</div></div><span class="tg tg-r">处理中</span></div>
+<div class="ai"><div class="as cr"><i data-lucide="zap"></i></div><div style="flex:1"><div style="font-size:13px;font-weight:600">K8s Pod 异常重启 <span style="font-size:11px;color:var(--t3);font-family:var(--fm)">8m</span></div><div style="font-size:12px;color:var(--t3);margin-top:2px">payment-service CrashLoopBackOff</div></div><span class="tg tg-r">处理中</span></div>
+<div class="ai"><div class="as wn"><i data-lucide="hard-drive"></i></div><div style="flex:1"><div style="font-size:13px;font-weight:600">磁盘空间预警 <span style="font-size:11px;color:var(--t3);font-family:var(--fm)">23m</span></div><div style="font-size:12px;color:var(--t3);margin-top:2px">SRV-LOG-03 /data 分区 89%</div></div><span class="tg tg-w">已确认</span></div>
+<div class="ai"><div class="as wn"><i data-lucide="thermometer"></i></div><div style="flex:1"><div style="font-size:13px;font-weight:600">CPU 温度过高 <span style="font-size:11px;color:var(--t3);font-family:var(--fm)">41m</span></div><div style="font-size:12px;color:var(--t3);margin-top:2px">SRV-GPU-02 温度 87°C</div></div><span class="tg tg-w">已确认</span></div>
+</div></div></div>
+<div class="g2">
+<div class="cd"><div class="ch"><div class="ct"><i data-lucide="server" style="width:16px;height:16px;color:var(--ac)"></i>核心服务器状态</div></div><div class="cbd f">
+<div style="display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid var(--bds)"><span class="sd on"></span><div style="flex:1"><div style="font-size:13px;font-weight:600">SRV-APP-01 <span class="tg tg-p">PROD</span></div><div style="font-size:11px;color:var(--t3);font-family:var(--fm)">10.0.1.101 · 64C/256GB</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:700;font-family:var(--fm);color:var(--gn)">38%</div><div class="pb" style="margin-left:auto;margin-top:4px"><div class="pf pf-g" style="width:38%"></div></div></div><div style="text-align:right"><div style="font-size:13px;font-weight:700;font-family:var(--fm)">71%</div><div class="pb" style="margin-left:auto;margin-top:4px"><div class="pf pf-a" style="width:71%"></div></div></div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:12px 20px;border-bottom:1px solid var(--bds)"><span class="sd on"></span><div style="flex:1"><div style="font-size:13px;font-weight:600">SRV-DB-01 <span class="tg tg-p">PROD</span></div><div style="font-size:11px;color:var(--t3);font-family:var(--fm)">10.0.1.201 · 32C/512GB</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:700;font-family:var(--fm);color:var(--wn)">76%</div><div class="pb" style="margin-left:auto;margin-top:4px"><div class="pf pf-a" style="width:76%"></div></div></div><div style="text-align:right"><div style="font-size:13px;font-weight:700;font-family:var(--fm);color:var(--dn)">89%</div><div class="pb" style="margin-left:auto;margin-top:4px"><div class="pf pf-r" style="width:89%"></div></div></div></div>
+<div style="display:flex;align-items:center;gap:14px;padding:12px 20px"><span class="sd of"></span><div style="flex:1"><div style="font-size:13px;font-weight:600">SRV-LEGACY-08 <span class="tg tg-d">DEV</span></div><div style="font-size:11px;color:var(--t3);font-family:var(--fm)">10.0.3.88 · 已停机</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:700;font-family:var(--fm);color:var(--t3)">—</div></div><div style="text-align:right"><div style="font-size:13px;font-weight:700;font-family:var(--fm);color:var(--t3)">—</div></div></div>
+</div></div>
+<div class="cd"><div class="ch"><div class="ct"><i data-lucide="history" style="width:16px;height:16px;color:var(--ac)"></i>运维动态</div></div><div class="cbd f" style="padding-top:16px"><ul class="tl">
+<li class="tl-i"><span class="td dr"></span><div class="tc"><div class="tt"><strong>张明</strong> 处理了 P0 告警 — MySQL 主节点连接池溢出</div><div class="tm">3 分钟前</div></div></li>
+<li class="tl-i"><span class="td dc"></span><div class="tc"><div class="tt"><strong>自动化</strong> 完成 K8s 集群滚动升级 v1.28 → v1.29</div><div class="tm">18 分钟前</div></div></li>
+<li class="tl-i"><span class="td dg"></span><div class="tc"><div class="tt"><strong>李薇</strong> 部署 Nginx 配置更新 — 启用 HTTP/3</div><div class="tm">45 分钟前</div></div></li>
+<li class="tl-i"><span class="td dw"></span><div class="tc"><div class="tt"><strong>系统</strong> SRV-CACHE-02 触发 CPU 阈值告警</div><div class="tm">1 小时前</div></div></li>
+</ul></div></div></div>
+</div>
+
+<!-- ═══ PAGE: 实时监控 ═══ -->
+<div class="pg" id="pg-monitor">
+<div class="ph"><div><h1>实时监控</h1><p>多维度指标实时跟踪 · 自动刷新</p></div><div class="pa"><span class="lb">实时</span><select class="fs"><option>全部集群</option><option>生产环境</option><option>预发布</option></select><button class="btn bg"><i data-lucide="plus"></i>添加面板</button></div></div>
+<div class="g4">
+<div class="mc ac"><div class="mh"><div class="mi cy"><i data-lucide="cpu"></i></div><div class="mt up"><i data-lucide="trending-up"></i>3.2%</div></div><div class="mv">42.6<span style="font-size:16px;color:var(--t3)">%</span></div><div class="ml">集群 CPU 均值</div></div>
+<div class="mc gn"><div class="mh"><div class="mi gn"><i data-lucide="memory-stick"></i></div><div class="mt up"><i data-lucide="trending-up"></i>1.8%</div></div><div class="mv">67.3<span style="font-size:16px;color:var(--t3)">%</span></div><div class="ml">集群内存均值</div></div>
+<div class="mc pp"><div class="mh"><div class="mi pp"><i data-lucide="network"></i></div><div class="mt dn"><i data-lucide="trending-down"></i>8.1%</div></div><div class="mv">2.4<span style="font-size:16px;color:var(--t3)">Gbps</span></div><div class="ml">网络吞吐量</div></div>
+<div class="mc am"><div class="mh"><div class="mi am"><i data-lucide="gauge"></i></div><div class="mt up"><i data-lucide="trending-up"></i>0.3ms</div></div><div class="mv">18.2<span style="font-size:16px;color:var(--t3)">ms</span></div><div class="ml">P99 延迟</div></div>
+</div>
+<div class="g2">
+<div class="cd"><div class="ch"><div class="ct"><span class="d l"></span>CPU 使用率趋势</div></div><div class="cbd"><svg viewBox="0 0 600 160" style="width:100%;height:160px"><line x1="0" y1="40" x2="600" y2="40" stroke="var(--bds)" stroke-dasharray="3,3"/><line x1="0" y1="80" x2="600" y2="80" stroke="var(--bds)" stroke-dasharray="3,3"/><line x1="0" y1="120" x2="600" y2="120" stroke="var(--bds)" stroke-dasharray="3,3"/><text x="4" y="38" fill="var(--t3)" font-size="9" font-family="var(--fm)">100%</text><text x="4" y="78" fill="var(--t3)" font-size="9" font-family="var(--fm)">50%</text><text x="4" y="118" fill="var(--t3)" font-size="9" font-family="var(--fm)">0%</text><path d="M0,110 C50,105 100,90 150,85 S250,70 300,75 S400,55 450,60 S550,48 600,42" fill="none" stroke="var(--ac)" stroke-width="2"/><path d="M0,110 C50,105 100,90 150,85 S250,70 300,75 S400,55 450,60 S550,48 600,42 V160 H0Z" fill="url(#cpuG)" opacity=".15"/><path d="M0,120 C50,118 100,112 150,115 S250,108 300,110 S400,102 450,104 S550,98 600,95" fill="none" stroke="var(--pp)" stroke-width="1.5" stroke-dasharray="5,3" opacity=".5"/><defs><linearGradient id="cpuG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--ac)" stop-opacity=".3"/><stop offset="100%" stop-color="var(--ac)" stop-opacity="0"/></linearGradient></defs><text x="0" y="155" fill="var(--t3)" font-size="9" font-family="var(--fm)">-30m</text><text x="285" y="155" fill="var(--t3)" font-size="9" font-family="var(--fm)">-15m</text><text x="570" y="155" fill="var(--t3)" font-size="9" font-family="var(--fm)">now</text></svg></div></div>
+<div class="cd"><div class="ch"><div class="ct"><span class="d l"></span>内存使用率趋势</div></div><div class="cbd"><svg viewBox="0 0 600 160" style="width:100%;height:160px"><line x1="0" y1="40" x2="600" y2="40" stroke="var(--bds)" stroke-dasharray="3,3"/><line x1="0" y1="80" x2="600" y2="80" stroke="var(--bds)" stroke-dasharray="3,3"/><line x1="0" y1="120" x2="600" y2="120" stroke="var(--bds)" stroke-dasharray="3,3"/><path d="M0,70 C50,68 100,62 150,60 S250,55 300,58 S400,50 450,48 S550,42 600,40" fill="none" stroke="var(--gn)" stroke-width="2"/><path d="M0,70 C50,68 100,62 150,60 S250,55 300,58 S400,50 450,48 S550,42 600,40 V160 H0Z" fill="url(#memG)" opacity=".15"/><path d="M0,85 C50,84 100,80 150,82 S250,78 300,80 S400,75 450,76 S550,73 600,72" fill="none" stroke="var(--wn)" stroke-width="1.5" stroke-dasharray="5,3" opacity=".5"/><defs><linearGradient id="memG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--gn)" stop-opacity=".3"/><stop offset="100%" stop-color="var(--gn)" stop-opacity="0"/></linearGradient></defs></svg></div></div>
+</div>
+<div class="g2">
+<div class="cd"><div class="ch"><div class="ct"><span class="d l"></span>磁盘 I/O</div></div><div class="cbd"><svg viewBox="0 0 600 160" style="width:100%;height:160px"><line x1="0" y1="53" x2="600" y2="53" stroke="var(--bds)" stroke-dasharray="3,3"/><line x1="0" y1="107" x2="600" y2="107" stroke="var(--bds)" stroke-dasharray="3,3"/><path d="M0,140 L30,130 L60,100 L90,110 L120,80 L150,90 L180,60 L210,75 L240,50 L270,70 L300,55 L330,65 L360,45 L390,60 L420,40 L450,55 L480,35 L510,50 L540,42 L570,48 L600,38" fill="none" stroke="var(--wn)" stroke-width="2"/><path d="M0,150 L30,148 L60,140 L90,145 L120,130 L150,138 L180,125 L210,132 L240,120 L270,128 L300,118 L330,122 L360,112 L390,118 L420,108 L450,115 L480,105 L510,110 L540,102 L570,108 L600,100" fill="none" stroke="var(--in)" stroke-width="1.5" stroke-dasharray="5,3" opacity=".6"/><text x="560" y="32" fill="var(--wn)" font-size="10" font-weight="600" font-family="var(--fm)">读 245MB/s</text><text x="560" y="93" fill="var(--in)" font-size="10" font-weight="600" font-family="var(--fm)">写 128MB/s</text></svg></div></div>
+<div class="cd"><div class="ch"><div class="ct"><span class="d l"></span>网络流量</div></div><div class="cbd"><svg viewBox="0 0 600 160" style="width:100%;height:160px"><path d="M0,90 C40,80 80,60 120,70 S200,40 260,50 S340,30 400,40 S480,25 540,30 L600,25" fill="none" stroke="var(--ac)" stroke-width="2"/><path d="M0,90 C40,80 80,60 120,70 S200,40 260,50 S340,30 400,40 S480,25 540,30 L600,25 V160 H0Z" fill="url(#netG)" opacity=".12"/><path d="M0,120 C40,115 80,105 120,110 S200,95 260,100 S340,85 400,90 S480,78 540,82 L600,75" fill="none" stroke="var(--gn)" stroke-width="1.5" stroke-dasharray="5,3" opacity=".5"/><defs><linearGradient id="netG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--ac)" stop-opacity=".3"/><stop offset="100%" stop-color="var(--ac)" stop-opacity="0"/></linearGradient></defs><text x="560" y="18" fill="var(--ac)" font-size="10" font-weight="600" font-family="var(--fm)">↑ 1.2Gbps</text><text x="560" y="70" fill="var(--gn)" font-size="10" font-weight="600" font-family="var(--fm)">↓ 856Mbps</text></svg></div></div>
+</div>
+</div>
+
+<!-- ═══ PAGE: 服务器管理 ═══ -->
+<div class="pg" id="pg-servers">
+<div class="ph"><div><h1>服务器管理</h1><p>共 1,284 台 · 1,261 在线 · 15 告警 · 8 离线</p></div><div class="pa"><button class="btn bg"><i data-lucide="upload"></i>导入</button><button class="btn bp"><i data-lucide="plus"></i>添加服务器</button></div></div>
+<div class="cd mb-24"><div class="fb"><div class="fi"><i data-lucide="search" style="width:14px;height:14px;color:var(--t3)"></i><input type="text" placeholder="搜索主机名、IP…"></div><select class="fs"><option>全部环境</option><option>生产</option><option>预发布</option><option>开发</option></select><select class="fs"><option>全部状态</option><option>在线</option><option>告警</option><option>离线</option></select><select class="fs"><option>全部系统</option><option>CentOS</option><option>Ubuntu</option><option>Debian</option></select><div style="margin-left:auto;display:flex;gap:6px"><span class="fc">PROD</span><span class="fc" style="background:var(--bg3);color:var(--t3);border-color:var(--bd)">清除</span></div></div>
+<div class="cbd f" style="overflow-x:auto"><table class="dt"><thead><tr><th style="width:30px"><input type="checkbox"></th><th>主机名</th><th>IP 地址</th><th>环境</th><th>系统</th><th>CPU</th><th>内存</th><th>磁盘</th><th>状态</th><th>运行时间</th><th></th></tr></thead><tbody>
+<tr><td><input type="checkbox"></td><td style="font-weight:600">SRV-APP-01</td><td style="font-family:var(--fm);color:var(--t2);font-size:12px">10.0.1.101</td><td><span class="tg tg-p">PROD</span></td><td>CentOS 8</td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-weight:600;color:var(--gn);font-size:12px">38%</span><div class="pb"><div class="pf pf-g" style="width:38%"></div></div></div></td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-weight:600;font-size:12px">71%</span><div class="pb"><div class="pf pf-a" style="width:71%"></div></div></div></td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-weight:600;font-size:12px">54%</span><div class="pb"><div class="pf pf-c" style="width:54%"></div></div></div></td><td><span class="tg tg-g">● 在线</span></td><td style="font-family:var(--fm);color:var(--t3);font-size:12px">142d 8h</td><td><button class="btn bg bs">详情</button></td></tr>
+<tr><td><input type="checkbox"></td><td style="font-weight:600">SRV-DB-01</td><td style="font-family:var(--fm);color:var(--t2);font-size:12px">10.0.1.201</td><td><span class="tg tg-p">PROD</span></td><td>Ubuntu 22.04</td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-weight:600;color:var(--wn);font-size:12px">76%</span><div class="pb"><div class="pf pf-a" style="width:76%"></div></div></div></td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-weight:600;color:var(--dn);font-size:12px">89%</span><div class="pb"><div class="pf pf-r" style="width:89%"></div></div></div></td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-weight:600;font-size:12px">62%</span><div class="pb"><div class="pf pf-c" style="width:62%"></div></div></div></td><td><span class="tg tg-g">● 在线</span></td><td style="font-family:var(--fm);color:var(--t3);font-size:12px">89d 3h</td><td><button class="btn bg bs">详情</button></td></tr>
+<tr><td><input type="checkbox"></td><td style="font-weight:600">SRV-CACHE-02</td><td style="font-family:var(--fm);color:var(--t2);font-size:12px">10.0.1.150</td><td><span class="tg tg-p">PROD</span></td><td>Debian 12</td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-weight:600;color:var(--dn);font-size:12px">92%</span><div class="pb"><div class="pf pf-r" style="width:92%"></div></div></div></td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-weight:600;font-size:12px">65%</span><div class="pb"><div class="pf pf-a" style="width:65%"></div></div></div></td><td><div style="display:flex;align-items:center;gap:8px"><span style="font-family:var(--fm);font-weight:600;font-size:12px">41%</span><div class="pb"><div class="pf pf-c" style="width:41%"></div></div></div></td><td><span class="tg tg-w">● 告警</span></td><td style="font-family:var(--fm);color:var(--t3);font-size:12px">56d 12h</td><td><button class="btn bg bs">详情</button></td></tr>
+<tr><td><input type="checkbox"></td><td style="font-weight:600">SRV-LEGACY-08</td><td style="font-family:var(--fm);color:var(--t2);font-size:12px">10.0.3.88</td><td><span class="tg tg-d">DEV</span></td><td>CentOS 7</td><td colspan="3" style="color:var(--t3);font-size:12px">已停机</td><td><span class="tg tg-r">● 离线</span></td><td style="font-family:var(--fm);color:var(--t3);font-size:12px">—</td><td><button class="btn bg bs">详情</button></td></tr>
+</tbody></table></div>
+<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-top:1px solid var(--bds)"><span style="font-size:12px;color:var(--t3)">显示 1-4 / 共 1,284 条</span><div style="display:flex;gap:4px"><button class="btn bg bs">上一页</button><button class="btn bp bs">1</button><button class="btn bg bs">2</button><button class="btn bg bs">3</button><button class="btn bg bs">…</button><button class="btn bg bs">214</button><button class="btn bg bs">下一页</button></div></div></div>
+</div>
+
+<!-- ═══ PAGE: 网络拓扑 ═══ -->
+<div class="pg" id="pg-network">
+<div class="ph"><div><h1>网络拓扑</h1><p>全网架构可视化 · 实时流量与节点状态</p></div><div class="pa"><button class="btn bg"><i data-lucide="maximize-2"></i>全屏</button><button class="btn bp"><i data-lucide="plus"></i>添加节点</button></div></div>
+<div class="g4">
+<div class="mc ac"><div class="mh"><div class="mi cy"><i data-lucide="globe"></i></div></div><div class="mv">48</div><div class="ml">网络节点</div></div>
+<div class="mc gn"><div class="mh"><div class="mi gn"><i data-lucide="link"></i></div></div><div class="mv">126</div><div class="ml">活跃连接</div></div>
+<div class="mc am"><div class="mh"><div class="mi am"><i data-lucide="arrow-left-right"></i></div></div><div class="mv">3.8<span style="font-size:16px;color:var(--t3)">Gbps</span></div><div class="ml">总带宽</div></div>
+<div class="mc rd"><div class="mh"><div class="mi rd"><i data-lucide="alert-circle"></i></div></div><div class="mv">0.02<span style="font-size:16px;color:var(--t3)">%</span></div><div class="ml">丢包率</div></div>
+</div>
+<div class="cd"><div class="ch"><div class="ct"><span class="d l"></span>生产环境网络拓扑</div><div class="ca"><button class="cb"><i data-lucide="zoom-in"></i></button><button class="cb"><i data-lucide="zoom-out"></i></button></div></div>
+<div class="cbd"><div class="tc2" style="height:380px"><svg viewBox="0 0 800 360">
+<line x1="400" y1="30" x2="200" y2="100" stroke="var(--ac)" stroke-width="1.5" opacity=".25"/><line x1="400" y1="30" x2="400" y2="100" stroke="var(--ac)" stroke-width="1.5" opacity=".25"/><line x1="400" y1="30" x2="600" y2="100" stroke="var(--ac)" stroke-width="1.5" opacity=".25"/>
+<line x1="200" y1="100" x2="120" y2="190" stroke="var(--gn)" stroke-width="1.5" opacity=".25"/><line x1="200" y1="100" x2="260" y2="190" stroke="var(--gn)" stroke-width="1.5" opacity=".25"/><line x1="400" y1="100" x2="400" y2="190" stroke="var(--wn)" stroke-width="1.5" opacity=".25"/><line x1="600" y1="100" x2="540" y2="190" stroke="var(--gn)" stroke-width="1.5" opacity=".25"/><line x1="600" y1="100" x2="680" y2="190" stroke="var(--gn)" stroke-width="1.5" opacity=".25"/>
+<line x1="120" y1="190" x2="250" y2="290" stroke="var(--gn)" stroke-width="1.5" opacity=".2"/><line x1="260" y1="190" x2="250" y2="290" stroke="var(--gn)" stroke-width="1.5" opacity=".2"/><line x1="400" y1="190" x2="400" y2="290" stroke="var(--wn)" stroke-width="1.5" opacity=".2"/><line x1="540" y1="190" x2="550" y2="290" stroke="var(--gn)" stroke-width="1.5" opacity=".2"/><line x1="680" y1="190" x2="550" y2="290" stroke="var(--gn)" stroke-width="1.5" opacity=".2"/>
+<circle r="3" fill="var(--ac)" opacity=".8"><animateMotion dur="2.5s" repeatCount="indefinite" path="M400,30 L200,100"/></circle>
+<circle r="3" fill="var(--ac)" opacity=".8"><animateMotion dur="3s" repeatCount="indefinite" path="M400,30 L600,100"/></circle>
+<circle r="2.5" fill="var(--gn)" opacity=".7"><animateMotion dur="2s" repeatCount="indefinite" path="M200,100 L120,190"/></circle>
+<circle r="2.5" fill="var(--wn)" opacity=".7"><animateMotion dur="2.8s" repeatCount="indefinite" path="M400,100 L400,190"/></circle>
+<circle r="2.5" fill="var(--gn)" opacity=".7"><animateMotion dur="1.8s" repeatCount="indefinite" path="M540,190 L550,290"/></circle>
+<g class="tn2" transform="translate(400,25)"><rect x="-48" y="-20" width="96" height="40" rx="20" fill="var(--bg3)" stroke="var(--ac)" stroke-width="1.5"/><text y="5" class="tla" style="fill:var(--ac)">Internet</text></g>
+<g class="tn2" transform="translate(200,100)"><rect x="-42" y="-18" width="84" height="36" rx="8" fill="var(--bg3)" stroke="var(--gn)" stroke-width="1.5"/><text y="4" class="tla" style="fill:var(--gn)">CDN/WAF</text></g>
+<g class="tn2" transform="translate(400,100)"><rect x="-42" y="-18" width="84" height="36" rx="8" fill="var(--bg3)" stroke="var(--wn)" stroke-width="1.5"/><text y="4" class="tla" style="fill:var(--wn)">LB-02</text></g>
+<g class="tn2" transform="translate(600,100)"><rect x="-42" y="-18" width="84" height="36" rx="8" fill="var(--bg3)" stroke="var(--gn)" stroke-width="1.5"/><text y="4" class="tla" style="fill:var(--gn)">LB-03</text></g>
+<g class="tn2" transform="translate(120,190)"><circle r="22" fill="var(--bg3)" stroke="var(--gn)" stroke-width="1.5"/><text y="4" class="tla" style="fill:var(--gn);font-size:9">APP-1</text></g>
+<g class="tn2" transform="translate(260,190)"><circle r="22" fill="var(--bg3)" stroke="var(--gn)" stroke-width="1.5"/><text y="4" class="tla" style="fill:var(--gn);font-size:9">APP-2</text></g>
+<g class="tn2" transform="translate(400,190)"><circle r="22" fill="var(--bg3)" stroke="var(--wn)" stroke-width="1.5"/><text y="4" class="tla" style="fill:var(--wn);font-size:9">APP-3</text></g>
+<g class="tn2" transform="translate(540,190)"><circle r="22" fill="var(--bg3)" stroke="var(--gn)" stroke-width="1.5"/><text y="4" class="tla" style="fill:var(--gn);font-size:9">APP-4</text></g>
+<g class="tn2" transform="translate(680,190)"><circle r="22" fill="var(--bg3)" stroke="var(--gn)" stroke-width="1.5"/><text y="4" class="tla" style="fill:var(--gn);font-size:9">APP-5</text></g>
+<g class="tn2" transform="translate(250,290)"><rect x="-36" y="-18" width="72" height="36" rx="8" fill="var(--bg3)" stroke="var(--gn)" stroke-width="1.5"/><text y="4" class="tla" style="fill:var(--gn);font-size:9">DB-Slave</text></g>
+<g class="tn2" transform="translate(400,290)"><rect x="-36" y="-18" width="72" height="36" rx="8" fill="var(--bg3)" stroke="var(--wn)" stroke-width="1.5"/><text y="4" class="tla" style="fill:var(--wn);font-size:9">DB-Master</text></g>
+<g class="tn2" transform="translate(550,290)"><rect x="-36" y="-18" width="72" height="36" rx="8" fill="var(--bg3)" stroke="var(--gn)" stroke-width="1.5"/><text y="4" class="tla" style="fill:var(--gn);font-size:9">DB-Slave</text></g>
+<text x="30" y="30" fill="var(--t3)" font-size="10" font-weight="600" opacity=".6">接入层</text><text x="30" y="105" fill="var(--t3)" font-size="10" font-weight="600" opacity=".6">负载均衡</text><text x="30" y="195" fill="var(--t3)" font-size="10" font-weight="600" opacity=".6">应用层</text><text x="30" y="295" fill="var(--t3)" font-size="10" font-weight="600" opacity=".6">数据层</text>
+</svg></div></div></div>
+</div>
+
+<!-- ═══ PAGE: 数据库集群 ═══ -->
+<div class="pg" id="pg-database">
+<div class="ph"><div><h1>数据库集群</h1><p>MySQL / PostgreSQL / Redis 集群管理</p></div><div class="pa"><button class="btn bg"><i data-lucide="download"></i>慢查询报告</button><button class="btn bp"><i data-lucide="plus"></i>新建实例</button></div></div>
+<div class="g4">
+<div class="mc ac"><div class="mh"><div class="mi cy"><i data-lucide="database"></i></div></div><div class="mv">12</div><div class="ml">数据库实例</div></div>
+<div class="mc gn"><div class="mh"><div class="mi gn"><i data-lucide="zap"></i></div></div><div class="mv">24.5K</div><div class="ml">QPS (每秒查询)</div></div>
+<div class="mc am"><div class="mh"><div class="mi am"><i data-lucide="timer"></i></div></div><div class="mv">3.2<span style="font-size:16px;color:var(--t3)">ms</span></div><div class="ml">平均查询延迟</div></div>
+<div class="mc rd"><div class="mh"><div class="mi rd"><i data-lucide="alert-triangle"></i></div></div><div class="mv">7</div><div class="ml">慢查询 (&gt;1s)</div></div>
+</div>
+<div class="g23">
+<div class="cd"><div class="ch"><div class="ct"><span class="d l"></span>查询吞吐量 (QPS)</div></div><div class="cbd"><svg viewBox="0 0 600 160" style="width:100%;height:160px"><line x1="0" y1="40" x2="600" y2="40" stroke="var(--bds)" stroke-dasharray="3,3"/><line x1="0" y1="80" x2="600" y2="80" stroke="var(--bds)" stroke-dasharray="3,3"/><line x1="0" y1="120" x2="600" y2="120" stroke="var(--bds)" stroke-dasharray="3,3"/><path d="M0,90 C30,85 60,70 90,75 S150,60 180,50 S240,55 270,45 S330,40 360,35 S420,45 450,38 S510,30 540,32 L600,28" fill="none" stroke="var(--ac)" stroke-width="2"/><path d="M0,90 C30,85 60,70 90,75 S150,60 180,50 S240,55 270,45 S330,40 360,35 S420,45 450,38 S510,30 540,32 L600,28 V160 H0Z" fill="url(#dbQ)" opacity=".15"/><defs><linearGradient id="dbQ" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--ac)" stop-opacity=".3"/><stop offset="100%" stop-color="var(--ac)" stop-opacity="0"/></linearGradient></defs></svg></div></div>
+<div class="cd"><div class="ch"><div class="ct"><i data-lucide="list" style="width:16px;height:16px;color:var(--wn)"></i>慢查询 TOP 5</div></div><div class="cbd f"><table class="dt"><thead><tr><th>SQL 摘要</th><th>耗时</th><th>次数</th><th>来源</th></tr></thead><tbody>
+<tr><td style="font-family:var(--fm);font-size:12px">SELECT * FROM orders WHERE status = ...</td><td style="color:var(--dn);font-weight:700;font-family:var(--fm)">4.2s</td><td>23</td><td>SRV-APP-01</td></tr>
+<tr><td style="font-family:var(--fm);font-size:12px">UPDATE users SET last_login = ...</td><td style="color:var(--wn);font-weight:700;font-family:var(--fm)">2.8s</td><td>156</td><td>SRV-APP-01</td></tr>
+<tr><td style="font-family:var(--fm);font-size:12px">SELECT COUNT(*) FROM logs WHERE ...</td><td style="color:var(--wn);font-weight:700;font-family:var(--fm)">1.9s</td><td>8</td><td>SRV-APP-03</td></tr>
+</tbody></table></div></div>
+</div>
+<div class="cd"><div class="ch"><div class="ct"><i data-lucide="circle-dot" style="width:16px;height:16px;color:var(--ac)"></i>集群实例</div></div><div class="cbd f"><table class="dt"><thead><tr><th>实例名</th><th>类型</th><th>角色</th><th>连接数</th><th>复制延迟</th><th>状态</th></tr></thead><tbody>
+<tr><td style="font-weight:600">MySQL-Prod-01</td><td>MySQL 8.0</td><td><span class="tg tg-p">Master</span></td><td style="font-family:var(--fm)">486/500</td><td style="font-family:var(--fm)">—</td><td><span class="tg tg-w">● 告警</span></td></tr>
+<tr><td style="font-weight:600">MySQL-Prod-02</td><td>MySQL 8.0</td><td><span class="tg tg-s">Slave</span></td><td style="font-family:var(--fm)">234/500</td><td style="font-family:var(--fm);color:var(--gn)">0.2ms</td><td><span class="tg tg-g">● 在线</span></td></tr>
+<tr><td style="font-weight:600">Redis-Prod-01</td><td>Redis 7.2</td><td><span class="tg tg-p">Master</span></td><td style="font-family:var(--fm)">120/1000</td><td style="font-family:var(--fm)">—</td><td><span class="tg tg-g">● 在线</span></td></tr>
+</tbody></table></div></div>
+</div>
+
+<!-- ═══ PAGE: 存储管理 ═══ -->
+<div class="pg" id="pg-storage">
+<div class="ph"><div><h1>存储管理</h1><p>存储池 · 卷 · 快照 · 备份</p></div><div class="pa"><button class="btn bg"><i data-lucide="plus"></i>创建卷</button><button class="btn bp"><i data-lucide="hard-drive"></i>扩容</button></div></div>
+<div class="g4">
+<div class="mc ac"><div class="mh"><div class="mi cy"><i data-lucide="hard-drive"></i></div></div><div class="mv">48.2<span style="font-size:16px;color:var(--t3)">TB</span></div><div class="ml">总存储容量</div></div>
+<div class="mc gn"><div class="mh"><div class="mi gn"><i data-lucide="pie-chart"></i></div></div><div class="mv">31.4<span style="font-size:16px;color:var(--t3)">TB</span></div><div class="ml">已使用</div></div>
+<div class="mc am"><div class="mh"><div class="mi am"><i data-lucide="activity"></i></div></div><div class="mv">12.8K</div><div class="ml">IOPS</div></div>
+<div class="mc rd"><div class="mh"><div class="mi rd"><i data-lucide="database-backup"></i></div></div><div class="mv">8</div><div class="ml">快照</div></div>
+</div>
+<div class="g2">
+<div class="cd"><div class="ch"><div class="ct"><span class="d l"></span>存储池使用率</div></div><div class="cbd">
+<div style="display:flex;flex-direction:column;gap:16px">
+<div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">SSD-Pool-01</span><span style="font-family:var(--fm);font-weight:700;color:var(--dn)">89%</span></div><div class="pb" style="width:100%;height:8px"><div class="pf pf-r" style="width:89%"></div></div><div style="font-size:11px;color:var(--t3);margin-top:4px">8.9TB / 10TB</div></div>
+<div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">SSD-Pool-02</span><span style="font-family:var(--fm);font-weight:700;color:var(--wn)">72%</span></div><div class="pb" style="width:100%;height:8px"><div class="pf pf-a" style="width:72%"></div></div><div style="font-size:11px;color:var(--t3);margin-top:4px">7.2TB / 10TB</div></div>
+<div><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">HDD-Pool-01</span><span style="font-family:var(--fm);font-weight:700;color:var(--gn)">54%</span></div><div class="pb" style="width:100%;height:8px"><div class="pf pf-g" style="width:54%"></div></div><div style="font-size:11px;color:var(--t3);margin-top:4px">15.3TB / 28.2TB</div></div>
+</div></div></div>
+<div class="cd"><div class="ch"><div class="ct"><i data-lucide="clock" style="width:16px;height:16px;color:var(--in)"></i>最近备份</div></div><div class="cbd f"><table class="dt"><thead><tr><th>备份名称</th><th>大小</th><th>时间</th><th>状态</th></tr></thead><tbody>
+<tr><td style="font-weight:600">mysql-prod-full-20260720</td><td style="font-family:var(--fm)">2.4GB</td><td style="font-family:var(--fm);font-size:12px">02:00</td><td><span class="tg tg-g">成功</span></td></tr>
+<tr><td style="font-weight:600">redis-prod-rdb-20260720</td><td style="font-family:var(--fm)">856MB</td><td style="font-family:var(--fm);font-size:12px">02:30</td><td><span class="tg tg-g">成功</span></td></tr>
+<tr><td style="font-weight:600">app-logs-20260720</td><td style="font-family:var(--fm)">12.8GB</td><td style="font-family:var(--fm);font-size:12px">03:00</td><td><span class="tg tg-g">成功</span></td></tr>
+</tbody></table></div></div>
+</div>
+</div>
+
+<!-- ═══ PAGE: 混合云管理 ═══ -->
+<div class="pg" id="pg-cloud">
+<div class="ph"><div><h1>混合云管理</h1><p>多云资源统一纳管 · 成本优化</p></div><div class="pa"><button class="btn bg"><i data-lucide="refresh-cw"></i>同步</button><button class="btn bp"><i data-lucide="plus"></i>接入云平台</button></div></div>
+<div class="g4">
+<div class="mc ac"><div class="mh"><div class="mi cy"><i data-lucide="cloud"></i></div></div><div class="mv">3</div><div class="ml">云平台</div></div>
+<div class="mc gn"><div class="mh"><div class="mi gn"><i data-lucide="server"></i></div></div><div class="mv">486</div><div class="ml">云实例</div></div>
+<div class="mc am"><div class="mh"><div class="mi am"><i data-lucide="dollar-sign"></i></div></div><div class="mv">¥128K</div><div class="ml">本月预估费用</div></div>
+<div class="mc rd"><div class="mh"><div class="mi rd"><i data-lucide="trending-down"></i></div><div class="mt dn"><i data-lucide="trending-down"></i>12%</div></div><div class="mv">¥1.2M</div><div class="ml">节省金额 (YTD)</div></div>
+</div>
+<div class="cd"><div class="ch"><div class="ct"><i data-lucide="bar-chart-3" style="width:16px;height:16px;color:var(--ac)"></i>云平台资源概览</div></div><div class="cbd f"><table class="dt"><thead><tr><th>平台</th><th>实例数</th><th>vCPU</th><th>内存</th><th>存储</th><th>本月费用</th><th>状态</th></tr></thead><tbody>
+<tr><td style="font-weight:600"><i data-lucide="cloud" style="width:14px;height:14px;color:var(--ac)"></i> 阿里云</td><td style="font-family:var(--fm)">312</td><td style="font-family:var(--fm)">1,248</td><td style="font-family:var(--fm)">4.8TB</td><td style="font-family:var(--fm)">32TB</td><td style="font-family:var(--fm);font-weight:700">¥72,400</td><td><span class="tg tg-g">● 正常</span></td></tr>
+<tr><td style="font-weight:600"><i data-lucide="cloud" style="width:14px;height:14px;color:var(--in)"></i> 腾讯云</td><td style="font-family:var(--fm)">98</td><td style="font-family:var(--fm)">392</td><td style="font-family:var(--fm)">1.2TB</td><td style="font-family:var(--fm)">8TB</td><td style="font-family:var(--fm);font-weight:700">¥28,900</td><td><span class="tg tg-g">● 正常</span></td></tr>
+<tr><td style="font-weight:600"><i data-lucide="building" style="width:14px;height:14px;color:var(--pp)"></i> 私有云</td><td style="font-family:var(--fm)">76</td><td style="font-family:var(--fm)">1,520</td><td style="font-family:var(--fm)">6.2TB</td><td style="font-family:var(--fm)">48TB</td><td style="font-family:var(--fm);font-weight:700;color:var(--t3)">—</td><td><span class="tg tg-g">● 正常</span></td></tr>
+</tbody></table></div></div>
+</div>
+
+<!-- ═══ PAGE: 告警中心 ═══ -->
+<div class="pg" id="pg-alerts">
+<div class="ph"><div><h1>告警中心</h1><p>23 活跃告警 · 7 未处理 · 156 已解决 (本月)</p></div><div class="pa"><button class="btn bg"><i data-lucide="filter"></i>筛选</button><button class="btn bp"><i data-lucide="plus"></i>创建规则</button></div></div>
+<div class="tbar" style="margin-bottom:16px"><button class="ti a">全部告警</button><button class="ti">告警规则</button><button class="ti">静默规则</button><button class="ti">通知渠道</button></div>
+<div class="cd"><div class="cbd f"><table class="dt"><thead><tr><th>级别</th><th>告警标题</th><th>来源</th><th>触发时间</th><th>状态</th><th>处理人</th><th>操作</th></tr></thead><tbody>
+<tr><td><span class="tg tg-r">P0 · 严重</span></td><td style="font-weight:600">数据库主节点响应超时</td><td>MySQL-Primary-01</td><td style="font-family:var(--fm);font-size:12px">23:42</td><td><span class="tg tg-r">处理中</span></td><td style="font-weight:600">张明</td><td><button class="btn bg bs">确认</button><button class="btn bg bs">静默</button></td></tr>
+<tr><td><span class="tg tg-r">P0 · 严重</span></td><td style="font-weight:600">K8s Pod 异常重启</td><td>payment-service</td><td style="font-family:var(--fm);font-size:12px">23:36</td><td><span class="tg tg-r">处理中</span></td><td style="font-weight:600">—</td><td><button class="btn bg bs">确认</button><button class="btn bg bs">静默</button></td></tr>
+<tr><td><span class="tg tg-w">P1 · 警告</span></td><td style="font-weight:600">磁盘空间预警</td><td>SRV-LOG-03</td><td style="font-family:var(--fm);font-size:12px">23:21</td><td><span class="tg tg-w">已确认</span></td><td style="font-weight:600">李薇</td><td><button class="btn bg bs">处理</button></td></tr>
+<tr><td><span class="tg tg-w">P1 · 警告</span></td><td style="font-weight:600">CPU 温度过高</td><td>SRV-GPU-02</td><td style="font-family:var(--fm);font-size:12px">23:03</td><td><span class="tg tg-w">已确认</span></td><td style="font-weight:600">王浩</td><td><button class="btn bg bs">处理</button></td></tr>
+</tbody></table></div></div>
+</div>
+
+<!-- ═══ PAGE: 安全审计 ═══ -->
+<div class="pg" id="pg-security">
+<div class="ph"><div><h1>安全审计</h1><p>安全事件 · 访问日志 · 合规报告</p></div><div class="pa"><button class="btn bg"><i data-lucide="download"></i>导出报告</button><button class="btn bp"><i data-lucide="shield-alert"></i>扫描</button></div></div>
+<div class="g4">
+<div class="mc ac"><div class="mh"><div class="mi cy"><i data-lucide="shield-alert"></i></div></div><div class="mv">3</div><div class="ml">安全事件 (今日)</div></div>
+<div class="mc gn"><div class="mh"><div class="mi gn"><i data-lucide="user-check"></i></div></div><div class="mv">2,847</div><div class="ml">登录尝试</div></div>
+<div class="mc am"><div class="mh"><div class="mi am"><i data-lucide="x-circle"></i></div></div><div class="mv">12</div><div class="ml">失败登录</div></div>
+<div class="mc rd"><div class="mh"><div class="mi rd"><i data-lucide="lock"></i></div></div><div class="mv">0</div><div class="ml">未授权访问</div></div>
+</div>
+<div class="cd"><div class="ch"><div class="ct"><i data-lucide="file-search" style="width:16px;height:16px;color:var(--dn)"></i>安全事件日志</div></div><div class="cbd f"><table class="dt"><thead><tr><th>事件类型</th><th>描述</th><th>来源 IP</th><th>用户</th><th>时间</th><th>风险</th></tr></thead><tbody>
+<tr><td><span class="tg tg-w">登录失败</span></td><td style="font-weight:500">SSH 暴力破解尝试</td><td style="font-family:var(--fm);font-size:12px">203.0.113.42</td><td>root</td><td style="font-family:var(--fm);font-size:12px">23:15</td><td><span class="tg tg-w">中</span></td></tr>
+<tr><td><span class="tg tg-r">权限变更</span></td><td style="font-weight:500">sudoers 文件修改</td><td style="font-family:var(--fm);font-size:12px">10.0.1.101</td><td>admin</td><td style="font-family:var(--fm);font-size:12px">22:08</td><td><span class="tg tg-r">高</span></td></tr>
+<tr><td><span class="tg tg-in">审计</span></td><td style="font-weight:500">SSL 证书更新</td><td style="font-family:var(--fm);font-size:12px">10.0.1.201</td><td>auto</td><td style="font-family:var(--fm);font-size:12px">21:00</td><td><span class="tg tg-g">低</span></td></tr>
+</tbody></table></div></div>
+</div>
+
+<!-- ═══ PAGE: 日志分析 ═══ -->
+<div class="pg" id="pg-logs">
+<div class="ph"><div><h1>日志分析</h1><p>集中式日志 · 实时搜索 · 过滤</p></div><div class="pa"><button class="btn bg"><i data-lucide="download"></i>导出</button><button class="btn bp"><i data-lucide="play"></i>实时跟踪</button></div></div>
+<div class="fb" style="padding:16px;background:var(--bg2);border-radius:var(--rl);margin-bottom:16px;border:1px solid var(--bds)">
+<div class="fi"><i data-lucide="search" style="width:14px;height:14px;color:var(--t3)"></i><input type="text" placeholder="搜索日志…" value="error OR timeout"></div>
+<select class="fs"><option>最近 1 小时</option><option>最近 6 小时</option><option>最近 24 小时</option></select>
+<select class="fs"><option>全部级别</option><option>ERROR</option><option>WARN</option><option>INFO</option><option>DEBUG</option></select>
+<select class="fs"><option>全部服务</option><option>nginx</option><option>mysql</option><option>k8s</option></select>
+<span class="fc" style="margin-left:auto">error <i data-lucide="x" style="width:12px;height:12px"></i></span>
+<span class="fc">timeout <i data-lucide="x" style="width:12px;height:12px"></i></span>
+</div>
+<div class="cd"><div class="ch"><div class="ct"><span class="d l"></span>日志流 · 匹配 1,247 条</div></div><div class="cbd f"><div class="lv">
+<div class="ll"><span class="lt">23:45:12.234</span><span class="ll-l e">ERROR</span><span class="lm">[<span class="h">mysql</span>] Connection pool exhausted: active=500, max=500, waiting=23</span></div>
+<div class="ll"><span class="lt">23:45:08.891</span><span class="ll-l e">ERROR</span><span class="lm">[<span class="h">payment-service</span>] <span class="h">timeout</span>: upstream request to mysql-primary-01 failed after 30s</span></div>
+<div class="ll"><span class="lt">23:44:55.102</span><span class="ll-l w">WARN</span><span class="lm">[<span class="h">k8s</span>] Pod payment-service-7d4f9b in CrashLoopBackOff state (restart #3)</span></div>
+<div class="ll"><span class="lt">23:44:30.567</span><span class="ll-l e">ERROR</span><span class="lm">[<span class="h">nginx</span>] upstream <span class="h">timeout</span> (110: Connection timed out) while connecting to upstream</span></div>
+<div class="ll"><span class="lt">23:44:12.001</span><span class="ll-l w">WARN</span><span class="lm">[<span class="h">monitor</span>] High CPU usage detected on SRV-DB-01: 89.2% (threshold: 85%)</span></div>
+<div class="ll"><span class="lt">23:43:55.234</span><span class="ll-l i">INFO</span><span class="lm">[<span class="h">deploy</span>] Kubernetes rolling update completed: v1.28.3 → v1.29.0 (12 nodes)</span></div>
+<div class="ll"><span class="lt">23:43:01.456</span><span class="ll-l e">ERROR</span><span class="lm">[<span class="h">redis</span>] Connection <span class="h">timeout</span> to replica redis-prod-replica-02:6379</span></div>
+<div class="ll"><span class="lt">23:42:48.789</span><span class="ll-l w">WARN</span><span class="lm">[<span class="h">monitor</span>] Disk usage on SRV-LOG-03:/data exceeded 85% threshold</span></div>
+</div></div></div>
+</div>
+
+<!-- ═══ PAGE: CI/CD 流水线 ═══ -->
+<div class="pg" id="pg-pipeline">
+<div class="ph"><div><h1>CI/CD 流水线</h1><p>构建 · 测试 · 部署 · 发布</p></div><div class="pa"><button class="btn bg"><i data-lucide="git-branch"></i>新建分支</button><button class="btn bp"><i data-lucide="play-circle"></i>触发构建</button></div></div>
+<div class="g4">
+<div class="mc ac"><div class="mh"><div class="mi cy"><i data-lucide="git-merge"></i></div></div><div class="mv">24</div><div class="ml">运行中流水线</div></div>
+<div class="mc gn"><div class="mh"><div class="mi gn"><i data-lucide="check-circle"></i></div></div><div class="mv">93.8<span style="font-size:16px;color:var(--t3)">%</span></div><div class="ml">成功率</div></div>
+<div class="mc am"><div class="mh"><div class="mi am"><i data-lucide="clock"></i></div></div><div class="mv">4.2<span style="font-size:16px;color:var(--t3)">min</span></div><div class="ml">平均构建时间</div></div>
+<div class="mc rd"><div class="mh"><div class="mi rd"><i data-lucide="x-circle"></i></div></div><div class="mv">3</div><div class="ml">失败</div></div>
+</div>
+<div class="g2">
+<div class="cd"><div class="ch"><div class="ct"><i data-lucide="git-branch" style="width:16px;height:16px;color:var(--ac)"></i>最近流水线</div></div><div class="cbd f"><table class="dt"><thead><tr><th>流水线</th><th>分支</th><th>提交</th><th>耗时</th><th>状态</th></tr></thead><tbody>
+<tr><td style="font-weight:600">payment-service</td><td style="font-family:var(--fm);font-size:12px">main</td><td style="font-family:var(--fm);font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis">feat: 接入支付宝支付</td><td style="font-family:var(--fm)">3m 42s</td><td><span class="tg tg-g">✓ 成功</span></td></tr>
+<tr><td style="font-weight:600">api-gateway</td><td style="font-family:var(--fm);font-size:12px">release/v2</td><td style="font-family:var(--fm);font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis">fix: 限流阈值调整</td><td style="font-family:var(--fm)">2m 18s</td><td><span class="tg tg-g">✓ 成功</span></td></tr>
+<tr><td style="font-weight:600">user-service</td><td style="font-family:var(--fm);font-size:12px">feature/oauth</td><td style="font-family:var(--fm);font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis">feat: OAuth2 集成</td><td style="font-family:var(--fm)">4m 55s</td><td><span class="tg tg-w">◉ 运行中</span></td></tr>
+</tbody></table></div></div>
+<div class="cd"><div class="ch"><div class="ct"><i data-lucide="play" style="width:16px;height:16px;color:var(--gn)"></i>构建阶段可视化</div></div>
+<div class="cbd">
+<div style="display:flex;flex-direction:column;gap:0">
+<div style="display:flex;align-items:center;gap:0;margin-bottom:16px"><div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px"><div class="si2 dn"><i data-lucide="check"></i></div><span style="font-size:11px;font-weight:600;color:var(--t2)">Lint</span><span style="font-size:10px;color:var(--t3);font-family:var(--fm)">42s</span></div><div style="flex:1;height:2px;background:var(--gn);min-width:20px"></div><div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px"><div class="si2 dn"><i data-lucide="check"></i></div><span style="font-size:11px;font-weight:600;color:var(--t2)">Test</span><span style="font-size:10px;color:var(--t3);font-family:var(--fm)">1m 12s</span></div><div style="flex:1;height:2px;background:var(--gn);min-width:20px"></div><div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px"><div class="si2 dn"><i data-lucide="check"></i></div><span style="font-size:11px;font-weight:600;color:var(--t2)">Build</span><span style="font-size:10px;color:var(--t3);font-family:var(--fm)">1m 48s</span></div><div style="flex:1;height:2px;background:var(--ac);min-width:20px;background:linear-gradient(90deg,var(--gn),var(--ac));animation:conn-flow 1.5s linear infinite"></div><div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:80px"><div class="si2 rn"><i data-lucide="loader"></i></div><span style="font-size:11px;font-weight:600;color:var(--ac)">Deploy</span><span style="font-size:10px;color:var(--t3);font-family:var(--fm)">进行中</span></div></div>
+</div>
+</div></div>
+</div>
+</div>
+
+<!-- ═══ PAGE: 自动化脚本 ═══ -->
+<div class="pg" id="pg-scripts">
+<div class="ph"><div><h1>自动化脚本</h1><p>脚本库 · 执行记录 · 编排</p></div><div class="pa"><button class="btn bg"><i data-lucide="upload"></i>上传脚本</button><button class="btn bp"><i data-lucide="plus"></i>新建脚本</button></div></div>
+<div class="cd mb-24"><div class="fb"><div class="fi"><i data-lucide="search" style="width:14px;height:14px;color:var(--t3)"></i><input type="text" placeholder="搜索脚本…"></div><select class="fs"><option>全部类型</option><option>Shell</option><option>Python</option><option>Ansible</option></select></div><div class="cbd f"><table class="dt"><thead><tr><th>脚本名称</th><th>类型</th><th>描述</th><th>最后执行</th><th>状态</th><th>操作</th></tr></thead><tbody>
+<tr><td style="font-weight:600">deploy-nginx-config.sh</td><td><span class="tg tg-p">Shell</span></td><td style="font-size:12px;color:var(--t2)">Nginx 配置自动部署</td><td style="font-family:var(--fm);font-size:12px">23:30</td><td><span class="tg tg-g">成功</span></td><td><button class="btn bg bs">执行</button><button class="btn bg bs">编辑</button></td></tr>
+<tr><td style="font-weight:600">db-backup-full.py</td><td><span class="tg tg-in">Python</span></td><td style="font-size:12px;color:var(--t2)">全量数据库备份</td><td style="font-family:var(--fm);font-size:12px">02:00</td><td><span class="tg tg-g">成功</span></td><td><button class="btn bg bs">执行</button><button class="btn bg bs">编辑</button></td></tr>
+<tr><td style="font-weight:600">ssl-cert-renewal.yml</td><td><span class="tg tg-s">Ansible</span></td><td style="font-size:12px;color:var(--t2)">SSL 证书自动续期</td><td style="font-family:var(--fm);font-size:12px">21:00</td><td><span class="tg tg-g">成功</span></td><td><button class="btn bg bs">执行</button><button class="btn bg bs">编辑</button></td></tr>
+</tbody></table></div></div>
+</div>
+
+<!-- ═══ PAGE: 定时任务 ═══ -->
+<div class="pg" id="pg-cron">
+<div class="ph"><div><h1>定时任务</h1><p>Cron 任务管理 · 调度策略</p></div><div class="pa"><button class="btn bp"><i data-lucide="plus"></i>创建任务</button></div></div>
+<div class="cd"><div class="cbd f"><table class="dt"><thead><tr><th>任务名称</th><th>Cron 表达式</th><th>下次执行</th><th>上次执行</th><th>状态</th><th>操作</th></tr></thead><tbody>
+<tr><td style="font-weight:600">数据库全量备份</td><td style="font-family:var(--fm);font-size:12px;color:var(--ac)">0 2 * * *</td><td style="font-family:var(--fm);font-size:12px">明天 02:00</td><td style="font-family:var(--fm);font-size:12px">今天 02:00</td><td><span class="tg tg-g">● 启用</span></td><td><button class="btn bg bs">暂停</button><button class="btn bg bs">编辑</button></td></tr>
+<tr><td style="font-weight:600">磁盘清理</td><td style="font-family:var(--fm);font-size:12px;color:var(--ac)">0 4 * * 0</td><td style="font-family:var(--fm);font-size:12px">周日 04:00</td><td style="font-family:var(--fm);font-size:12px">周日 04:00</td><td><span class="tg tg-g">● 启用</span></td><td><button class="btn bg bs">暂停</button><button class="btn bg bs">编辑</button></td></tr>
+<tr><td style="font-weight:600">SSL 证书检查</td><td style="font-family:var(--fm);font-size:12px;color:var(--ac)">0 8 * * *</td><td style="font-family:var(--fm);font-size:12px">明天 08:00</td><td style="font-family:var(--fm);font-size:12px">今天 08:00</td><td><span class="tg tg-g">● 启用</span></td><td><button class="btn bg bs">暂停</button><button class="btn bg bs">编辑</button></td></tr>
+<tr><td style="font-weight:600">日志归档</td><td style="font-family:var(--fm);font-size:12px;color:var(--ac)">0 1 * * *</td><td style="font-family:var(--fm);font-size:12px">明天 01:00</td><td style="font-family:var(--fm);font-size:12px">今天 01:00</td><td><span class="tg tg-r">● 暂停</span></td><td><button class="btn bg bs">启用</button><button class="btn bg bs">编辑</button></td></tr>
+</tbody></table></div></div>
+</div>
+
+<!-- ═══ PAGE: 团队与权限 ═══ -->
+<div class="pg" id="pg-team">
+<div class="ph"><div><h1>团队与权限</h1><p>用户管理 · 角色 · 权限策略</p></div><div class="pa"><button class="btn bg"><i data-lucide="user-plus"></i>邀请成员</button><button class="btn bp"><i data-lucide="plus"></i>添加用户</button></div></div>
+<div class="cd"><div class="cbd f"><table class="dt"><thead><tr><th>用户</th><th>角色</th><th>邮箱</th><th>团队</th><th>最后登录</th><th>状态</th><th>操作</th></tr></thead><tbody>
+<tr><td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff">陈</div><span style="font-weight:600">陈伟</span></div></td><td><span class="tg tg-p">超级管理员</span></td><td style="font-family:var(--fm);font-size:12px">chen@nexusops.com</td><td>运维</td><td style="font-family:var(--fm);font-size:12px">23:45</td><td><span class="tg tg-g">● 在线</span></td><td><button class="btn bg bs">编辑</button></td></tr>
+<tr><td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:var(--gn);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff">张</div><span style="font-weight:600">张明</span></div></td><td><span class="tg tg-s">运维工程师</span></td><td style="font-family:var(--fm);font-size:12px">zhang@nexusops.com</td><td>运维</td><td style="font-family:var(--fm);font-size:12px">23:30</td><td><span class="tg tg-g">● 在线</span></td><td><button class="btn bg bs">编辑</button></td></tr>
+<tr><td><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:50%;background:var(--in);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff">李</div><span style="font-weight:600">李薇</span></div></td><td><span class="tg tg-s">运维工程师</span></td><td style="font-family:var(--fm);font-size:12px">li@nexusops.com</td><td>运维</td><td style="font-family:var(--fm);font-size:12px">22:15</td><td><span class="tg tg-w">● 离线</span></td><td><button class="btn bg bs">编辑</button></td></tr>
+</tbody></table></div></div>
+</div>
+
+<!-- ═══ PAGE: 系统设置 ═══ -->
+<div class="pg" id="pg-settings">
+<div class="ph"><div><h1>系统设置</h1><p>全局配置 · 通知 · 集成</p></div><div class="pa"><button class="btn bp">保存设置</button></div></div>
+<div class="g2">
+<div class="cd"><div class="ch"><div class="ct"><i data-lucide="sliders" style="width:16px;height:16px;color:var(--ac)"></i>通知配置</div></div><div class="cbd">
+<div class="sr"><div class="switch-info"><span class="srt">邮件通知</span><span class="srd">告警发生时发送邮件通知</span></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+<div class="sr"><div class="switch-info"><span class="srt">钉钉通知</span><span class="srd">告警推送到钉钉群</span></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+<div class="sr"><div class="switch-info"><span class="srt">短信通知</span><span class="srd">P0 告警触发短信通知</span></div><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+<div class="sr"><div class="switch-info"><span class="srt">Webhook</span><span class="srd">自定义 Webhook 回调</span></div><button class="tog" onclick="this.classList.toggle('on')"></button></div>
+</div></div>
+<div class="cd"><div class="ch"><div class="ct"><i data-lucide="settings" style="width:16px;height:16px;color:var(--wn)"></i>系统参数</div></div><div class="cbd">
+<div class="fg"><label class="fl">系统名称</label><input class="fip" value="NexusOps"></div>
+<div class="fg"><label class="fl">默认语言</label><select class="fip" style="width:100%"><option>简体中文</option><option>English</option></select></div>
+<div class="fg"><label class="fl">数据刷新间隔</label><select class="fip" style="width:100%"><option>5 秒</option><option>10 秒</option><option>30 秒</option></select></div>
+<div class="fg"><label class="fl">时区</label><select class="fip" style="width:100%"><option>Asia/Shanghai (UTC+8)</option></select></div>
+</div></div>
+</div>
+</div>
+
+</main>
+</div>
+<script>
+lucide.createIcons();
+
+// Page navigation
+document.querySelectorAll('.ni').forEach(item => {
+  item.addEventListener('click', function(e) {
+    e.preventDefault();
+    document.querySelectorAll('.ni').forEach(i => i.classList.remove('a'));
+    this.classList.add('a');
+    document.querySelectorAll('.pg').forEach(p => p.classList.remove('a'));
+    const pageId = 'pg-' + this.dataset.page;
+    const target = document.getElementById(pageId);
+    if (target) target.classList.add('a');
+    document.getElementById('bc').textContent = this.dataset.name;
+    document.getElementById('mc').scrollTop = 0;
+  });
+});
+
+// Tab switching
+document.querySelectorAll('.ti').forEach(tab => {
+  tab.addEventListener('click', function() {
+    this.parentElement.querySelectorAll('.ti').forEach(t => t.classList.remove('a'));
+    this.classList.add('a');
+  });
+});
+
+// Refresh time
+function updateTime() {
+  const el = document.getElementById('rf');
+  if (el) el.textContent = new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+// ⌘K shortcut
+document.addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+    document.querySelector('.ts input').focus();
+  }
+});
+
+// Simulated CPU monitor update
+setInterval(() => {
+  const el = document.querySelector('#pg-monitor .mc.ac .mv');
+  if (el) {
+    const v = (38 + Math.random() * 10).toFixed(1);
+    el.innerHTML = v + '<span style="font-size:16px;color:var(--t3)">%</span>';
+  }
+}, 5000);
+</script>
+</body>
+</html>

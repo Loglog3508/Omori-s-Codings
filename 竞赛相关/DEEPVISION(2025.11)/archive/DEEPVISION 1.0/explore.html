@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>海洋塑料污染数据平台 · 起始页</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="shared-ui.css" />
+  <link rel="stylesheet" href="explore.css" />
+  <style>
+    /* 背景音乐控制按钮（与玻璃风格统一） */
+    .music-btn{position:fixed;right:18px;top:18px;z-index:30;cursor:pointer;padding:8px 14px;font-size:12px;letter-spacing:.05em;border:1px solid rgba(168,218,220,.5);background:rgba(0,0,0,.35);color:#e0fbfc;border-radius:18px;backdrop-filter:blur(8px) saturate(1.4);-webkit-backdrop-filter:blur(8px) saturate(1.4);transition:background .25s,border-color .25s;}
+    .music-btn:hover{background:rgba(255,255,255,0.12);border-color:rgba(168,218,220,.75);}  
+    .music-btn.muted{opacity:.6;}
+  </style>
+</head>
+<body class="landing-body">
+  <!-- 背景视频与主页面一致; 若加载失败会被脚本移除并显示静态背景 -->
+  <video id="bg-video" class="bg-video" muted autoplay loop playsinline preload="auto" poster="imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg">
+    <source src="https://cdn.pixabay.com/video/2016/09/13/5200-183786525_large.mp4" type="video/mp4" />
+  </video>
+  <canvas id="particle-canvas"></canvas>
+  <!-- 背景音乐 (默认静音，首个用户交互后自动以50%音量播放) -->
+  <!-- 背景音乐: 更换为 Kan R. Gao - For River - Piano (Johnny's Version) -->
+  <audio id="bg-music" preload="auto" loop muted>
+    <source src="Kan R. Gao - For River - Piano (Johnny's Version).mp3" type="audio/mpeg" />
+    您的浏览器不支持音频播放 / Your browser does not support audio.
+  </audio>
+  <button id="music-toggle" class="music-btn muted" title="点击播放背景音乐">♪ For River - Piano (Johnny's Version)</button>
+  <!-- 光标跟随柔和光斑 (纯背景，不影响卡片) -->
+  <div id="cursor-glow" aria-hidden="true"></div>
+  <main class="landing-center glass-card">
+    <h1 class="landing-title">海洋塑料污染数据平台</h1>
+    <p class="landing-subtitle">Multi‑source Ocean Plastic Intelligence & Drift Simulation</p>
+    <div class="landing-actions">
+      <button id="enter-platform" class="enter-btn">进入主平台 <span class="arrow">→</span></button>
+    </div>
+    <div class="meta-line">
+      <span class="tag">实时刷新</span>
+      <span class="tag">OWID / OSCAR / OBIS</span>
+      <span class="tag">双源回退</span>
+    </div>
+    <div class="landing-footer-note">若网络受限将自动使用模拟数据 (file:// 模式提示)</div>
+  </main>
+  <footer class="landing-footer">© 2025 Ocean Plastic Visualization Project</footer>
+
+
+  <script>
+    // 背景视频回退
+    (function initBg(){
+      const v=document.getElementById('bg-video'); if(!v) return;
+      let loaded=false; const to=setTimeout(()=>{ if(!loaded && v.parentElement){ v.parentElement.removeChild(v); console.warn('[Landing] 背景视频超时，使用静态背景'); } },12000);
+      v.addEventListener('canplay',()=>{ loaded=true; clearTimeout(to); v.classList.add('bg-video-ready'); },{once:true});
+      v.addEventListener('error',()=>{ clearTimeout(to); if(v.parentElement){ v.parentElement.removeChild(v); console.warn('[Landing] 背景视频失败'); } });
+    })();
+    // file:// 检测
+    if(location.protocol==='file:'){ window.__FILE_MODE__=true; console.warn('[Landing] file:// 模式，主平台将使用模拟数据'); }
+    // 进入主平台
+    document.getElementById('enter-platform').addEventListener('click',()=>{ window.location.href='main.html'; });
+  // 键盘增强: 回车进入主平台 (漂流快速入口已移除)
+  document.addEventListener('keydown',e=>{ if(e.key==='Enter'){ document.getElementById('enter-platform').click(); } });
+
+    /* ---------------- Cursor Glow (纯背景光斑) ---------------- */
+    (function initCursorGlow(){
+      const glow=document.getElementById('cursor-glow');
+      if(!glow) return;
+      let targetX=window.innerWidth/2, targetY=window.innerHeight/2;
+      let currX=targetX, currY=targetY;
+      let lastMove=Date.now();
+      const lerp=(a,b,t)=>a+(b-a)*t;
+      function raf(){
+        currX=lerp(currX,targetX,0.12);
+        currY=lerp(currY,targetY,0.12);
+        glow.style.transform=`translate(-50%,-50%) translate(${currX}px,${currY}px)`;
+        requestAnimationFrame(raf);
+      }
+      raf();
+      const moveHandler=e=>{
+        lastMove=Date.now();
+        targetX=e.clientX; targetY=e.clientY;
+      };
+      window.addEventListener('pointermove',moveHandler,{passive:true});
+      window.addEventListener('resize',()=>{ targetX=window.innerWidth/2; targetY=window.innerHeight/2; });
+      // 降级: 若 prefers-reduced-motion 则保持中心静止
+      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+        window.removeEventListener('pointermove',moveHandler);
+        glow.style.opacity='0.35';
+      }
+    })();
+
+    /* ---------------- 3~5s 后按钮呼吸高亮 ---------------- */
+    (function initEnterBtnPulse(){
+      const btn=document.getElementById('enter-platform');
+      if(!btn) return;
+      const delay=3000+Math.random()*2000; // 3-5s
+      let activated=false;
+      const arm=setTimeout(()=>{ if(activated) return; btn.classList.add('auto-pulse'); }, delay);
+      function cancel(){ if(activated) return; activated=true; btn.classList.remove('auto-pulse'); clearTimeout(arm); }
+      ['pointerenter','pointerdown','keydown','click','focus'].forEach(ev=>btn.addEventListener(ev,cancel,{once:false}));
+    })();
+
+    /* ---------------- 背景音乐控制 ---------------- */
+    (function initBgMusic(){
+      const audio=document.getElementById('bg-music');
+      const toggle=document.getElementById('music-toggle');
+      if(!audio||!toggle) return;
+      const FULL_TITLE='♪ Kan R. Gao - For River (Piano · Johnny\'s Version)';
+      const PLAY_LABEL='♪ 开启音乐';
+      const MUTE_LABEL='♪ 静音';
+      // 初始展示完整曲名（用户还未开始时保留曲目信息）
+      toggle.textContent=FULL_TITLE;
+  audio.volume=0.5; // 初始 50% 音量 (用户交互后播放)
+      let userInteracted=false; let attempted=false; let playing=false;
+      function setState(){
+        if(!playing){
+          // 未播放：显示开启音乐 + 保留 title 完整曲名
+          toggle.classList.add('muted');
+          toggle.title='点击播放: For River';
+          toggle.textContent=PLAY_LABEL + ' · For River';
+        } else {
+          toggle.classList.remove('muted');
+            toggle.title='点击静音';
+            toggle.textContent=MUTE_LABEL + ' · For River';
+        }
+      }
+      function tryPlay(){
+        if(attempted||playing) return; attempted=true;
+        audio.play().then(()=>{ audio.muted=false; playing=true; setState(); })
+          .catch(()=>{ // 自动播放失败：保留完整曲名，等待交互
+            playing=false; attempted=false; setState();
+          });
+      }
+      function ensurePlay(){ if(userInteracted) return; userInteracted=true; tryPlay(); }
+      ['click','keydown','pointerdown'].forEach(ev=>window.addEventListener(ev,ensurePlay,{once:true,passive:true}));
+      toggle.addEventListener('click',()=>{
+        if(!playing){ tryPlay(); }
+        else { audio.muted=true; audio.pause(); playing=false; attempted=false; setState(); }
+      });
+      // 浏览器允许自动播放时，短延迟尝试；若失败，按钮文本仍包含 For River
+      setTimeout(tryPlay,1000);
+      // 当音频可播放并正在播放，强制一次状态同步，防止部分浏览器延迟
+      audio.addEventListener('playing',()=>{ playing=true; setState(); });
+      audio.addEventListener('pause',()=>{ playing=false; setState(); });
+      setState();
+    })();
+
+    /* ---------------- 初始元素渐入与卡片高光 ---------------- */
+    (function initReveal(){
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(prefersReduced){ document.body.classList.add('reveal'); return; }
+      // 等待 1 帧，避免布局抖动
+      requestAnimationFrame(()=>{ setTimeout(()=> document.body.classList.add('reveal'), 60); });
+    })();
+  </script>
+  <style>
+    /* 保证页面最小高度 */
+    body.landing-body { min-height:100vh; }
+  </style>
+</body>
+</html>

@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐬海洋塑料污染数据分析展示平台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@                 // 强调显示数值大于等于13.5的年份
+        const highlightIndexes = [];
+        // 确定历史数据的长度。如果模型信息存在，则为30；否则为5。
+        const historyLength = data.modelInfo ? 30 : 5;
+        data.values.forEach((v, i) => {
+            // 重点：只对索引大于等于历史数据长度（即未来数据）的部分应用13.5的阈值
+            if (i >= historyLength && v >= 13.5) {
+                highlightIndexes.push(i);
+            }
+        });数值大于等于13.5的年份
+        const highlightIndexes = [];
+        const historyLength = data.modelInfo ? 30 : 5; // 根据是否有模型信息判断历史数据长度
+        data.values.forEach((v,i)=>{
+            if(v >= 13.5 && i >= historyLength) highlightIndexes.push(i);
+        }); 强调显示数值大于等于13.5的年份
+        const highlightIndexes = [];
+        data.values.forEach((v,i)=>{
+            if(v >= 13.5 && i>=5) highlightIndexes.push(i); // 高于基准值20%
+        });0;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="shared-ui.css">
+    <!-- 追加自定义附加样式 (style2) 放在主样式后，便于覆盖 -->
+    <!-- style2.css 已弃用：引用清理 -->
+    <!-- 字体与全局样式就绪，Chart.js 由 body 底部多 CDN 动态加载（已移除 Three.js） -->
+</head>
+<body>
+    <div class="main-content" style="zoom:0.9;">
+        <!-- 统一导航条：返回起始页 + 扩展功能入口 -->
+    <nav id="global-nav" class="glass-card" style="position:fixed;top:4px;left:0;right:0;z-index:40;display:flex;align-items:center;justify-content:space-between;padding:20px 40px 18px;border-radius:0 0 30px 30px;backdrop-filter:blur(22px) saturate(1.3);background:rgba(10,30,60,0.55);background-image:linear-gradient(135deg,rgba(0,18,36,0.48),rgba(0,40,72,0.38));font-size:17px;gap:28px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 8px 28px -8px rgba(0,0,0,0.55);">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <a href="explore.html" class="nav-home-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:8px 22px;border-radius:22px;font-size:16px;font-weight:700;letter-spacing:.8px;background:linear-gradient(135deg,#1e6fa1 60%,#0d4d77 100%);color:#8de9ff;border:2px solid #8de9ff;box-shadow:0 4px 16px -6px #0b6fa1,0 0 0 2px #8de9ff inset;backdrop-filter:blur(6px);transition:background .3s,border-color .3s;">← 起始页</a>
+                <a href="education_walkthrough.html" class="help-nav-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:22px;font-size:15px;font-weight:600;letter-spacing:.6px;background:linear-gradient(135deg,#0d4d77 50%,#1e6fa1 100%);color:#d8f3fd;border:2px solid #78c6f7;box-shadow:0 4px 14px -6px #0b6fa1,0 0 0 2px #78c6f7 inset;backdrop-filter:blur(6px);transition:background .3s,border-color .3s;">❓ 帮助与查询</a>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <a href="display_wall.html" class="data-wall-nav-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:10px 28px;border-radius:30px;font-size:17px;font-weight:700;letter-spacing:1px;background:linear-gradient(135deg,#0d4d77 60%,#0b6fa1 100%);color:#fff;border:2px solid #8de9ff;box-shadow:0 8px 24px -8px #0b6fa1,0 0 0 2px #8de9ff inset;backdrop-filter:blur(8px);position:relative;overflow:hidden;transition:background .3s,border-color .3s;">📊 数据大屏</a>
+            </div>
+            <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;align-items:center;">
+                <div id="main-refresh" class="refresh-indicator" style="display:inline-flex;align-items:center;gap:6px;font-size:13px;padding:6px 14px;border:1px solid rgba(255,255,255,0.28);border-radius:22px;background:rgba(0,0,0,.38);backdrop-filter:blur(8px);">
+                    <span class="refresh-ring" aria-hidden="true" style="width:22px;height:22px;display:inline-block;">
+                        <svg viewBox="0 0 40 40" style="width:22px;height:22px;overflow:visible;">
+                            <circle cx="20" cy="20" r="16" stroke="rgba(255,255,255,0.18)" stroke-width="4" fill="none"></circle>
+                            <circle class="ring-fg" cx="20" cy="20" r="16" stroke="#78c6f7" stroke-width="4" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="100" fill="none" style="transition:stroke-dashoffset .9s linear"></circle>
+                        </svg>
+                    </span>
+                    <span id="main-refresh-text">60s</span>
+                </div>
+            </div>
+        </nav>
+        <!-- 背景视频：在最底层，使用 muted autoplay loop playsinline 避免移动端限制 -->
+        <video id="bg-video" class="bg-video" muted autoplay loop playsinline preload="auto" poster="imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg">
+            <source src="https://cdn.pixabay.com/video/2016/09/13/5200-183786525_large.mp4" type="video/mp4">
+        </video>
+        <!-- 粒子背景画布 -->
+        <canvas id="particle-canvas"></canvas>
+
+        <!-- 页面标题区域 -->
+                <header class="header animated-header" style="margin-top:68px;">
+                        <div class="title-block">
+                            <h1 class="title">🐬 海洋塑料污染数据分析展示平台</h1>
+                            <p class="subtitle">多源数据 · 可视化探索 · 交互式演示</p>
+                        </div>
+                           <!-- 数据大屏入口已移至导航栏 -->
+                </header>
+
+        <!-- 顶部操作栏已移除；倒计时集成到导航栏 -->
+
+        <!-- 原简化漂流模拟折叠面板已删除：避免与 Streamlit 内嵌版本重复 -->
+
+            <!-- 粒子背景画布 -->
+            <!-- 区域3: 华容道组件区域 -->
+    <section class="components-section">
+            <div class="layout-frame">
+        <!-- 只保留一个网格类，避免双重 grid 定义导致混乱 -->
+                <!-- Simple Uniform Grid: 移除所有 puzzle 占位 / u-* 尺寸语义，只保留 1 层普通卡片 -->
+                <div class="dashboard-grid glass-card dynamic-auto fixed-5x2" data-layout="5x2">
+                    <div class="huarong-piece panel chart-panel piece-1" data-key="overview">
+                        <h3 class="panel-title">🌊 海洋污染</h3>
+                        <div class="ocean-pollution-card">
+                            <div class="ocean-pollution-main">
+                                <div class="main-value">8.2M</div>
+                                <div class="main-label">吨/年 估算输入</div>
+                            </div>
+                            <div class="ocean-pollution-sub">
+                                <div class="sub-box"><div class="sub-value">80%</div><div class="sub-label">陆源贡献</div></div>
+                                <div class="sub-box"><div class="sub-value">5.25万亿</div><div class="sub-label">碎片数量</div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="huarong-piece panel chart-panel piece-2" data-key="source">
+                        <h3 class="panel-title">🏭 塑料污染来源统计</h3>
+                        <canvas id="source-chart"></canvas>
+                        <div class="panel-info"><span class="info-text">陆地来源占 80%</span></div>
+                    </div>
+                    <div class="huarong-piece panel stats-panel piece-3" data-key="eco" onclick="toggleEcoChart(this)">
+                        <h3 class="panel-title">🌍 生态影响统计</h3>
+                        <div class="large-stats-grid">
+                            <div class="large-stat-row">
+                                <div class="large-stat-item"><div class="large-stat-number">800+</div><div class="large-stat-label">受影响物种</div></div>
+                                <div class="large-stat-item"><div class="large-stat-number">5.25万亿</div><div class="large-stat-label">塑料颗粒</div></div>
+                            </div>
+                            <div class="large-stat-row">
+                                <div class="large-stat-item"><div class="large-stat-number">269,000</div><div class="large-stat-label">吨漂浮塑料</div></div>
+                                <div class="large-stat-item"><div class="large-stat-number">90%</div><div class="large-stat-label">海鸟含塑料</div></div>
+                            </div>
+                        </div>
+                        <canvas id="density-chart" style="margin-top:10px;height:100px;"></canvas>
+                    </div>
+                    <div class="huarong-piece panel chart-panel piece-4" data-key="trend">
+                        <h3 class="panel-title">📈 历史趋势</h3>
+                        <canvas id="trend-chart"></canvas>
+                    </div>
+                    <div class="huarong-piece panel chart-panel simulation-chart-panel piece-5" data-key="yearly">
+                        <h3 class="panel-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                            <span>年度误管理塑料趋势</span>
+                            <span id="rubbish-yearly-range-label" style="font-size:11px;color:#89c2d9;letter-spacing:.5px;opacity:.85;">近20年</span>
+                        </h3>
+                        <div class="yearly-controls" style="display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 8px 0;font-size:11px;align-items:center;">
+                            <label style="display:flex;align-items:center;gap:4px;">窗口
+                                <select id="rubbish-range" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#d8f3fd;padding:2px 6px;border-radius:6px;font-size:11px;">
+                                    <option value="10">近10年</option>
+                                    <option value="15">近15年</option>
+                                    <option value="20" selected>近20年</option>
+                                    <option value="30">近30年</option>
+                                </select>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                                <input type="checkbox" id="rubbish-ma" checked style="accent-color:#4dbafd;"> 移动均值(5)
+                            </label>
+                            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                                <input type="checkbox" id="rubbish-forecast" style="accent-color:#ffc857;"> 预测+5年
+                            </label>
+                            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                                <input type="checkbox" id="rubbish-yoy" style="accent-color:#ff6b6b;" checked> 同比图
+                            </label>
+                        </div>
+                        <div class="yearly-chart-wrap"><canvas id="rubbish-yearly-chart"></canvas></div>
+                        <canvas id="rubbish-yearly-mini-chart" style="margin-top:6px;height:56px;display:block;"></canvas>
+                        <canvas id="rubbish-yearly-yoy-chart" style="margin-top:8px;height:90px;display:none;"></canvas>
+                        <div id="rubbish-forecast-table" style="display:none;margin-top:10px;font-size:11px;line-height:1.4;color:#d8f3fd;"></div>
+                        <div class="panel-info" style="margin-top:6px;">
+                            <span class="info-text" id="rubbish-yearly-data-note">来源: OWID</span>
+                            <div id="rubbish-yearly-kpis" class="yearly-kpis" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;"></div>
+                        </div>
+                    </div>
+                                        <div class="huarong-piece panel chart-panel simulation-chart-panel piece-6" data-key="city" data-embed="realtime-city">
+                                                <h3 class="panel-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                                                    <span>🌐 国家误管理实时概览 <span id="rt-mode-label" style="font-size:11px;color:#86c9e6;font-weight:400;margin-left:4px;letter-spacing:.5px;">Auto</span></span>
+                                                    <div style="display:flex;align-items:center;gap:6px;">
+                                                        <div id="rt-connection-indicator" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#8edfff;">
+                                                            <span class="rt-dot" style="width:10px;height:10px;border-radius:50%;background:#ffb347;box-shadow:0 0 0 3px rgba(255,179,71,0.25);"></span>
+                                                            <span id="rt-status-text">连接中...</span>
+                                                        </div>
+                                                        <button id="rt-refresh-btn" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.25);color:#c7f2ff;font-size:11px;padding:4px 10px;border-radius:18px;cursor:pointer;backdrop-filter:blur(4px);">刷新</button>
+                                                    </div>
+                                                </h3>
+                                                <div class="rt-toolbar" style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 6px;">
+                                                    <button class="rt-mode-btn active" data-mode="auto">自适应</button>
+                                                    <button class="rt-mode-btn" data-mode="top5">Top5</button>
+                                                    <button class="rt-mode-btn" data-mode="top8">Top8</button>
+                                                    <span style="flex:1 1 auto;text-align:right;font-size:10px;color:#7fbfd6;letter-spacing:.5px;">60s 自动刷新</span>
+                                                </div>
+                                                <div id="rt-country-list" class="rt-country-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:6px;align-content:start;flex:1 1 auto;min-height:120px;">
+                                                    <!-- 动态列表 -->
+                                                </div>
+                                                <div id="rt-spark-row" style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+                                                    <canvas id="rt-mini-spark" height="54" style="flex:1 1 auto;max-height:60px;min-height:54px;"></canvas>
+                                                    <div style="display:flex;flex-direction:column;gap:4px;font-size:10px;color:#9ed4e6;width:90px;">
+                                                        <div><span style="opacity:.7;">主观察:</span> <span id="rt-focus-country" style="color:#ffe3a1;">—</span></div>
+                                                        <div><span style="opacity:.7;">近15年Δ:</span> <span id="rt-focus-delta" style="color:#ffd4b0;">—</span></div>
+                                                    </div>
+                                                </div>
+                                                <div class="panel-info" style="margin-top:6px;">
+                                                    <span class="info-text" id="rt-footnote">来源: OWID Mismanaged Plastic (实时拉取, 离线回退模拟)</span>
+                                                </div>
+                                        </div>
+                    <div class="huarong-piece panel chart-panel simulation-chart-panel piece-7" data-key="river">
+                        <h3 class="panel-title">🌊 洋流速度分布</h3>
+                        <canvas id="ocean-river-chart"></canvas>
+                        <div class="panel-info"><span class="info-text">OSCAR 采样速度</span></div>
+                    </div>
+                    <div class="huarong-piece panel chart-panel simulation-chart-panel piece-8" data-key="gyre">
+                        <h3 class="panel-title">📈 洋流指标概览</h3>
+                        <canvas id="ocean-overview-chart"></canvas>
+                        <div class="panel-info"><span class="info-text">OSCAR 样本统计</span></div>
+                    </div>
+                    <div class="huarong-piece panel chart-panel simulation-chart-panel piece-9" data-key="bio">
+                        <h3 class="panel-title">🧬 沿海城市生物减少</h3>
+                        <canvas id="marine-bio-loss-chart"></canvas>
+                        <div class="panel-info">
+                            <span class="info-text">模拟数据 (data_simulated2)</span>
+                            <div id="bio-loss-missing" style="display:none;margin-top:6px;">
+                                <button id="generate-bio-loss" class="control-btn" style="padding:4px 10px;font-size:12px;">⚙ 生成 CSV</button>
+                                <span style="display:block;font-size:11px;color:#a8dadc;margin-top:4px;opacity:.85;">缺少源数据，正在使用内置模拟</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="huarong-piece panel chart-panel simulation-chart-panel piece-10" data-key="water">
+                        <h3 class="panel-title">💧 沿海城市水质影响</h3>
+                        <canvas id="water-quality-chart"></canvas>
+                        <div class="panel-info"><span class="info-text">模拟数据 (simulate_water)</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 信息面板 -->
+        <!-- 预测与预警卡片区域 -->
+        <section class="info-section">
+            <div class="panel chart-panel" style="margin-bottom:28px;">
+                <h3 class="panel-title" style="display:flex;align-items:center;gap:10px;">
+                    <span>🔮 未来趋势预测与预警</span>
+                    <span id="forecast-warning" style="display:none;color:#ff2d55;font-size:15px;font-weight:700;">⚠ 未来垃圾激增预警！</span>
+                    <span id="forecast-years-highlight" style="margin-left:18px;display:none;font-size:16px;font-weight:700;color:#ff2d55;background:rgba(255,45,85,0.12);padding:3px 14px;border-radius:18px;box-shadow:0 2px 8px -2px #ff2d55;"> </span>
+                </h3>
+                    <canvas id="forecast-chart" style="height:350px;width:100%;"></canvas>
+                <div class="panel-info" style="margin-top:8px;">
+                    <span class="info-text" id="forecast-info">根据历史数据与政策变化，预测未来5年垃圾变化趋势。</span>
+                </div>
+            </div>
+            <div class="panel info-panel">
+                <h3 class="panel-title">关键概念</h3>
+                <div class="concept-links">
+                    <a href="https://baike.baidu.com/item/海洋污染" target="_blank" class="concept-link">海洋污染</a>
+                    <a href="https://baike.baidu.com/item/太平洋垃圾带" target="_blank" class="concept-link">太平洋垃圾带</a>
+                    <a href="https://baike.baidu.com/item/微塑料" target="_blank" class="concept-link">微塑料</a>
+                    <a href="https://baike.baidu.com/item/海洋环流" target="_blank" class="concept-link">海洋环流</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- 底部导航 -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p class="footer-text">海洋塑料污染数据可视化平台 © 2025</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="particles.js"></script>
+    <script>
+    (function loadChartMultiCDN(){
+        const sources=[
+            'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+            'https://unpkg.com/chart.js@4.4.1/dist/chart.umd.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js'
+        ];
+        let i=0; function attempt(){
+            if(window.Chart){ console.log('[Loader] Chart.js 已存在'); document.dispatchEvent(new Event('chart-ready')); return; }
+            if(i>=sources.length){ console.warn('[Loader] 所有 Chart.js CDN 失败'); window.__CHART_FAILED__=true; return; }
+            const src=sources[i++];
+            const s=document.createElement('script');
+            s.src=src; s.onload=()=>{ console.log('[Loader] Chart.js 加载成功:',src); document.dispatchEvent(new Event('chart-ready')); };
+            s.onerror=()=>{ console.warn('[Loader] Chart.js 失败:',src); setTimeout(attempt,200); };
+            document.head.appendChild(s);
+        } attempt();
+    })();
+    </script>
+    <!-- 新增：TensorFlow.js 多 CDN 加载 -->
+    <script>
+    (function loadTFJSMultiCDN(){
+        const sources=[
+            'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js',
+            'https://unpkg.com/@tensorflow/tfjs@4.20.0/dist/tf.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.20.0/tf.min.js'
+        ];
+        let i=0; function attempt(){
+            if(window.tf){ console.log('[Loader] TensorFlow.js 已存在'); document.dispatchEvent(new Event('tf-ready')); return; }
+            if(i>=sources.length){ console.warn('[Loader] 所有 TensorFlow.js CDN 失败'); window.__TF_FAILED__=true; document.dispatchEvent(new Event('tf-ready')); /* 触发事件，让后续逻辑可以回退 */ return; }
+            const src=sources[i++];
+            const s=document.createElement('script');
+            s.src=src; s.onload=()=>{ console.log('[Loader] TensorFlow.js 加载成功:',src); document.dispatchEvent(new Event('tf-ready')); };
+            s.onerror=()=>{ console.warn('[Loader] TensorFlow.js 失败:',src); setTimeout(attempt,200); };
+            document.head.appendChild(s);
+        } attempt();
+    })();
+    </script>
+    <!-- 新增：数据服务抽象 (B1) 必须在 charts.js 之前 -->
+    <script src="dataService.js"></script>
+    <script src="charts.js"></script>
+    <script src="realtime-city.js"></script>
+    <script src="responsive-layout.js"></script>
+    <!-- 添加版本参数防缓存（调试阶段） -->
+    <script src="overflow-detector.js?v=dev2"></script>
+    <script src="main.js?v=dev2"></script>
+    <!-- 新增：预测与预警图表逻辑 -->
+    <script>
+    // 预测数据生成（可替换为后端/AI接口）
+    async function getForecastData() {
+        // 确保 tf.js 已加载
+        if (!window.tf) {
+            console.warn('TensorFlow.js尚未加载或加载失败，使用简单线性预测作为回退。');
+            // 过去5年（单位：百万吨）
+            const base = [8.2, 8.3, 8.1, 8.0, 7.9];
+            const years = [2021, 2022, 2023, 2024, 2025];
+            let future = [];
+            let warningIndex = -1;
+            let last = base[base.length-1];
+            for(let i=1;i<=25;i++){
+                // 预测到2050年
+                let val = last + 0.04*i; // 每年递增0.04
+                // 每隔7年模拟一次突发事件导致激增
+                if(i%7===0) val += 0.35;
+                if(val > 8.2 && warningIndex === -1) warningIndex = base.length + i - 1;
+                future.push(val);
+            }
+            const futureYears = [];
+            for(let y=2026;y<=2050;y++) futureYears.push(y);
+            return {
+                years: years.concat(futureYears),
+                values: base.concat(future),
+                warningIndex
+            };
+        }
+
+        console.log('使用MLP模型进行预测...');
+        // 1. 准备训练数据 (使用 dataService 获取更长的历史序列)
+        const history = await window.dataService.getPlasticWasteTimeSeries();
+        const trainYears = history.data.years.slice(-30); // 使用最近30年数据
+        const trainValues = history.data.values.slice(-30);
+
+        const xs = tf.tensor1d(trainYears);
+        const ys = tf.tensor1d(trainValues);
+
+        // 归一化
+        const xsMin = xs.min();
+        const xsMax = xs.max();
+        const ysMin = ys.min();
+        const ysMax = ys.max();
+        const normalizedXs = xs.sub(xsMin).div(xsMax.sub(xsMin));
+        const normalizedYs = ys.sub(ysMin).div(ysMax.sub(ysMin));
+
+        // 2. 定义MLP模型
+        const model = tf.sequential();
+        model.add(tf.layers.dense({units: 32, activation: 'relu', inputShape: [1]}));
+        model.add(tf.layers.dense({units: 16, activation: 'relu'}));
+        model.add(tf.layers.dense({units: 1}));
+
+        model.compile({optimizer: tf.train.adam(0.01), loss: 'meanSquaredError'});
+
+        // 3. 训练模型
+        await model.fit(normalizedXs, normalizedYs, {
+            epochs: 100,
+            callbacks: {
+                onEpochEnd: (epoch, logs) => {
+                    if(epoch % 20 === 0) console.log(`MLP Epoch ${epoch}: loss = ${logs.loss}`);
+                }
+            }
+        });
+
+        // 4. 进行预测
+        const futureYearsRaw = [];
+        for (let y = trainYears[trainYears.length - 1] + 1; y <= 2050; y++) {
+            futureYearsRaw.push(y);
+        }
+        const futureYearsTensor = tf.tensor1d(futureYearsRaw);
+        const normalizedFutureYears = futureYearsTensor.sub(xsMin).div(xsMax.sub(xsMin));
+        
+        const predictionsTensor = model.predict(normalizedFutureYears.reshape([-1, 1]));
+        const unnormalizedPredictions = predictionsTensor.mul(ysMax.sub(ysMin)).add(ysMin);
+        
+        const futureValues = Array.from(await unnormalizedPredictions.data());
+
+        // 组合历史与预测数据
+        const allYears = trainYears.concat(futureYearsRaw);
+        const allValues = trainValues.concat(futureValues);
+
+        // 查找预警点
+        let warningIndex = -1;
+        const threshold = trainValues[0] * 1.1; // 预警阈值：比30年前高10%
+        for(let i=trainValues.length; i<allValues.length; i++){
+            if(allValues[i] > threshold){
+                warningIndex = i;
+                break;
+            }
+        }
+
+        return {
+            years: allYears,
+            values: allValues,
+            warningIndex: warningIndex,
+            modelInfo: {
+                name: "MLP (多层感知机)",
+                trainingData: `OWID历史塑料污染数据 (${trainYears.length}条)`,
+                layers: ["Dense(32, relu)", "Dense(16, relu)", "Dense(1)"],
+                optimizer: "Adam (lr=0.01)",
+                epochs: 100
+            }
+        };
+    }
+    async function renderForecastChart() {
+        const forecastInfoEl = document.getElementById('forecast-info');
+        forecastInfoEl.textContent = '正在加载MLP模型并进行预测...';
+
+        const data = await getForecastData();
+
+        if (data.modelInfo) {
+            forecastInfoEl.textContent = `预测模型: ${data.modelInfo.name} | 训练数据: ${data.modelInfo.trainingData} | 算法: ${data.modelInfo.layers.join(' -> ')}`;
+        } else {
+            forecastInfoEl.textContent = '根据历史数据与政策变化，预测未来5年垃圾变化趋势。';
+        }
+
+        const ctx = document.getElementById('forecast-chart').getContext('2d');
+        if(window.forecastChart) window.forecastChart.destroy();
+
+        // --- 核心高亮逻辑 ---
+        const highlightIndexes = [];
+        const threshold = 13.5;
+        // 确定历史数据的长度。如果模型信息存在，则为30；否则为5。
+        const historyLength = data.modelInfo ? 30 : 5;
+        
+        data.values.forEach((v, i) => {
+            // 重点：只对索引大于等于历史数据长度（即未来数据）的部分应用阈值
+            if (i >= historyLength && v >= threshold) {
+                highlightIndexes.push(i);
+            }
+        });
+
+        // --- 诊断代码开始 ---
+        console.log("--- 图表渲染诊断 ---");
+        console.log("历史数据长度 (historyLength):", historyLength);
+        console.log("高风险阈值 (threshold):", threshold);
+        console.log("找到的高风险年份索引 (highlightIndexes):", highlightIndexes);
+        if (highlightIndexes.length > 0) {
+            console.log("第一个高风险值:", data.values[highlightIndexes[0]], "在年份:", data.years[highlightIndexes[0]]);
+            const highlightedValues = highlightIndexes.map(i => ({ year: data.years[i], value: data.values[i] }));
+            console.log("所有高风险数据点:", highlightedValues);
+        } else {
+            console.log("未找到任何超过 " + threshold + " 的未来数据点。");
+        }
+        console.log("--------------------");
+        // --- 诊断代码结束 ---
+
+        const barColors = data.values.map((_,i) => highlightIndexes.includes(i) ? '#ff2d55' : 'rgba(255,179,71,0.68)');
+        const barBorders = data.values.map((_,i) => highlightIndexes.includes(i) ? '#fff' : '#ffb347');
+        const barWidths = data.values.map((_,i) => highlightIndexes.includes(i) ? 2 : 1);
+
+        window.forecastChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.years,
+                datasets: [{
+                    label: '年度垃圾量 (百万吨)',
+                    data: data.values,
+                    backgroundColor: barColors,
+                    borderColor: barBorders,
+                    borderWidth: barWidths,
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: {display:false},
+                    tooltip: {
+                        enabled:true,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.y.toFixed(2) + ' 百万吨';
+                                }
+                                if (highlightIndexes.includes(context.dataIndex)) {
+                                    label += ' (高风险)';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid:{color:'rgba(255,255,255,0.08)'},
+                        ticks:{color:'#c6f2ff'},
+                        title: {
+                            display: true,
+                            text: '年份',
+                            color: '#a7d5e6'
+                        }
+                    },
+                    y: {
+                        grid:{color:'rgba(255,255,255,0.08)'},
+                        ticks:{color:'#c6f2ff'},
+                        beginAtZero:false,
+                        title: {
+                            display: true,
+                            text: '垃圾量 (百万吨)',
+                            color: '#a7d5e6'
+                        }
+                    }
+                }
+            }
+        });
+        // 预警显示
+        const highlightSpan = document.getElementById('forecast-years-highlight');
+        if(highlightIndexes.length) {
+            highlightSpan.style.display = '';
+            const years = highlightIndexes.map(i=>data.years[i]);
+            // 只显示部分年份，避免过长
+            let displayText = years.join(', ');
+            if (years.length > 5) {
+                displayText = `${years.slice(0, 4).join(', ')}...等 ${years.length}个年份`;
+            }
+            highlightSpan.textContent = `高风险年份: ${displayText}`;
+        } else {
+            highlightSpan.style.display = 'none';
+        }
+    }
+    
+    // 修复后的逻辑：等待两个库都就绪再渲染
+    let tfReady = !!window.tf;
+    let chartReady = !!window.Chart;
+
+    function checkAndRender() {
+        if (tfReady && chartReady) {
+            renderForecastChart();
+        }
+    }
+
+    document.addEventListener('tf-ready', () => {
+        tfReady = true;
+        checkAndRender();
+    });
+
+    document.addEventListener('chart-ready', () => {
+        chartReady = true;
+        checkAndRender();
+    });
+
+    // 如果页面加载时库已经存在，也触发检查
+    checkAndRender();
+    </script>
+    <!-- 调试辅助：统一注入全局工具函数 (layoutDebug / forceGridFallback / forceDisableUnify / disableOverflowDetector / enableOverflowDetector) -->
+    <script>
+    (function(){
+        if(window.__DEV_UTILS_READY__) return; // 避免重复注入
+        window.__DEV_UTILS_READY__ = 'v1';
+        console.log('[DevTools] 调试工具注入 v1');
+        const SEL = '.huarong-puzzle-container.panel-grid-8';
+        function calcMinWidth(){
+            const c = document.querySelector(SEL); if(!c) return null;
+            const widths = [...c.querySelectorAll('.huarong-piece')].map(p=>p.getBoundingClientRect().width).filter(w=>w>0);
+            if(!widths.length) return null; return Math.min(...widths);
+        }
+        window.layoutDebug = function(){
+            return {
+                classes: document.body.className,
+                gridFallback: document.body.classList.contains('grid-fallback'),
+                unify: document.body.classList.contains('unify-cards'),
+                portraitFlex: document.body.classList.contains('portrait-flex-fallback'),
+                minWidth: calcMinWidth()
+            };
+        };
+        window.forceGridFallback = function(on){
+            if(on === false){ document.body.classList.remove('grid-fallback'); }
+            else { document.body.classList.add('grid-fallback'); document.body.classList.remove('unify-cards'); }
+            console.log('[DevTools] grid-fallback=' + document.body.classList.contains('grid-fallback'));
+        };
+        window.forceDisableUnify = function(){ document.body.classList.remove('unify-cards'); console.log('[DevTools] 已移除 unify-cards'); };
+        window.disableOverflowDetector = function(){ window.__DISABLE_OVERFLOW__=true; if(window.overflowDetector){ window.overflowDetector.disabled=true; window.overflowDetector.stopMonitoring(); } console.log('[DevTools] OverflowDetector 已禁用'); };
+        window.enableOverflowDetector = function(){ window.__DISABLE_OVERFLOW__=false; if(window.overflowDetector){ window.overflowDetector.disabled=false; window.overflowDetector.startMonitoring(); } console.log('[DevTools] OverflowDetector 已启用'); };
+    })();
+    </script>
+    <script>
+    // 背景视频加载与回退处理
+    (function initBgVideo(){
+        const v=document.getElementById('bg-video');
+        if(!v) return;
+        let loaded=false;
+        const timeout=setTimeout(()=>{
+            if(!loaded){ v.parentElement && v.parentElement.removeChild(v); console.warn('[BGVideo] 加载超时，已移除保留静态背景'); }
+        },12000);
+        v.addEventListener('canplay',()=>{ loaded=true; clearTimeout(timeout); v.classList.add('bg-video-ready'); },{once:true});
+        v.addEventListener('error',()=>{ clearTimeout(timeout); if(v.parentElement){ v.parentElement.removeChild(v); console.warn('[BGVideo] 加载失败，移除 video'); } });
+        // 提供手动暂停/播放调试接口
+        window.toggleBgVideo=()=>{ if(!v) return; if(v.paused){ v.play(); console.log('[BGVideo] play'); } else { v.pause(); console.log('[BGVideo] pause'); } };
+    })();
+    </script>
+    <style>
+            /* 返回起始页按钮美化 */
+            .nav-home-btn {
+                animation: homeBtnPulse 2.2s infinite cubic-bezier(.4,.14,.2,1);
+            }
+            .nav-home-btn:hover {
+                background:linear-gradient(135deg,#0d4d77 60%,#1e6fa1 100%);
+                color:#fff;
+                border-color:#fff;
+                box-shadow:0 0 0 6px #8de9ff44,0 4px 16px -6px #0b6fa1;
+            }
+            @keyframes homeBtnPulse {
+                0% { box-shadow:0 0 0 0 #8de9ff,0 4px 16px -6px #0b6fa1; }
+                70% { box-shadow:0 0 0 10px #8de9ff44,0 4px 16px -6px #0b6fa1; }
+                100% { box-shadow:0 0 0 0 #8de9ff,0 4px 16px -6px #0b6fa1; }
+            }
+            /* 数据大屏导航按钮高亮样式 */
+            .data-wall-nav-btn {
+                animation: wallBtnPulse 2.2s infinite cubic-bezier(.4,.14,.2,1);
+                box-shadow:0 0 0 0 #8de9ff,0 8px 24px -8px #0b6fa1;
+            }
+            .data-wall-nav-btn:hover {
+                background:linear-gradient(135deg,#0d4d77 60%,#0d6fa1 100%);
+                border-color:#fff;
+                box-shadow:0 0 0 6px #8de9ff44,0 8px 24px -8px #0b6fa1;
+            }
+            @keyframes wallBtnPulse {
+                0% { box-shadow:0 0 0 0 #8de9ff,0 8px 24px -8px #0b6fa1; }
+                70% { box-shadow:0 0 0 12px #8de9ff44,0 8px 24px -8px #0b6fa1; }
+                100% { box-shadow:0 0 0 0 #8de9ff,0 8px 24px -8px #0b6fa1; }
+            }
+      /* 背景视频样式：保持在粒子 canvas 之下（z-index:-2），粒子仍为 -1 */
+      .bg-video{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s ease; filter:brightness(0.9) saturate(1.1); }
+      .bg-video-ready{ opacity:1; }
+      /* 若需要在某些低性能设备禁用视频，可在 body 加 class no-video 再隐藏 */
+      body.no-video .bg-video{ display:none !important; }
+            /* 统一导航条 & 扩展卡片样式 */
+            #global-nav .mini-nav-link:hover{ text-decoration:underline; }
+            .ext-link-tile{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:12px 10px;border-radius:12px;color:#d4f3ff;text-decoration:none;backdrop-filter:blur(6px);transition:background .25s,border-color .25s,transform .25s;}
+            .ext-link-tile:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);transform:translateY(-2px);}
+            @media (max-width:980px){ #global-nav{flex-direction:column;align-items:flex-start;gap:6px;} }
+
+    /* === 扩展功能侧边栏与呼吸按钮 (替代原卡片) === */
+    /* 右下角呼吸按钮已移除（使用导航栏按钮触发展开） */
+    .ext-sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:118;opacity:0;pointer-events:none;transition:opacity .3s;}
+    .ext-sidebar-overlay.active{opacity:1;pointer-events:auto;} 
+    /* 侧边栏改为左侧滑出 */
+    #ext-sidebar{position:fixed;top:0;left:0;height:100%;width:340px;max-width:86vw;z-index:119;background:linear-gradient(215deg,rgba(8,33,54,0.82),rgba(6,26,58,0.72));border-right:1px solid rgba(255,255,255,.09);box-shadow:6px 0 18px -4px rgba(0,0,0,0.45);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);transform:translateX(-110%);transition:transform .38s cubic-bezier(.4,.14,.2,1);display:flex;flex-direction:column;padding:20px 20px 26px 22px;}
+    #ext-sidebar.open{transform:translateX(0);} 
+    #ext-sidebar header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+    #ext-sidebar h3{margin:0;font-size:18px;letter-spacing:.5px;color:#b6ecff;font-weight:600;display:flex;align-items:center;gap:6px;}
+    #ext-sidebar h3 span.badge{font-size:11px;padding:2px 7px;border-radius:16px;background:rgba(255,255,255,0.08);color:#8bdcff;border:1px solid rgba(255,255,255,0.18);letter-spacing:.5px;font-weight:500;}
+    #ext-sidebar-close{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#e8faff;cursor:pointer;width:34px;height:34px;border-radius:14px;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;transition:background .25s,border-color .25s,transform .25s;}
+    #ext-sidebar-close:hover{background:rgba(255,255,255,0.16);transform:rotate(90deg);} 
+    .ext-links{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px;margin-bottom:14px;}
+    .ext-links a{position:relative;display:flex;align-items:center;justify-content:flex-start;gap:6px;padding:10px 12px;border-radius:14px;font-size:13px;text-decoration:none;color:#d9f5ff;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:background .28s,border-color .28s,transform .28s,box-shadow .28s;} 
+    .ext-links a:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.28);transform:translateY(-3px);box-shadow:0 6px 14px -4px rgba(0,0,0,0.55);} 
+    .ext-hint{margin-top:auto;font-size:11px;line-height:1.6;color:#a7d5e6;padding-top:10px;border-top:1px dashed rgba(255,255,255,0.12);} 
+    @media (max-width:760px){#ext-sidebar{width:100%;max-width:none;}#ext-sidebar-toggle{right:16px;bottom:22px;width:54px;height:54px;}}
+    body.ext-sidebar-open{overflow:hidden;} 
+    /* 强制隐藏旧卡片 */
+    #ext-features-card{display:none !important;}
+     /* === 卡片放大预览 (非全屏 90%) === */
+     body.panel-enlarge-active{overflow:hidden;}
+     .panel-enlarge-overlay{position:fixed;inset:0;background:rgba(6,22,38,0.55);backdrop-filter:blur(10px) brightness(.9);-webkit-backdrop-filter:blur(10px) brightness(.9);z-index:149;opacity:0;transition:opacity .38s ease;}
+     .panel-enlarge-overlay.visible{opacity:1;}
+     .huarong-piece.panel-enlarging{box-shadow:0 18px 46px -10px rgba(0,0,0,0.65),0 0 0 1px rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:26px !important;overflow:hidden;}
+    .huarong-piece.panel-enlarging{animation:none !important;transform:none !important;}
+    .huarong-piece.panel-enlarging::-webkit-scrollbar{width:10px;background:rgba(255,255,255,0.05);} 
+    .huarong-piece.panel-enlarging::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,255,255,0.25),rgba(255,255,255,0.07));border-radius:10px;border:1px solid rgba(255,255,255,0.25);} 
+     .panel-close-btn{position:absolute;top:10px;right:12px;width:40px;height:40px;border-radius:14px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.08);color:#e9faff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .25s,border-color .25s,transform .25s;}
+     .panel-close-btn:hover{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.4);transform:rotate(90deg);}    
+     .panel-placeholder{width:100%;height:100%;pointer-events:none;}
+    .huarong-piece.panel-enlarging{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;}
+    .huarong-piece.panel-enlarging{scrollbar-gutter:stable;}
+    .huarong-piece.panel-enlarging .panel-title, .huarong-piece.panel-enlarging canvas, .huarong-piece.panel-enlarging > *{animation:panelEnlargeFade .48s ease both;}
+    @keyframes panelEnlargeFade{from{opacity:0;transform:translateY(12px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);} }
+    /* 扩展内容容器与动画 */
+    .panel-extra-wrapper{margin-top:14px;padding:14px 16px;background:linear-gradient(145deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03));border:1px solid rgba(255,255,255,0.14);border-radius:20px;display:flex;flex-direction:column;gap:14px;opacity:0;transform:translateY(12px);animation:extraIn .5s .08s cubic-bezier(.4,.14,.2,1) forwards;}
+    .panel-extra-wrapper h4{margin:0;font-size:15px;letter-spacing:.5px;color:#c8f1ff;font-weight:600;display:flex;align-items:center;gap:6px;}
+    .panel-extra-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
+    .panel-stat-box{background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;backdrop-filter:blur(6px);}
+    .panel-stat-box .k{font-size:11px;letter-spacing:.5px;color:#9dd4e8;}
+    .panel-stat-box .v{font-size:18px;font-weight:600;color:#fff;line-height:1;}
+    .panel-mini-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .panel-mini-table th,.panel-mini-table td{padding:4px 6px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:left;}
+    .panel-mini-table th{color:#8fd9ff;font-weight:500;font-size:11px;}
+    .panel-mini-table tbody tr:last-child td{border-bottom:none;}
+    .panel-note{font-size:11px;color:#a8d6e6;line-height:1.5;letter-spacing:.3px;}
+    @keyframes extraIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+    .closing-transitioning{pointer-events:none;}
+     @media (max-width:820px){
+         .panel-close-btn{top:6px;right:6px;width:36px;height:36px;font-size:20px;}
+     }
+    </style>
+    <style>
+    /* ===== Top5/Top8 面板放大布局修复 ===== */
+    .panel-enlarging.piece-6{display:flex;flex-direction:column;overflow:hidden;}
+    .panel-enlarging.piece-6 #rubbish-city-legend{max-height:80px;overflow:auto;margin-bottom:6px;}
+    .panel-enlarging.piece-6 .dual-chart-flex{flex:1 1 auto;display:flex;flex-direction:row;gap:12px;align-items:stretch;overflow:visible;}
+    .panel-enlarging.piece-6 .dual-chart-flex .city-chart-box{flex:1 1 50%;display:flex;flex-direction:column;}
+    .panel-enlarging.piece-6 canvas{width:100%!important;height:100%!important;min-height:0;}
+    /* 普通模式保持原垂直堆叠（窄屏下仍可换行） */
+    .piece-6 .dual-chart-flex{display:flex;flex-direction:column;gap:10px;}
+    @media (min-width:1080px){ .piece-6:not(.panel-enlarging) .dual-chart-flex{flex-direction:row;} }
+    </style>
+    <script>
+    // file:// 环境检测（本地直接双击可能导致 fetch CORS 失败）
+    (function detectFileMode(){
+        if(location.protocol === 'file:'){
+            window.__FILE_MODE__ = true;
+            console.warn('[Env] 当前以 file:// 方式打开，外部 fetch 将被浏览器阻止。将强制使用模拟数据。建议使用本地服务器，例如: npx serve 或 python -m http.server');
+        }
+    })();
+    // ===== 临时调试：图表全部不显示时的诊断与重试 =====
+    (function debugCharts(){
+        function logStatus(){
+            console.group('%c[ChartDebug] 状态快照','color:#4fc3f7');
+            console.log('Chart.js 存在?', !!window.Chart);
+            console.log('ChartManager 实例?', !!window.chartManager);
+            const ids=['source-chart','density-chart','species-impact-chart','trend-chart','rubbish-yearly-chart','rubbish-city-chart','ocean-overview-chart','marine-bio-loss-chart','water-quality-chart'];
+            ids.forEach(id=>{
+                const el=document.getElementById(id);
+                console.log(id,'DOM',!!el,'尺寸', el? (el.clientWidth+'x'+el.clientHeight):'N/A');
+            });
+            if(window.chartManager){
+                Object.entries(window.chartManager.charts).forEach(([k,v])=>{
+                    console.log('实例',k, !!v, v && v.config && v.config.type);
+                });
+            }
+            console.groupEnd();
+        }
+        // 移除临时图表重建调试逻辑（已清理按钮）
+    })();
+    </script>
+    
+    <!-- 移除重复的手动多次地球创建脚本，统一由 globe.js 处理 -->
+    
+    <!-- 已移除 3D 地球相关脚本与快捷键逻辑 -->
+    <!-- 扩展功能侧边栏结构 (放置在 body 尾部，避免阻塞首屏) -->
+    <div class="ext-sidebar-overlay" id="ext-sidebar-overlay"></div>
+    <!-- 侧边栏已移除 -->
+    <!-- 浮动触发按钮已删除，改用导航条按钮 #ext-sidebar-open-nav -->
+    <script>
+    (function initExtensionSidebar(){
+        const sidebar = document.getElementById('ext-sidebar');
+        const closeBtn = document.getElementById('ext-sidebar-close');
+        const overlay = document.getElementById('ext-sidebar-overlay');
+        const navBtn = document.getElementById('ext-sidebar-open-nav');
+        if(!sidebar || !navBtn){ return; }
+        function open(){
+            // 左侧滑入：CSS 通过 .open 取消 translateX(-110%)
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+            document.body.classList.add('ext-sidebar-open');
+            sidebar.setAttribute('aria-hidden','false');
+        }
+        function close(){
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            document.body.classList.remove('ext-sidebar-open');
+            sidebar.setAttribute('aria-hidden','true');
+        }
+        navBtn.addEventListener('click', open);
+        closeBtn && closeBtn.addEventListener('click', close);
+        overlay && overlay.addEventListener('click', close);
+        document.addEventListener('keydown', e=>{ if(e.key==='Escape' && sidebar.classList.contains('open')) close(); });
+        const old = document.getElementById('ext-features-card'); if(old) old.remove();
+        console.log('[ExtSidebar] 已初始化(导航按钮)');
+    })();
+    // 监听生物减少图表 fallback 事件，显示生成按钮（保留原有功能）
+    document.addEventListener('marine-bio-loss-fallback', ()=>{
+        const wrap = document.getElementById('bio-loss-missing');
+        if(wrap){ wrap.style.display='block'; }
+    });
+    document.addEventListener('click', e=>{
+        if(e.target && e.target.id==='generate-bio-loss'){
+            alert('请在项目根目录运行: python data_simulated2.py\n生成完成后刷新页面。');
+        }
+    });
+    </script>
+    
+</body>
+</html>

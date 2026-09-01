@@ -1,0 +1,197 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"/><title>海洋塑料污染智能监测系统 · 教育引导</title><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="styles.css"/><link rel="stylesheet" href="shared-ui.css"/><link rel="stylesheet" href="education_walkthrough.css"/>
+<script src="utils.js"></script><style>body{margin:0;font-family:Roboto,Arial,sans-serif;scroll-behavior:smooth}header{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:rgba(0,0,0,0.35);backdrop-filter:blur(10px);z-index:10}header a{text-decoration:none;font-size:13px}nav a:not(:first-child){margin-left:14px}#progressBar{position:fixed;top:0;left:0;height:3px;background:#49c4ff;width:0;z-index:20;transition:width .15s}footer{padding:40px 0;text-align:center;font-size:12px;opacity:.65;background:#02111b} .step h2 span{font-size:18px;opacity:0.85;margin-left:8px;letter-spacing:0} .jump-menu{position:fixed;right:14px;top:70px;display:flex;flex-direction:column;gap:6px;z-index:15} .jump-menu a{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:6px 10px;font-size:11px;color:#bdefff;border-radius:14px;text-decoration:none;opacity:.75} .jump-menu a.active{background:#0496c7;color:#fff;opacity:1}</style></head><body class="themed-page">
+  <!-- 背景视频与粒子层（参考 main.html 主题） -->
+  <video id="bg-video" class="bg-video" muted autoplay loop playsinline preload="auto" poster="imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg">
+    <source src="https://cdn.pixabay.com/video/2016/09/13/5200-183786525_large.mp4" type="video/mp4">
+  </video>
+  <canvas id="particle-canvas" class="particle-canvas"></canvas>
+<div id="progressBar"></div>
+<header class="frost-header"><div>🔍帮助与查询</div><nav><a href="main.html" class="back-link small">← 返回主页面</a> <a id="markDone" href="javascript:void(0)" style="margin-left:14px;color:#ffcf6b;">标记已完成✓</a> <a id="resetWalk" href="javascript:void(0)" style="margin-left:8px;color:#9fe1ff;">重置标记</a></nav></header>
+<div class   ="jump-menu" id="jump"></div>
+<main style="margin-top:58px">
+  <section class="step" id="s1" style="background: linear-gradient(180deg, rgba(2,10,14,0.22), rgba(2,10,14,0.22)), url('imgs/b6bf5b0bb9e93c662193f8104e2cf505.jpg') center/cover no-repeat; background-color:#042434;">
+    <h2>1. 全球塑料问题 <span>Global Context</span></h2>
+    <p>每年大量塑料进入海洋，对生态系统、渔业与人类健康构成持续性压力。本平台整合多源数据，提供可视化与模拟能力，帮助理解扩散与治理潜力。</p>
+  </section>
+  <section class="step" id="s2" style="background: linear-gradient(180deg, rgba(2,10,14,0.22), rgba(2,10,14,0.22)), url('imgs/c83b305457dec35c308d7a794f64427a.jpg') center/cover no-repeat; background-color:#042434;">
+    <h2>2. 漂移与海流 <span>Drift & Currents</span></h2>
+    <p>海洋塑料的迁移受表层洋流、风场、随机湍流与海岸线阻挡作用。模拟中常用噪声场 + 大尺度流场叠加，近岸区域可发生聚集。</p>
+  </section>
+  <section class="step" id="s3">
+    <div class="step-bg"><img src="imgs/4acd392b37a0d564ec34c9d19c50cf78.jpg" alt="数据来源"></div>
+    <h2>3. 数据来源与不确定性 <span>Data Sources</span></h2>
+    <p>数据包含：全球统计（OWID）、海流（再分析/模式）、生物多样性观测、合成示例。缺失或延迟时系统提供回退生成策略并标记状态。</p>
+  </section>
+  <section class="step" id="s4">
+    <div class="step-bg"><img src="imgs/6e665ad7d8ad250d246bdf0244507911.jpg" alt="治理与政策"></div>
+    <h2>4. 治理与政策情景 <span>Policy</span></h2>
+    <p>减排、回收、清理与创新材料构成多维策略。本平台的政策模拟为示意模型，不代表真实评估，需要结合生命周期与区域特征。</p>
+  </section>
+  <section class="step" id="s5">
+    <div class="step-bg"><img src="imgs/5585d1d96a19215ccfbd41f8cc7f88c7.jpg" alt="你可以做什么"></div>
+    <h2>5. 你可以做什么 <span>Actions</span></h2>
+    <p>减少一次性塑料、支持回收体系、参与科学数据反馈、推动政策与教育传播，共同降低海洋塑料负荷。</p>
+  </section>
+</main>
+
+<div style="margin:60px 0 30px;display:flex;justify-content:center;">
+  <a href="main.html" style="text-decoration:none"><button style="padding:10px 24px;border-radius:26px;border:1px solid rgba(255,255,255,.28);background:linear-gradient(145deg,rgba(0,160,255,.25),rgba(0,210,255,.25));color:#e6f8ff;cursor:pointer;font-size:14px;backdrop-filter:blur(8px);letter-spacing:.5px;">← 返回主页 / Back to Home</button></a>
+</div>
+<footer>© 2025 Ocean Plastic Educational Walkthrough</footer>
+<script>
+;(function initWalk(){
+  const steps=[...document.querySelectorAll('.step')]; const jump=document.getElementById('jump'); const bar=document.getElementById('progressBar');
+  const LS_KEY='walkthrough_done_v1';
+  if(localStorage.getItem(LS_KEY)==='1'){
+    // 已完成：可选提示 + 提供重新进入按钮
+    console.log('[Walkthrough] 已标记完成，立即显示完成提示。');
+    const note=document.createElement('div'); note.style.cssText='position:fixed;bottom:14px;right:14px;background:rgba(0,0,0,0.5);padding:10px 14px;border-radius:12px;font-size:12px;color:#cfefff;backdrop-filter:blur(6px);z-index=50;';
+    note.innerHTML='已完成引导。<a href="#" id="replay" style="color:#7fe2ff;text-decoration:underline;margin-left:6px;">重新体验</a>';
+    document.body.appendChild(note);
+    document.getElementById('replay').onclick=(e)=>{ e.preventDefault(); window.scrollTo({top:0,behavior:'smooth'}); };
+  }
+  steps.forEach(s=>{ const a=document.createElement('a'); a.href='#'+s.id; a.textContent=s.id.toUpperCase(); jump.appendChild(a); });
+  function update(){ const vh=window.innerHeight; let sc=window.scrollY; bar.style.width= (sc/(document.body.scrollHeight - vh))*100+'%'; steps.forEach(step=>{ const r= step.getBoundingClientRect(); const center = r.top + r.height/2; const active = center>vh*0.15 && center<vh*0.85; step.dataset.active=active; const link = jump.querySelector('a[href="#'+step.id+'"]'); if(link) link.classList.toggle('active', active); }); }
+  document.addEventListener('scroll',()=>requestAnimationFrame(update)); update();
+  // 标记完成与重置
+  document.getElementById('markDone').onclick=()=>{ localStorage.setItem(LS_KEY,'1'); alert('已记录：下次可直接跳过或重新进入。'); };
+  document.getElementById('resetWalk').onclick=()=>{ localStorage.removeItem(LS_KEY); alert('已清除完成标记。'); };
+
+  // 插入背景遮罩以提高前景可读性（不遮挡交互）
+  (function insertOverlay(){
+    if(document.querySelector('.bg-overlay')) return;
+    const o=document.createElement('div'); o.className='bg-overlay'; document.body.appendChild(o);
+  })();
+
+  // 首次进入动效：当 step 第一次变为 active，增加 entered 属性以避免反复动画
+  (function oneTimeEnter(){
+    const observed = new WeakSet();
+    function markEntered(){
+      steps.forEach(s=>{
+        if(s.dataset.active === 'true' && !observed.has(s)){
+          s.classList.add('entered'); observed.add(s);
+        }
+      });
+    }
+    document.addEventListener('scroll', ()=>requestAnimationFrame(markEntered));
+    // 也在首次加载时检查一次
+    markEntered();
+  })();
+})();
+</script>
+
+<!-- Styles migrated to styles.css (migrated from education_walkthrough.html on 2025-09-30) -->
+
+
+<script>
+// 背景视频加载回退逻辑（超时移除）
+(function initBgVideo(){
+  const v=document.getElementById('bg-video');
+  if(!v) return;
+  let loaded=false;
+  const timeout=setTimeout(()=>{
+    if(!loaded){ v.parentElement && v.parentElement.removeChild(v); console.warn('[BGVideo] 加载超时，已移除 video'); }
+  },12000);
+  v.addEventListener('canplay',()=>{ loaded=true; clearTimeout(timeout); v.classList.add('bg-video-ready'); },{once:true});
+  v.addEventListener('error',()=>{ clearTimeout(timeout); if(v.parentElement){ v.parentElement.removeChild(v); console.warn('[BGVideo] 加载失败，移除 video'); } });
+  window.toggleBgVideo=()=>{ if(!v) return; if(v.paused){ v.play(); } else { v.pause(); } };
+})();
+
+// 轻量粒子占位：简单移动小圆点（避免引入大型库）
+(function simpleParticles(){
+  const canvas=document.getElementById('particle-canvas');
+  if(!canvas || !canvas.getContext) return;
+  const ctx=canvas.getContext('2d');
+  let w,h,particles=[];
+  function resize(){ w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; }
+  function init(){ resize(); particles=[]; for(let i=0;i<60;i++){ particles.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.6+0.4, vx:(Math.random()-0.5)*0.2, vy:(Math.random()-0.5)*0.2, alpha:0.6+Math.random()*0.4}); } }
+  function step(){ ctx.clearRect(0,0,w,h); for(const p of particles){ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>w) p.vx*=-1; if(p.y<0||p.y>h) p.vy*=-1; ctx.beginPath(); ctx.fillStyle='rgba(173,228,255,'+p.alpha+')'; ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); } requestAnimationFrame(step); }
+  window.addEventListener('resize', ()=>{ resize(); });
+  init(); step();
+})();
+
+// file:// 兼容提示（保留原有页面模式建议）
+(function detectFileMode(){ if(location.protocol==='file:'){ window.__FILE_MODE__=true; console.warn('[Env] file:// 模式，外部 fetch 可能被阻止；建议使用简单静态服务器: npx serve 或 python -m http.server'); } })();
+</script>
+
+<!-- 海洋污染类型与治理策略 查询按钮 + 弹窗 -->
+<button id="pollutionQueryBtn" class="query-fab" aria-haspopup="dialog" aria-controls="pollutionQueryModal" title="查询海洋污染类型与治理策略">🔍 查询</button>
+<div id="pollutionQueryModal" class="pollution-modal hidden" role="dialog" aria-modal="true" aria-labelledby="pollutionModalTitle">
+  <div class="modal-backdrop" data-close="1"></div>
+  <div class="modal-panel" role="document">
+    <div class="modal-header">
+      <h2 id="pollutionModalTitle">海洋污染类型与治理策略查询</h2>
+      <button id="pollutionModalClose" class="close-btn" aria-label="关闭">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="search-row">
+        <input id="pollutionSearch" type="text" placeholder="输入关键词（类型 / 策略 / 说明），例如：塑料、富营养化、回收、治理" autocomplete="off" />
+        <select id="pollutionFilter">
+          <option value="all">全部字段</option>
+          <option value="type">仅类型</option>
+          <option value="strategy">仅策略</option>
+        </select>
+      </div>
+      <div id="pollutionStats" class="stats-bar">共 <span id="resultCount">0</span> 条相关记录。</div>
+      <ul id="pollutionResultList" class="result-list" aria-live="polite"></ul>
+      <div class="no-result hidden" id="noResult">未找到匹配项。可尝试换一个关键词。</div>
+      <details class="data-notes"><summary>数据说明 / Disclaimer</summary><p>此列表为教学演示用的精简概念集合，并非完整或权威数据库；策略效果需结合情景建模与区域特征进行综合评估。</p></details>
+    </div>
+  </div>
+</div>
+
+<script>
+// === 海洋污染查询数据 & 逻辑 ===
+(function initPollutionQuery(){
+  const DATA = [
+    { type:'塑料污染 (Plastic Debris)', desc:'宏观与微塑料进入海洋，影响生态链并可吸附有害化学物。', strategies:['源头减量','生产者延伸责任 (EPR)','循环回收体系','河口 & 入海口拦截','海滩 / 离岸清理','可降解 / 替代材料','公众教育'] },
+    { type:'微塑料 (Microplastics)', desc:'粒径 <5mm，来源于磨损、化纤洗涤、颗粒树脂 & 二次碎裂。', strategies:['纺织过滤与改性','城市雨污分流优化','颗粒树脂防泄漏规范','污水处理升级','监测与标准体系','塑料减量'] },
+    { type:'石油与烃类 (Oil / Hydrocarbon)', desc:'油轮泄漏、钻井事故、日常排放形成的烃类污染。', strategies:['溢油应急预案','双层船体监管','生物 / 化学分散剂慎用','吸附回收技术','风险监测与航线管控'] },
+    { type:'营养盐富营养化 (Eutrophication)', desc:'氮磷等营养盐过量引起赤潮 / 缺氧。', strategies:['农业控肥 & 缓释肥','湿地 / 缓冲带构建','生活污水深度除磷脱氮','点源排放许可','生态修复 (增氧, 水动力)'] },
+    { type:'重金属 (Heavy Metals)', desc:'来自采矿、工业排放与沉积再悬浮，易生物累积。', strategies:['源头清洁生产','排放标准 & 监测','受污染沉积物治理 (固化/疏浚)','风险分级管理','土壤—河流协同治理'] },
+    { type:'持久性有机污染物 POPs', desc:'难降解、有毒、生物富集，跨界迁移。', strategies:['淘汰 / 替代化学品','封闭式工艺改造','国际公约协同 (斯德哥尔摩等)','监测溯源','安全处置与回收'] },
+    { type:'噪声污染 (Underwater Noise)', desc:'航运、地震勘测、施工影响海洋生物通讯与行为。', strategies:['安静船舶设计','航速优化与航线调整','施工时段避让敏感季','缓冲区划定','实时声学监测'] },
+    { type:'海洋酸化 (Ocean Acidification)', desc:'CO₂ 吸收导致 pH 下降，影响碳酸钙生物。', strategies:['减排 (能源转型)','蓝碳生态保护 (红树林/海草)','局地缓冲 (部分养殖场)','增强监测网络','与气候政策协同'] },
+    { type:'海洋热浪 (Marine Heatwaves)', desc:'异常高温事件损伤珊瑚与生态系统。', strategies:['全球温室气体减排','早期预警系统','生态多样性缓冲','受影响区域临时保护','动态海洋管理'] },
+    { type:'外来入侵物种 (Invasive Species)', desc:'压舱水 / 船体附着传播，扰乱本地生态。', strategies:['压舱水处理系统','船体防污涂层优化','高风险港口监测','快速清除与生物安全计划','生物风险评估'] }
+  ];
+
+  const btn = document.getElementById('pollutionQueryBtn');
+  const modal = document.getElementById('pollutionQueryModal');
+  const closeBtn = document.getElementById('pollutionModalClose');
+  const searchInput = document.getElementById('pollutionSearch');
+  const filterSelect = document.getElementById('pollutionFilter');
+  const listEl = document.getElementById('pollutionResultList');
+  const countEl = document.getElementById('resultCount');
+  const noResultEl = document.getElementById('noResult');
+  let lastFocus = null;
+
+  function escapeHTML(str){ return str.replace(/[&<>\"]+/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[s])); }
+  function highlight(text, term){
+    if(!term) return escapeHTML(text);
+    try{
+      const re=new RegExp('(' + term.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&') + ')','ig');
+      return escapeHTML(text).replace(re,'<mark>$1</mark>');
+    }catch{ return escapeHTML(text); }
+  }
+
+  function render(term=''){ const scope = filterSelect.value; const kw = term.trim(); let results = DATA.filter(row=>{ if(!kw) return true; const t = kw.toLowerCase(); if(scope==='type') return row.type.toLowerCase().includes(t); if(scope==='strategy') return row.strategies.some(s=>s.toLowerCase().includes(t)); return (row.type+row.desc+row.strategies.join(',')).toLowerCase().includes(t); }); listEl.innerHTML=''; if(!results.length){ noResultEl.classList.remove('hidden'); countEl.textContent='0'; return; } noResultEl.classList.add('hidden'); results.forEach(row=>{ const li=document.createElement('li'); li.className='pollution-item'; li.innerHTML = '<div class="pi-type">'+highlight(row.type, kw)+'</div>'+
+      '<div class="pi-desc">'+highlight(row.desc, kw)+'</div>'+
+      '<div class="pi-strat-label">治理策略:</div>'+
+      '<ul class="pi-strategies">'+ row.strategies.map(s=>'<li>'+highlight(s, kw)+'</li>').join('') +'</ul>';
+      listEl.appendChild(li); }); countEl.textContent=results.length; }
+
+  function openModal(){ if(!modal.classList.contains('hidden')) return; lastFocus = document.activeElement; modal.classList.remove('hidden'); document.body.classList.add('modal-open'); setTimeout(()=>modal.classList.add('show'),10); render(searchInput.value); searchInput.focus({preventScroll:true}); }
+  function closeModal(){ if(modal.classList.contains('hidden')) return; modal.classList.remove('show'); setTimeout(()=>{ modal.classList.add('hidden'); document.body.classList.remove('modal-open'); lastFocus && lastFocus.focus(); },180); }
+
+  btn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', e=>{ if(e.target.dataset.close) closeModal(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); if(e.key==='/' && document.activeElement.tagName!=='INPUT' && document.activeElement.tagName!=='TEXTAREA'){ openModal(); e.preventDefault(); } });
+  searchInput.addEventListener('input', ()=>render(searchInput.value));
+  filterSelect.addEventListener('change', ()=>render(searchInput.value));
+})();
+</script>
+
+</body></html>
+

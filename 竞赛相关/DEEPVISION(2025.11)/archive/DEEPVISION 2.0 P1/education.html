@@ -1,0 +1,987 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"/><title>DeepVision (深蓝视界) - 教育引导</title><link rel="icon" href="icon.png" type="image/png"><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="base.css"/><link rel="stylesheet" href="ui_kit.css"/><link rel="stylesheet" href="education.css"/>
+<script src="core.js"></script><style>body{margin:0;font-family:Roboto,Arial,sans-serif;scroll-behavior:smooth}header{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:rgba(0,0,0,0.35);backdrop-filter:blur(10px);z-index:10}header a{text-decoration:none;font-size:13px}nav a:not(:first-child){margin-left:14px}.help-actions{position:relative;z-index:50;flex-shrink:0}#progressBar{position:fixed;top:0;left:0;height:3px;background:#49c4ff;width:0;z-index:20;transition:width .15s}footer{padding:40px 0;text-align:center;font-size:12px;opacity:.65;background:#02111b} .jump-menu{position:fixed;right:14px;top:70px;display:flex;flex-direction:column;gap:6px;z-index:15} .jump-menu a{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:6px 10px;font-size:11px;color:#bdefff;border-radius:14px;text-decoration:none;opacity:.75} .jump-menu a.active{background:#0496c7;color:#fff;opacity:1}
+/* ===== 顶部搜索与沉浸轮播升级样式 ===== */
+.help-header{gap:16px;flex-wrap:wrap}
+.help-header.single-nav{flex-wrap:nowrap;justify-content:space-between;}
+.help-search-wrap{position:relative;display:flex;align-items:center;gap:10px;margin-left:auto;min-width:340px;}
+.help-search-wrap.centered{margin:0 auto;min-width:520px;max-width:760px;width:66%;order:3;}
+.help-search-wrap.elevate{padding:6px 10px;border-radius:14px;background:rgba(0,40,60,.55);box-shadow:0 6px 22px -8px rgba(0,150,255,.45),0 2px 8px -2px rgba(0,0,0,.55);backdrop-filter:blur(12px) saturate(1.3);-webkit-backdrop-filter:blur(12px) saturate(1.3);}
+.help-search-wrap input{flex:1;padding:10px 18px;border:0;background:rgba(0,0,0,.38);color:#eaf9ff;border-radius:10px;font-size:15px;letter-spacing:.55px;outline:none;transition:background .4s,box-shadow .45s;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);} 
+.help-search-wrap input:focus{background:rgba(0,0,0,.62);box-shadow:inset 0 0 0 1px rgba(120,210,255,.75),0 0 0 3px rgba(73,196,255,.35),0 0 22px -2px rgba(120,230,255,.6);} 
+.help-search-wrap input::placeholder{color:#c9e8fb;opacity:.6;}
+.help-search-status{font-size:11px;color:#9fe1ff;letter-spacing:.3px;min-width:88px;}
+.help-search-dropdown{position:absolute;top:46px;left:0;right:0;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.25);border-radius:12px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);max-height:340px;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:6px;z-index:30;}
+.help-search-dropdown.hidden{display:none;}
+.help-search-dropdown .dd-item{display:flex;align-items:center;gap:10px;font-size:12px;padding:7px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:9px;cursor:pointer;line-height:1.3;transition:.25s;}
+.help-search-dropdown .dd-item:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35);}
+.help-search-dropdown .dd-item.external{border-color:rgba(120,198,247,.45);}
+.help-search-dropdown .dd-type{font-size:10px;padding:3px 6px;background:rgba(255,255,255,.18);border-radius:6px;letter-spacing:.5px;color:#d8f3fd;}
+.help-search-dropdown mark{background:#ffe29f;color:#002b36;padding:0 3px;border-radius:3px;}
+.help-search-dropdown .dd-empty{font-size:11px;padding:6px 4px;color:#bfe8ff;}
+@media (max-width:760px){ .help-search-wrap{min-width:100%;order:3;} }
+
+/* ===== 照片墙背景样式 ===== */
+body.themed-page { background: transparent !important; }
+.immersive-carousel{position:fixed;inset:0;z-index:0;overflow:hidden;background:transparent;}
+.photo-wall{position:absolute;top:0;left:0;will-change:transform;cursor:grab;user-select:none;}
+.photo-item{position:absolute;background:#000;border-radius:12px;overflow:hidden;box-shadow:0 8px 25px rgba(0,0,0,0.6);transition:transform 0.3s;filter:brightness(0.85);}
+.photo-item:hover{transform:scale(1.05);filter:brightness(1.1);z-index:10;box-shadow:0 12px 35px rgba(0,0,0,0.8);}
+.photo-item img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;}
+/* 隐藏原背景视频 */
+/* #bg-video { display: none !important; } */
+/* #particle-canvas { display: none !important; } */
+#bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block !important;
+    filter: brightness(0.25);
+    z-index: -5;
+}
+.photo-wall {
+    transition: opacity 1s ease;
+}
+
+/* ===== 右侧污染对策卡片 ===== */
+.pollution-sidebar {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 320px;
+  max-height: calc(100vh - 100px);
+  background: rgba(2, 15, 25, 0.75);
+  backdrop-filter: blur(16px) saturate(1.2);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: translateX(0);
+}
+.pollution-sidebar.collapsed {
+  transform: translateX(calc(100% + 20px));
+}
+.pollution-sidebar-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px 16px 0 0;
+}
+.pollution-sidebar-header h3 {
+  margin: 0;
+  font-size: 15px;
+  color: #4cc9f0;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.pollution-sidebar-toggle {
+  position: absolute;
+  left: -32px;
+  top: 16px;
+  width: 32px;
+  height: 32px;
+  background: rgba(2, 15, 25, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #4cc9f0;
+  backdrop-filter: blur(16px);
+}
+.pollution-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 0;
+}
+.pollution-list::-webkit-scrollbar { width: 4px; }
+.pollution-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
+.ps-item {
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background 0.2s;
+}
+.ps-item:last-child { border-bottom: none; }
+.ps-item:hover { background: rgba(255, 255, 255, 0.04); }
+.ps-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e0fbfc;
+  margin-bottom: 4px;
+}
+.ps-desc {
+  font-size: 11px;
+  color: #94a3b8;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.ps-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.ps-tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  background: rgba(76, 201, 240, 0.15);
+  color: #4cc9f0;
+  border-radius: 4px;
+  border: 1px solid rgba(76, 201, 240, 0.2);
+}
+</style></head><body class="themed-page help-page">
+  <!-- 背景视频与粒子层（参考 main.html 主题） -->
+  <video id="bg-video" class="bg-video" muted autoplay loop playsinline preload="auto" poster="imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg">
+  <source src="background.mp4" type="video/mp4">
+  </video>
+  <canvas id="particle-canvas" class="particle-canvas"></canvas>
+<div id="progressBar"></div>
+<header class="frost-header help-header single-nav" style="position:relative;z-index:2000;"><div class="help-title">🎓 DeepVision 帮助页</div><nav class="help-actions"><a href="./dashboard.html" class="back-link small only-home" target="_self" style="cursor:pointer;pointer-events:auto!important;" onclick="if(window.parent!==window){window.parent.postMessage('closePopup','*');}else{window.location.href='./dashboard.html';}return false;">← 返回主页</a></nav>
+  <div class="help-search-wrap centered elevate">
+    <input id="helpSearch" type="text" placeholder="搜索指南 / 数据 / 策略（按 / 快速聚焦）" aria-label="帮助搜索" autocomplete="off" />
+    
+    <div id="helpSearchDropdown" class="help-search-dropdown hidden" role="listbox"></div>
+  </div>
+</header>
+
+<div class   ="jump-menu" id="jump"></div>
+<main style="margin-top:72px">
+  <div id="immersiveCarousel" class="immersive-carousel" aria-label="沉浸式资料墙" tabindex="0">
+    <div class="carousel-wallpaper" aria-hidden="true"></div>
+  </div>
+</main>
+
+<!-- 底部返回按钮移除：仅顶部链接保留 -->
+
+<!-- 已移除完成标记脚本：简化导航 -->
+
+<!-- Styles migrated to styles.css (migrated from education_walkthrough.html on 2025-09-30) -->
+
+
+<script>
+// 背景视频加载回退逻辑（超时移除）
+(function initBgVideo(){
+  const v=document.getElementById('bg-video');
+  if(!v) return;
+  let loaded=false;
+  const timeout=setTimeout(()=>{
+    if(!loaded){ v.parentElement && v.parentElement.removeChild(v); console.warn('[BGVideo] 加载超时，已移除 video'); }
+  },12000);
+  v.addEventListener('canplay',()=>{ loaded=true; clearTimeout(timeout); v.classList.add('bg-video-ready'); },{once:true});
+  v.addEventListener('error',()=>{ clearTimeout(timeout); if(v.parentElement){ v.parentElement.removeChild(v); console.warn('[BGVideo] 加载失败，移除 video'); } });
+  window.toggleBgVideo=()=>{ if(!v) return; if(v.paused){ v.play(); } else { v.pause(); } };
+})();
+
+// 轻量粒子占位：简单移动小圆点（避免引入大型库）
+(function simpleParticles(){
+  const canvas=document.getElementById('particle-canvas');
+  if(!canvas || !canvas.getContext) return;
+  const ctx=canvas.getContext('2d');
+  let w,h,particles=[];
+  function resize(){ w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; }
+  function init(){ resize(); particles=[]; for(let i=0;i<60;i++){ particles.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.6+0.4, vx:(Math.random()-0.5)*0.2, vy:(Math.random()-0.5)*0.2, alpha:0.6+Math.random()*0.4}); } }
+  function step(){ ctx.clearRect(0,0,w,h); for(const p of particles){ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>w) p.vx*=-1; if(p.y<0||p.y>h) p.vy*=-1; ctx.beginPath(); ctx.fillStyle='rgba(173,228,255,'+p.alpha+')'; ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); } requestAnimationFrame(step); }
+  window.addEventListener('resize', ()=>{ resize(); });
+  init(); step();
+})();
+
+// 动态照片墙：无限循环移动 + 拖拽交互
+(function photoWall(){
+  const container = document.getElementById('immersiveCarousel');
+  if(!container) return;
+  
+  // 重置容器内容
+  container.innerHTML = '<div class="photo-wall" id="photoWall"></div>';
+  const wall = document.getElementById('photoWall');
+  
+  const IMAGES = [
+    'imgs/1054835_20211004152747917060_0.jpg',
+    'imgs/20230427180108ZrcbO.jpg',
+    'imgs/21d86cc3cf78356293bd199f192f95c3.jpg',
+    'imgs/4acd392b37a0d564ec34c9d19c50cf78.jpg',
+    'imgs/5585d1d96a19215ccfbd41f8cc7f88c7.jpg',
+    'imgs/6024.jpg_wh860.jpg',
+    'imgs/6443ae31327048d1b00e68343be2f2f9.jpeg',
+    'imgs/6e665ad7d8ad250d246bdf0244507911.jpg',
+    'imgs/8a87-31a3fda6af0c2646428b78f1a11b0e7f.jpg',
+    'imgs/90.jpg',
+    'imgs/b6bf5b0bb9e93c662193f8104e2cf505.jpg',
+    'imgs/c83b305457dec35c308d7a794f64427a.jpg',
+    'imgs/deep-blue-ocean-gradient-abstract-background.jpg',
+    'imgs/deep_blue_dark_ocean_gradient_background.jpg',
+    'imgs/deep_blue_ocean_gradient_abstract_background_navy.jpg',
+    'imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg',
+    'imgs/deep_blue_ocean_light_rays_gradient_background.jpg',
+    'imgs/dynamic_white_flowing_lines_abstract_black_background.jpg',
+    'imgs/modern_stacked_bar_chart_rounded_corners.jpg',
+    'imgs/ocean_plastic_pollution_infographic_icons_deep_blue.jpg',
+    'imgs/ocean_plastic_pollution_infographic_icons_marine_waste_illustration.jpg',
+    'imgs/ocean_plastic_pollution_infographic_marine_waste_statistics.jpg',
+    'imgs/R-C.jpg'
+  ];
+
+  // 配置参数
+  const ITEM_WIDTH = 280; // 卡片宽度 + 间距
+  const ITEM_HEIGHT = 200; // 卡片高度 + 间距
+  const BASE_SPEED_X = -0.15;
+  const BASE_SPEED_Y = 0.15;
+  let speedX = BASE_SPEED_X; // 向左移动速度 (减慢)
+  let speedY = BASE_SPEED_Y;  // 向下移动速度 (减慢)
+  
+  // 状态变量
+  let offsetX = 0;
+  let offsetY = 0;
+  let dragX = 0;
+  let dragY = 0;
+  let isDragging = false;
+  let startX = 0;
+  let startY = 0;
+  let lastDragX = 0;
+  let lastDragY = 0;
+  let animFrame = null;
+
+  function initGrid(){
+    wall.innerHTML = '';
+    
+    // 计算覆盖屏幕所需的行列数 (增加缓冲以支持循环)
+    const screenW = window.innerWidth;
+    const screenH = window.innerHeight;
+    
+    // 确保网格足够大，且是 4x4 模式的倍数 (因为我们有 16 张图，按 4x4 排列可完美循环)
+    let cols = Math.ceil(screenW / ITEM_WIDTH) + 4;
+    let rows = Math.ceil(screenH / ITEM_HEIGHT) + 4;
+    
+    // 强制为 4 的倍数以匹配图案周期
+    cols = Math.ceil(cols / 4) * 4;
+    rows = Math.ceil(rows / 4) * 4;
+    
+    const wallWidth = cols * ITEM_WIDTH;
+    const wallHeight = rows * ITEM_HEIGHT;
+    
+    wall.style.width = wallWidth + 'px';
+    wall.style.height = wallHeight + 'px';
+    
+    // 生成网格项
+    const fragment = document.createDocumentFragment();
+    for(let r=0; r<rows; r++){
+      for(let c=0; c<cols; c++){
+        // 使用 4x4 循环模式选择图片，确保无缝拼接
+        const imgIdx = ( (r % 4) * 4 + (c % 4) ) % IMAGES.length;
+        
+        const div = document.createElement('div');
+        div.className = 'photo-item';
+        div.style.width = (ITEM_WIDTH - 24) + 'px'; // 减去间距
+        div.style.height = (ITEM_HEIGHT - 24) + 'px';
+        div.style.left = (c * ITEM_WIDTH) + 'px';
+        div.style.top = (r * ITEM_HEIGHT) + 'px';
+        
+        const img = document.createElement('img');
+        img.src = IMAGES[imgIdx];
+        img.alt = 'Gallery Item';
+        img.loading = 'lazy';
+        
+        div.appendChild(img);
+        fragment.appendChild(div);
+      }
+    }
+    wall.appendChild(fragment);
+  }
+  
+  function animate(){
+    // 如果处于 3D 模式，暂停 2D 墙的移动更新，保持位置同步
+    if (window.is3DMode) {
+        animFrame = requestAnimationFrame(animate);
+        return;
+    }
+
+    if(!isDragging){
+      offsetX += speedX;
+      offsetY += speedY;
+    }
+    
+    // 当前总位移
+    const currentX = offsetX + dragX;
+    const currentY = offsetY + dragY;
+    
+    // 循环周期 (4x4 单元格)
+    const patternW = 4 * ITEM_WIDTH;
+    const patternH = 4 * ITEM_HEIGHT;
+    
+    // 计算循环取模后的位置 (保持在 -patternW 到 0 之间，或类似范围)
+    // 使用 ((x % n) + n) % n 公式处理负数
+    const wrapX = ((currentX % patternW) + patternW) % patternW - patternW; 
+    const wrapY = ((currentY % patternH) + patternH) % patternH - patternH;
+    
+    // 居中偏移 (让网格覆盖屏幕)
+    // 我们希望 (0,0) 对应屏幕中心附近，或者至少覆盖屏幕
+    // 简单起见，我们让 wrapX/Y 作为一个偏移量，然后减去一个足够大的 buffer 确保不露底
+    // 但因为我们已经重置到了 [-patternW, 0] 区间，我们只需要确保 grid 足够大
+    // initGrid 生成了比屏幕大很多的 grid。
+    // 我们将 grid 定位在 (wrapX - patternW, wrapY - patternH) 可能会导致左上角露白
+    // 实际上，我们应该定位在 (wrapX - 200, wrapY - 200) 这种固定偏移上?
+    // 不，wrapX 是周期性的。
+    // 只要 grid 绘制得足够大 (initGrid 做了)，我们只需要平移。
+    
+    wall.style.transform = `translate3d(${wrapX - ITEM_WIDTH}px, ${wrapY - ITEM_HEIGHT}px, 0)`;
+    
+    animFrame = requestAnimationFrame(animate);
+  }
+  
+  // 拖拽事件处理
+  container.addEventListener('pointerdown', e => {
+    if(e.button !== 0) return;
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    lastDragX = 0;
+    lastDragY = 0;
+    dragX = 0;
+    dragY = 0;
+    wall.classList.add('dragging');
+    container.setPointerCapture(e.pointerId);
+  });
+  
+  container.addEventListener('pointermove', e => {
+    if(!isDragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    dragX = dx;
+    dragY = dy;
+  });
+  
+  container.addEventListener('pointerup', e => {
+    if(!isDragging) return;
+    isDragging = false;
+    wall.classList.remove('dragging');
+    // 将拖拽距离合并到基础偏移量
+    offsetX += dragX;
+    offsetY += dragY;
+    dragX = 0;
+    dragY = 0;
+  });
+  
+  container.addEventListener('pointercancel', e => {
+    isDragging = false;
+    wall.classList.remove('dragging');
+    dragX = 0;
+    dragY = 0;
+  });
+  
+  window.addEventListener('resize', ()=>{
+    initGrid();
+  });
+
+  // --- 手势控制集成 ---
+  window.addEventListener('gesture-drag-start', () => {
+    isDragging = true;
+    wall.classList.add('dragging');
+    dragX = 0;
+    dragY = 0;
+  });
+  
+  window.addEventListener('gesture-drag-move', (e) => {
+    if(isDragging) {
+      dragX = e.detail.x;
+      dragY = e.detail.y;
+    }
+  });
+  
+  window.addEventListener('gesture-drag-end', () => {
+    if(isDragging) {
+      isDragging = false;
+      wall.classList.remove('dragging');
+      offsetX += dragX;
+      offsetY += dragY;
+      dragX = 0;
+      dragY = 0;
+    }
+  });
+
+  window.addEventListener('gesture-palm', (e) => {
+      if (e.detail.slow) {
+          speedX = BASE_SPEED_X * 0.1; // 变慢到 10%
+          speedY = BASE_SPEED_Y * 0.1;
+      } else {
+          speedX = BASE_SPEED_X;
+          speedY = BASE_SPEED_Y;
+      }
+  });
+  // -------------------
+  
+  initGrid();
+  animate();
+})();
+
+// file:// 兼容提示（保留原有页面模式建议）
+(function detectFileMode(){ if(location.protocol==='file:'){ window.__FILE_MODE__=true; console.warn('[Env] file:// 模式，外部 fetch 可能被阻止；建议使用简单静态服务器: npx serve 或 python -m http.server'); } })();
+</script>
+
+<!-- 海洋污染类型与治理策略 查询按钮 + 弹窗 -->
+<!-- 原查询按钮替换为顶部搜索框，保留弹窗可通过外部扩展再次启用：已移除 query-fab -->
+<div id="pollutionQueryModal" class="pollution-modal hidden" role="dialog" aria-modal="true" aria-labelledby="pollutionModalTitle">
+  <div class="modal-backdrop" data-close="1"></div>
+  <div class="modal-panel" role="document">
+    <div class="modal-header">
+      <h2 id="pollutionModalTitle">海洋污染类型与治理策略查询</h2>
+      <button id="pollutionModalClose" class="close-btn" aria-label="关闭">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="search-row">
+        <input id="pollutionSearch" type="text" placeholder="输入关键词（类型 / 策略 / 说明），例如：塑料、富营养化、回收、治理" autocomplete="off" />
+        <select id="pollutionFilter">
+          <option value="all">全部字段</option>
+          <option value="type">仅类型</option>
+          <option value="strategy">仅策略</option>
+        </select>
+      </div>
+      <div id="pollutionStats" class="stats-bar">共 <span id="resultCount">0</span> 条相关记录。</div>
+      <ul id="pollutionResultList" class="result-list" aria-live="polite"></ul>
+      <div class="no-result hidden" id="noResult">未找到匹配项。可尝试换一个关键词。</div>
+      <details class="data-notes"><summary>数据说明 / Disclaimer</summary><p>此列表为教学演示用的精简概念集合，并非完整或权威数据库；策略效果需结合情景建模与区域特征进行综合评估。</p></details>
+    </div>
+  </div>
+</div>
+
+<script>
+// === 海洋污染查询数据 & 逻辑 ===
+// 保留原查询数据供顶部搜索复用（不再弹窗显示）
+(function exposePollutionData(){
+  const DATA = [
+    { type:'塑料污染 (Plastic Debris)', desc:'宏观与微塑料进入海洋，影响生态链并可吸附有害化学物。', strategies:['源头减量','生产者延伸责任 (EPR)','循环回收体系','河口 & 入海口拦截','海滩 / 离岸清理','可降解 / 替代材料','公众教育'] },
+    { type:'微塑料 (Microplastics)', desc:'粒径 <5mm，来源于磨损、化纤洗涤、颗粒树脂 & 二次碎裂。', strategies:['纺织过滤与改性','城市雨污分流优化','颗粒树脂防泄漏规范','污水处理升级','监测与标准体系','塑料减量'] },
+    { type:'石油与烃类 (Oil / Hydrocarbon)', desc:'油轮泄漏、钻井事故、日常排放形成的烃类污染。', strategies:['溢油应急预案','双层船体监管','生物 / 化学分散剂慎用','吸附回收技术','风险监测与航线管控'] },
+    { type:'营养盐富营养化 (Eutrophication)', desc:'氮磷等营养盐过量引起赤潮 / 缺氧。', strategies:['农业控肥 & 缓释肥','湿地 / 缓冲带构建','生活污水深度除磷脱氮','点源排放许可','生态修复 (增氧, 水动力)'] },
+    { type:'重金属 (Heavy Metals)', desc:'来自采矿、工业排放与沉积再悬浮，易生物累积。', strategies:['源头清洁生产','排放标准 & 监测','受污染沉积物治理 (固化/疏浚)','风险分级管理','土壤—河流协同治理'] },
+    { type:'持久性有机污染物 POPs', desc:'难降解、有毒、生物富集，跨界迁移。', strategies:['淘汰 / 替代化学品','封闭式工艺改造','国际公约协同 (斯德哥尔摩等)','监测溯源','安全处置与回收'] },
+    { type:'噪声污染 (Underwater Noise)', desc:'航运、地震勘测、施工影响海洋生物通讯与行为。', strategies:['安静船舶设计','航速优化与航线调整','施工时段避让敏感季','缓冲区划定','实时声学监测'] },
+    { type:'海洋酸化 (Ocean Acidification)', desc:'CO₂ 吸收导致 pH 下降，影响碳酸钙生物。', strategies:['减排 (能源转型)','蓝碳生态保护 (红树林/海草)','局地缓冲 (部分养殖场)','增强监测网络','与气候政策协同'] },
+    { type:'海洋热浪 (Marine Heatwaves)', desc:'异常高温事件损伤珊瑚与生态系统。', strategies:['全球温室气体减排','早期预警系统','生态多样性缓冲','受影响区域临时保护','动态海洋管理'] },
+    { type:'外来入侵物种 (Invasive Species)', desc:'压舱水 / 船体附着传播，扰乱本地生态。', strategies:['压舱水处理系统','船体防污涂层优化','高风险港口监测','快速清除与生物安全计划','生物风险评估'] }
+  ];
+
+  const btn = document.getElementById('pollutionQueryBtn');
+  const modal = document.getElementById('pollutionQueryModal');
+  const closeBtn = document.getElementById('pollutionModalClose');
+  const searchInput = document.getElementById('pollutionSearch');
+  const filterSelect = document.getElementById('pollutionFilter');
+  const listEl = document.getElementById('pollutionResultList');
+  const countEl = document.getElementById('resultCount');
+  const noResultEl = document.getElementById('noResult');
+  let lastFocus = null;
+
+  function escapeHTML(str){ return str.replace(/[&<>\"]+/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[s])); }
+  function highlight(text, term){
+    if(!term) return escapeHTML(text);
+    try{
+      const re=new RegExp('(' + term.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&') + ')','ig');
+      return escapeHTML(text).replace(re,'<mark>$1</mark>');
+    }catch{ return escapeHTML(text); }
+  }
+
+  function render(term=''){ const scope = filterSelect.value; const kw = term.trim(); let results = DATA.filter(row=>{ if(!kw) return true; const t = kw.toLowerCase(); if(scope==='type') return row.type.toLowerCase().includes(t); if(scope==='strategy') return row.strategies.some(s=>s.toLowerCase().includes(t)); return (row.type+row.desc+row.strategies.join(',')).toLowerCase().includes(t); }); listEl.innerHTML=''; if(!results.length){ noResultEl.classList.remove('hidden'); countEl.textContent='0'; return; } noResultEl.classList.add('hidden'); results.forEach(row=>{ const li=document.createElement('li'); li.className='pollution-item'; li.innerHTML = '<div class="pi-type">'+highlight(row.type, kw)+'</div>'+
+      '<div class="pi-desc">'+highlight(row.desc, kw)+'</div>'+
+      '<div class="pi-strat-label">治理策略:</div>'+
+      '<ul class="pi-strategies">'+ row.strategies.map(s=>'<li>'+highlight(s, kw)+'</li>').join('') +'</ul>';
+      listEl.appendChild(li); }); countEl.textContent=results.length; }
+
+  function openModal(){ if(!modal.classList.contains('hidden')) return; lastFocus = document.activeElement; modal.classList.remove('hidden'); document.body.classList.add('modal-open'); setTimeout(()=>modal.classList.add('show'),10); render(searchInput.value); searchInput.focus({preventScroll:true}); }
+  function closeModal(){ if(modal.classList.contains('hidden')) return; modal.classList.remove('show'); setTimeout(()=>{ modal.classList.add('hidden'); document.body.classList.remove('modal-open'); lastFocus && lastFocus.focus(); },180); }
+
+  window.__HELP_POLLUTION_DATA__ = DATA;
+})();
+
+// ================= 顶部搜索框逻辑（本地索引 + 外部回退） =================
+(function helpSearch(){
+  const input=document.getElementById('helpSearch'); if(!input) return;
+  const statusEl=document.getElementById('helpSearchStatus');
+  const dropdown=document.getElementById('helpSearchDropdown');
+  const pollution=window.__HELP_POLLUTION_DATA__||[];
+  const referenceCards=[
+    {title:'海龟与海洋垃圾',text:'塑料碎片可误食或缠绕，威胁大型海洋生物安全。'},
+    {title:'洋流漂移',text:'表层漂移决定垃圾汇聚区，需结合预测模拟。'},
+    {title:'数据与不确定性',text:'多源数据时间/空间稀疏，必须标注置信区间。'},
+    {title:'治理策略',text:'源头减量、循环回收与材料创新需协同推进。'},
+    {title:'个人行动',text:'重复使用、分类回收、参与清理是可执行起点。'},
+    {title:'全球影响',text:'区域输入差异提示治理优先级与合作分工。'},
+    {title:'深海光线',text:'光照衰减影响生态层次，需考虑垂直结构。'},
+    {title:'信息图图标',text:'抽象图形帮助快速分类污染类型与来源。'}
+  ];
+  let extAbort=null; let zhipuAbort=null;
+  const ZHIPU_CFG={ endpoint:'https://open.bigmodel.cn/api/paas/v4/chat/completions', model:'glm-4-flash', apiKey: window.__ZHIPU_API_KEY || '' };
+
+  function setStatus(msg){ if(statusEl) statusEl.textContent=msg||''; }
+  function indexLocal(){
+    return referenceCards.map((card,i)=>({type:'topic',title:card.title,text:card.text,idx:i}))
+      .concat(pollution.map((row,i)=>({type:'pollution',title:row.type,text:row.desc+' '+row.strategies.join(' '),row,idx:i})));
+  }
+  const LOCAL=indexLocal();
+  function clearResults(){ dropdown.innerHTML=''; dropdown.classList.add('hidden'); }
+  function highlight(str,kw){ if(!kw) return str; try{ const re=new RegExp('('+kw.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&')+')','ig'); return str.replace(re,'<mark>$1</mark>'); }catch{ return str; } }
+  function appendInfo(msg){ const info=document.createElement('div'); info.className='dd-empty'; info.innerHTML=msg; dropdown.appendChild(info); }
+  function triggerZhipu(q){
+    if(zhipuAbort){ zhipuAbort.abort(); zhipuAbort=null; }
+    const controller=new AbortController(); zhipuAbort=controller;
+    if(!ZHIPU_CFG.apiKey){ appendInfo('未配置智谱 API Key。请在控制台设置 window.__ZHIPU_API_KEY 后重试。'); setStatus('AI 未配置'); return; }
+    setStatus('AI 思考中…'); appendInfo('正在调用智谱 AI 获取智能建议…');
+    const prompt='你是海洋环境与污染治理的中文助手，请针对用户的检索词 "'+q+'" 提供最多6条相关知识点或策略，每条15~30字，使用项目符号。';
+    fetch(ZHIPU_CFG.endpoint,{
+      method:'POST',
+      signal:controller.signal,
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+ZHIPU_CFG.apiKey},
+      body:JSON.stringify({model:ZHIPU_CFG.model,messages:[{role:'user',content:prompt}],temperature:0.7})
+    }).then(r=>r.json()).then(data=>{
+      if(controller.signal.aborted) return;
+      const choice=(data.choices&&data.choices[0])||{}; const content=(choice.message&&choice.message.content)||'';
+      if(!content){ setStatus('AI 无结果'); appendInfo('AI 未返回内容'); return; }
+      const lines=content.split(/\n+/).map(l=>l.replace(/^[-*•\d\.\s]+/,'').trim()).filter(Boolean);
+      lines.slice(0,6).forEach(line=>{ const div=document.createElement('div'); div.className='dd-item external ai'; div.innerHTML='<span class="dd-type">AI</span><span class="dd-text">'+highlight(line,q)+'</span>'; div.onclick=()=>{ setStatus('AI: '+line); }; dropdown.appendChild(div); });
+      setStatus('AI 建议 '+lines.length+' 条');
+    }).catch(err=>{ if(controller.signal.aborted) return; console.warn('[HelpSearch] 智谱AI 失败',err); setStatus('AI 失败'); appendInfo('AI 获取失败，可稍后重试。'); });
+  }
+  function showLocal(q){ const kw=q.trim().toLowerCase(); if(!kw){ clearResults(); setStatus(''); return; }
+    const hits=LOCAL.filter(item=> item.text.toLowerCase().includes(kw) || item.title.toLowerCase().includes(kw));
+    dropdown.innerHTML=''; if(!hits.length){ setStatus('未找到本地内容，尝试外部搜索…'); dropdown.classList.remove('hidden'); dropdown.innerHTML='<div class="dd-empty">正在尝试获取外部结果…</div>'; triggerExternal(q); return; }
+    hits.slice(0,15).forEach(h=>{ const opt=document.createElement('div'); opt.className='dd-item'; opt.setAttribute('role','option'); const label=h.type==='topic'?'主题':'污染'; opt.innerHTML='<span class="dd-type">'+label+'</span><span class="dd-text">'+highlight(h.title,kw)+'</span>'; opt.onclick=()=>{ if(h.type==='topic'){ setStatus(h.title+' · '+h.text); } else { setStatus(h.row.type+' 策略: '+h.row.strategies.join(', ')); } dropdown.classList.add('hidden'); }; dropdown.appendChild(opt); });
+    dropdown.classList.remove('hidden'); setStatus('匹配 '+hits.length+' 条');
+  }
+  function triggerExternal(q){ 
+    if(extAbort){ extAbort.abort(); extAbort=null; }
+    let suggestions = []; // 存储联想词用于 fallback
+    
+    // 1. 添加百度百科直达选项
+    const baikeLink = document.createElement('div');
+    baikeLink.className = 'dd-item external';
+    baikeLink.innerHTML = '<span class="dd-type" style="background:#2932e1;">百度百科</span><span class="dd-text">查看 "'+highlight(q,q)+'" 的详细词条</span>';
+    baikeLink.onclick = ()=>{ window.open('https://baike.baidu.com/item/'+encodeURIComponent(q), '_blank'); };
+    dropdown.appendChild(baikeLink);
+    dropdown.classList.remove('hidden');
+
+    // 2. [新增] 尝试通过本地代理抓取百科摘要
+    const fetchLink = document.createElement('div');
+    fetchLink.className = 'dd-item external';
+    fetchLink.innerHTML = '<span class="dd-type" style="background:#00a4ff;">智能抓取</span><span class="dd-text">获取 "'+highlight(q,q)+'" 的百科摘要</span>';
+    
+    // 封装抓取逻辑
+    const doFetch = async (queryTerm, isFallback=false) => {
+        setStatus(isFallback ? '尝试抓取联想词: '+queryTerm+'...' : '正在连接服务器...');
+        const targetUrl = 'https://baike.baidu.com/item/' + encodeURIComponent(queryTerm);
+        const proxyUrl = '/api/proxy?url=' + encodeURIComponent(targetUrl);
+        console.log('[SmartFetch] Requesting:', proxyUrl);
+        
+        const res = await fetch(proxyUrl);
+        if (!res.ok) {
+            const errText = await res.text().catch(()=>'');
+            throw new Error(`Proxy Error ${res.status}: ${errText}`);
+        }
+        
+        setStatus('正在解析内容...');
+        const html = await res.text();
+        console.log('[SmartFetch] HTML Length:', html.length);
+        
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Debug: Check title
+        const pageTitle = doc.title || 'No Title';
+        console.log('[SmartFetch] Page Title:', pageTitle);
+
+        // 增强的选择器策略：多维度尝试提取摘要
+        let text = '';
+        
+        // 1. 尝试标准摘要容器 (Baidu Baike 变种)
+        const summary = doc.querySelector('.lemma-summary') || 
+                      doc.querySelector('.summary-content') || 
+                      doc.querySelector('.J-summary') ||
+                      doc.querySelector('.lemmaWgt-lemmaSummary');
+        if (summary) text = summary.innerText;
+        
+        // 2. 尝试 Meta Description (通常最可靠)
+        if (!text || text.trim().length < 5) {
+            const meta = doc.querySelector('meta[name="description"]');
+            if (meta) text = meta.content;
+        }
+
+        // 3. 尝试 OpenGraph Description
+        if (!text || text.trim().length < 5) {
+            const ogDesc = doc.querySelector('meta[property="og:description"]');
+            if (ogDesc) text = ogDesc.content;
+        }
+        
+        // 4. 还是没有，尝试正文第一段 (Fallback)
+        if (!text || text.trim().length < 5) {
+            const firstPara = doc.querySelector('.para') || doc.querySelector('.main-content p');
+            if (firstPara) text = firstPara.innerText;
+        }
+        
+        if (text && text.trim().length > 0) {
+            // 清理文本
+            text = text.replace(/\s+/g, ' ').trim().substring(0, 180) + '...';
+            setStatus('抓取成功');
+            
+            fetchLink.className = 'dd-item external expanded';
+            fetchLink.style.background = 'rgba(0, 164, 255, 0.15)';
+            fetchLink.innerHTML = '<div style="padding:4px;white-space:normal;line-height:1.6;color:#d9f2ff;font-size:12px;">' + 
+                                  '<strong style="color:#4cc9f0;display:block;margin-bottom:4px;">百科摘要 ('+(isFallback?queryTerm:q)+'):</strong>' + text + 
+                                  '<br/><a href="'+targetUrl+'" target="_blank" style="color:#ffe29f;text-decoration:underline;margin-top:6px;display:inline-block;font-size:11px;">阅读完整词条 &gt;</a></div>';
+            fetchLink.onclick = null; 
+            fetchLink.style.cursor = 'default';
+            return true;
+        } else {
+            // 记录失败原因以便调试
+            console.warn('[SmartFetch] Extraction failed. Title:', pageTitle);
+            // 如果是验证码页面
+            if(pageTitle.includes('验证') || pageTitle.includes('安全')){
+                throw new Error('触发了百度安全验证，请稍后再试');
+            }
+            // 如果是多义词页面
+            if(doc.querySelector('.polysemant-list')){
+                throw new Error('这是一个多义词页面，请尝试更具体的关键词');
+            }
+            // 抛出包含调试信息的错误
+            throw new Error(`解析失败 (Title: ${pageTitle.substring(0, 15)}...)`);
+        }
+    };
+
+    fetchLink.onclick = async (e) => {
+        e.stopPropagation();
+        console.log('[SmartFetch] Clicked for:', q);
+        
+        try {
+            // 第一次尝试：直接抓取
+            const success = await doFetch(q);
+            if(!success){
+                // 如果直接抓取没找到摘要，尝试 fallback
+                if(suggestions.length > 0){
+                    console.log('[SmartFetch] Direct fetch empty, trying suggestion:', suggestions[0]);
+                    const success2 = await doFetch(suggestions[0], true);
+                    if(!success2) throw new Error('未找到摘要 (尝试了联想词)');
+                } else {
+                    throw new Error('未找到摘要');
+                }
+            }
+        } catch (err) {
+            console.error('[SmartFetch] Failed:', err);
+            // 如果是 404 且有联想词，尝试抓取第一个联想词
+            if(err.message.includes('404') && suggestions.length > 0){
+                 try {
+                    console.log('[SmartFetch] 404, trying fallback:', suggestions[0]);
+                    const success3 = await doFetch(suggestions[0], true);
+                    if(!success3) {
+                        setStatus('抓取失败');
+                        alert('抓取失败，且联想词也无摘要。');
+                    }
+                 } catch(err2) {
+                    setStatus('抓取失败');
+                    alert('抓取失败：' + err2.message);
+                 }
+            } else {
+                setStatus('抓取失败');
+                alert('抓取失败：请确保您已重启 start_server.py 以启用代理功能。\n\n错误信息: ' + err.message);
+            }
+        }
+    };
+    dropdown.appendChild(fetchLink);
+
+    // 3. 尝试使用 JSONP 获取百度搜索建议 (模拟抓取相关词条)
+    const cbName = 'baidu_sug_' + Date.now();
+    const script = document.createElement('script');
+    script.src = 'https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd='+encodeURIComponent(q)+'&cb='+cbName;
+    
+    window[cbName] = function(data){
+      if(data && data.s && data.s.length > 0){
+        suggestions = data.s; // 保存联想词
+        // 移除之前的空提示（如果有）
+        const empties = dropdown.querySelectorAll('.dd-empty');
+        empties.forEach(e=>e.remove());
+        
+        // 添加联想结果
+        data.s.slice(0, 5).forEach(s => {
+          const div = document.createElement('div');
+          div.className = 'dd-item external';
+          div.innerHTML = '<span class="dd-type" style="background:#2932e1;">百科联想</span><span class="dd-text">'+highlight(s,q)+'</span>';
+          div.onclick = ()=>{ window.open('https://baike.baidu.com/item/'+encodeURIComponent(s), '_blank'); };
+          dropdown.appendChild(div);
+        });
+        setStatus('发现 '+data.s.length+' 个相关词条');
+      } else {
+        // setStatus('无相关联想');
+      }
+      delete window[cbName];
+      document.body.removeChild(script);
+    };
+    
+    script.onerror = function(){
+      delete window[cbName];
+      document.body.removeChild(script);
+      setStatus('联想服务连接失败');
+    };
+    
+    document.body.appendChild(script);
+  }
+  input.addEventListener('input',()=>showLocal(input.value));
+  document.addEventListener('keydown',e=>{ if(e.key==='/' && document.activeElement!==input){ input.focus(); e.preventDefault(); } });
+})();
+
+// 返回主页标志：顶部链接写入 sessionStorage
+;(function initBackHomeFlag(){
+  const link=document.querySelector('a.back-link.only-home');
+  if(!link) return; 
+  link.addEventListener('click',(e)=>{ 
+    try{ sessionStorage.setItem('fromHelp','1'); }catch(e){ console.warn('[BackFlag] 写入失败',e); } 
+    // 移除智能返回逻辑，强制使用 href 跳转以确保可靠性
+  });
+})();
+</script>
+
+<!-- 右侧污染对策侧边栏 -->
+<aside class="pollution-sidebar" id="pollutionSidebar">
+  <div class="pollution-sidebar-toggle" id="psToggle" title="切换面板">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="pollution-sidebar-header">
+    <h3>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      常见污染与对策
+    </h3>
+  </div>
+  <div class="pollution-list" id="pollutionList">
+    <!-- Dynamic Content -->
+  </div>
+</aside>
+
+<script>
+(function initPollutionSidebar(){
+  const sidebar = document.getElementById('pollutionSidebar');
+  const list = document.getElementById('pollutionList');
+  const toggle = document.getElementById('psToggle');
+  
+  // Toggle Logic
+  toggle.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    toggle.innerHTML = isCollapsed 
+      ? '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>'
+      : '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>';
+  });
+
+  // Populate Data
+  function render(){
+    const data = window.__HELP_POLLUTION_DATA__;
+    if(!data || !data.length) {
+      // Retry if data not ready
+      setTimeout(render, 100);
+      return;
+    }
+    
+    list.innerHTML = data.map(item => `
+      <div class="ps-item">
+        <div class="ps-title">${item.type.split('(')[0]}</div>
+        <div class="ps-desc">${item.desc}</div>
+        <div class="ps-tags">
+          ${item.strategies.slice(0,3).map(s => `<span class="ps-tag">${s}</span>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  // Initial render attempt
+  render();
+})();
+</script>
+
+<!-- MediaPipe Hands & Gesture Control -->
+<div id="gestureModeControl" class="gesture-mode-control">
+  <div class="mode-highlighter"></div>
+  <div class="mode-btn" data-mode="2D">平面手势 (2D)</div>
+  <div class="mode-btn active" data-mode="OFF">关闭手势</div>
+  <div class="mode-btn" data-mode="3D">高级交互 (3D)</div>
+</div>
+<style>
+.gesture-mode-control {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: fit-content;
+  min-width: 0;
+  background: rgba(2, 15, 25, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 30px;
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+.mode-highlighter {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: calc(100% - 8px);
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  border-radius: 26px;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 2px 10px rgba(14, 165, 233, 0.3);
+  z-index: 0;
+  pointer-events: none;
+}
+.mode-btn {
+  position: relative;
+  z-index: 1;
+  padding: 8px 24px;
+  border-radius: 26px;
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  user-select: none;
+  white-space: nowrap;
+  text-align: center;
+}
+.mode-btn:hover {
+  color: #e2e8f0;
+}
+.mode-btn.active {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+</style>
+
+<script>
+// 初始化手势模式 (默认关闭)
+window.GESTURE_MODE = 'OFF';
+
+document.addEventListener('DOMContentLoaded', () => {
+    const highlighter = document.querySelector('.mode-highlighter');
+    const btns = document.querySelectorAll('.mode-btn');
+
+    function updateHighlighter(targetBtn) {
+        if (!targetBtn) return;
+        const left = targetBtn.offsetLeft;
+        const width = targetBtn.offsetWidth;
+        highlighter.style.width = `${width}px`;
+        highlighter.style.transform = `translateX(${left}px)`;
+    }
+
+    btns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // 更新 UI
+            btns.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            updateHighlighter(e.target);
+            
+            // 更新状态
+            const newMode = e.target.dataset.mode;
+            window.GESTURE_MODE = newMode;
+            console.log('Gesture Mode switched to:', newMode);
+            
+            // 按需启动/停止摄像头
+            if (window.GestureControl) {
+                if (newMode === 'OFF') {
+                    window.GestureControl.stop();
+                } else {
+                    window.GestureControl.start();
+                }
+            }
+
+            // 如果从 3D 切换走，且当前处于 3D 模式，强制退出
+            if (newMode !== '3D' && window.is3DMode) {
+                if (window.ThreeScene && window.ThreeScene.stop) {
+                    window.ThreeScene.stop();
+                }
+            }
+        });
+    });
+
+    // 初始化位置
+    const activeBtn = document.querySelector('.mode-btn.active');
+    // 延迟一小会儿以确保布局计算正确
+    setTimeout(() => updateHighlighter(activeBtn), 100);
+    
+    // 窗口大小改变时重新计算
+    window.addEventListener('resize', () => {
+        const currentActive = document.querySelector('.mode-btn.active');
+        updateHighlighter(currentActive);
+    });
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<!-- MediaPipe Hands & Gesture Control -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/18.6.4/tween.umd.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script src="gesture-control.js"></script>
+<script src="three-scene.js"></script>
+<video class="input_video" style="display:none"></video>
+
+<script>
+// 初始化 3D 场景
+window.is3DMode = false; // 全局标志位
+window.addEventListener('DOMContentLoaded', () => {
+    const IMAGES = [
+        'imgs/1054835_20211004152747917060_0.jpg',
+        'imgs/20230427180108ZrcbO.jpg',
+        'imgs/21d86cc3cf78356293bd199f192f95c3.jpg',
+        'imgs/4acd392b37a0d564ec34c9d19c50cf78.jpg',
+        'imgs/5585d1d96a19215ccfbd41f8cc7f88c7.jpg',
+        'imgs/6024.jpg_wh860.jpg',
+        'imgs/6443ae31327048d1b00e68343be2f2f9.jpeg',
+        'imgs/6e665ad7d8ad250d246bdf0244507911.jpg',
+        'imgs/8a87-31a3fda6af0c2646428b78f1a11b0e7f.jpg',
+        'imgs/90.jpg',
+        'imgs/b6bf5b0bb9e93c662193f8104e2cf505.jpg',
+        'imgs/c83b305457dec35c308d7a794f64427a.jpg',
+        'imgs/deep-blue-ocean-gradient-abstract-background.jpg',
+        'imgs/deep_blue_dark_ocean_gradient_background.jpg',
+        'imgs/deep_blue_ocean_gradient_abstract_background_navy.jpg',
+        'imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg',
+        'imgs/deep_blue_ocean_light_rays_gradient_background.jpg',
+        'imgs/dynamic_white_flowing_lines_abstract_black_background.jpg',
+        'imgs/modern_stacked_bar_chart_rounded_corners.jpg',
+        'imgs/ocean_plastic_pollution_infographic_icons_deep_blue.jpg',
+        'imgs/ocean_plastic_pollution_infographic_icons_marine_waste_illustration.jpg',
+        'imgs/ocean_plastic_pollution_infographic_marine_waste_statistics.jpg',
+        'imgs/R-C.jpg'
+    ];
+    
+    const container = document.createElement('div');
+    container.id = 'three-canvas-container';
+    document.body.appendChild(container);
+    
+    ThreeScene.init(container, IMAGES, () => {
+        return document.querySelectorAll('.photo-item');
+    });
+});
+</script>
+</body></html>
+

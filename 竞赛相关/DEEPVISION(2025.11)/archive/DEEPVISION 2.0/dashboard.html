@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepVision (深蓝视界) - 主控台</title>
+    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="base.css">
+    <link rel="stylesheet" href="ui_kit.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <!-- 追加自定义附加样式 (style2) 放在主样式后，便于覆盖 -->
+    <!-- 字体与全局样式就绪，Chart.js 由 body 底部多 CDN 动态加载（已移除 Three.js） -->
+    <style>
+    /* 页面入场动画 - 细粒度错峰显示 */
+    .homepage-layout {
+        /* 容器本身保持可见 */
+    }
+    
+    /* 1. 左侧栏各模块初始状态 */
+    .left-col .a1-title,
+    .left-col .quick-glance,
+    .left-col .nav-menu {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    /* 2. 右侧栏各模块初始状态 */
+    .right-col .b1-top,
+    .right-col .b21-widgets,
+    .right-col .b22-links,
+    .right-col .b23-forecast {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    /* 3. 页面加载后 - 左侧顺序 */
+    body.page-loaded .left-col .a1-title { transition-delay: 0.1s; opacity: 1; transform: translateY(0); }
+    body.page-loaded .left-col .quick-glance { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
+    body.page-loaded .left-col .nav-menu { transition-delay: 0.3s; opacity: 1; transform: translateY(0); }
+
+    /* 4. 页面加载后 - 右侧顺序 */
+    body.page-loaded .right-col .b1-top { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
+    body.page-loaded .right-col .b21-widgets { transition-delay: 0.4s; opacity: 1; transform: translateY(0); }
+    body.page-loaded .right-col .b22-links { transition-delay: 0.5s; opacity: 1; transform: translateY(0); }
+    body.page-loaded .right-col .b23-forecast { transition-delay: 0.6s; opacity: 1; transform: translateY(0); }
+
+    /* 5. 左侧小组件 (Quick Glance Items) 内部错峰 */
+    .quick-glance .qg-item {
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+    }
+    body.page-loaded .quick-glance .qg-item { opacity: 1; transform: translateX(0); }
+    body.page-loaded .quick-glance .qg-item:nth-child(1) { transition-delay: 0.3s; }
+    body.page-loaded .quick-glance .qg-item:nth-child(2) { transition-delay: 0.4s; }
+    body.page-loaded .quick-glance .qg-item:nth-child(3) { transition-delay: 0.5s; }
+    body.page-loaded .quick-glance .qg-item:nth-child(4) { transition-delay: 0.6s; }
+
+    /* ===== 侧边栏弹出层与预加载样式 ===== */
+    #popup-overlay {
+        position: fixed;
+        z-index: 9999;
+        background: #0b1d2a;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+        box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        transform-origin: center center;
+        /* 优化动画曲线：使用更流畅的 easeOutQuart 曲线，消除僵直感 */
+        transition: 
+            top 0.6s cubic-bezier(0.25, 0.8, 0.25, 1),
+            left 0.6s cubic-bezier(0.25, 0.8, 0.25, 1),
+            width 0.6s cubic-bezier(0.25, 0.8, 0.25, 1),
+            height 0.6s cubic-bezier(0.25, 0.8, 0.25, 1),
+            border-radius 0.6s cubic-bezier(0.25, 0.8, 0.25, 1),
+            opacity 0.4s ease-out;
+    }
+    #popup-overlay.active {
+        pointer-events: auto;
+        opacity: 1;
+    }
+    #popup-overlay iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        display: block;
+        background: #0b1d2a;
+    }
+    /* 移除右上角关闭按钮样式，改用子页面内部返回按钮控制 */
+    #preload-container {
+        position: absolute;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+        visibility: hidden;
+        z-index: -1;
+    }
+    /* 性能优化：背景模糊与缩放 */
+    .blur-target {
+        transition: filter 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        will-change: filter, transform;
+    }
+    body.popup-open .blur-target {
+        filter: blur(12px) brightness(0.8);
+        transform: scale(0.98);
+        pointer-events: none; /* 禁止背景交互 */
+    }
+    </style>
+</head>
+<body>
+    <div class="homepage-layout blur-target">
+        <!-- 左侧 20% A 区域 -->
+        <aside class="left-col">
+            <div class="a1-title">
+                <h1 class="site-title">🐬 DeepVision (深蓝视界)</h1>
+                <p class="site-sub">基于沉浸式数字孪生技术的海洋生态科普与环境监测系统</p>
+            </div>
+            <!-- 快速概览模块：填充侧边栏空间，展示关键数字与登录状态 -->
+            <section class="quick-glance" aria-label="快速概览">
+                <header class="qg-header">⚡ 即时概览</header>
+                <div class="qg-stats" id="qg-stats">
+                    <div class="qg-item" data-key="total"><span class="k">全球估算输入</span><span class="v" id="qg-total">--</span><span class="u">Mt/年</span></div>
+                    <div class="qg-item" data-key="land"><span class="k">陆源贡献</span><span class="v" id="qg-land">--</span><span class="u">%</span></div>
+                    <div class="qg-item" data-key="fragments"><span class="k">碎片数量</span><span class="v" id="qg-fragments">--</span><span class="u">万亿</span></div>
+                    <!-- 网络状态指示：替代访客标识 -->
+                    <div class="qg-item qg-net-card">
+                        <div class="qg-net-status" id="qg-net-status" aria-live="polite" data-state="init" title="数据源网络状态">
+                            <span class="qg-net-dot"></span>
+                            <span class="qg-net-text">初始化...</span>
+                        </div>
+                    </div>
+                </div>
+                <details class="qg-more">
+                    <summary>更多指标</summary>
+                    <ul class="qg-extra" id="qg-extra">
+                        <li id="qg-next-refresh">下次刷新: --s</li>
+                        <li id="qg-r2">预测拟合 R²: --</li>
+                        <li id="qg-threshold">预测阈值: --</li>
+                    </ul>
+                </details>
+            </section>
+            <nav class="a2-nav" aria-label="页面导航">
+                <ul class="nav-links">
+                    <li><a href="index.html">起始页</a></li>
+                    <li><a href="monitor.html">数据大屏</a></li>
+                    <li><a href="education.html">帮助页</a></li>
+                    <li><a href="compare.html">情景对比</a></li>
+                    <li><a href="lab.html">预测实验室</a></li>
+                </ul>
+            </nav>
+            <footer class="a3-footer">
+                <div class="footer-mini">海洋塑料污染数据可视化平台 © 2025</div>
+            </footer>
+        </aside>
+        <!-- 右侧 80% B 区域 -->
+        <main class="right-col">
+            <section class="b1-top" aria-label="问候与账户区">
+                <div class="b11-greet" id="greet-box">
+                    <h2 id="greet-text">欢迎<span id="current-time" aria-label="当前时间">--:--</span></h2>
+                    <div id="main-refresh" class="refresh-indicator mini" title="自动数据刷新">
+                        <span class="refresh-ring" aria-hidden="true">
+                            <svg viewBox="0 0 40 40">
+                                <circle cx="20" cy="20" r="16" stroke="rgba(255,255,255,0.18)" stroke-width="4" fill="none"></circle>
+                                <circle class="ring-fg" cx="20" cy="20" r="16" stroke="#78c6f7" stroke-width="4" stroke-linecap="round" stroke-dasharray="100" stroke-dashoffset="100" fill="none"></circle>
+                            </svg>
+                        </span>
+                        <span id="main-refresh-text">初始化…</span>
+                    </div>
+                </div>
+            </section>
+            <section class="b2-bottom" aria-label="主内容与链接及预测">
+                <div class="b21-widgets">
+                    <div class="b21-header">核心监测卡片</div>
+                    <div class="widgets-scroll glass-card">
+                        <div class="dashboard-grid home-widgets two-col" data-layout="5x2">
+                    <div class="huarong-piece panel chart-panel piece-1" data-key="overview">
+                        <h3 class="panel-title">🌊 海洋污染</h3>
+                        <div class="ocean-pollution-card">
+                            <div class="ocean-pollution-main">
+                                <div class="main-value">8.2M</div>
+                                <div class="main-label">吨/年 估算输入</div>
+                            </div>
+                            <div class="ocean-pollution-sub">
+                                <div class="sub-box"><div class="sub-value">80%</div><div class="sub-label">陆源贡献</div></div>
+                                <div class="sub-box"><div class="sub-value">5.25万亿</div><div class="sub-label">碎片数量</div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="huarong-piece panel chart-panel piece-2" data-key="source">
+                        <h3 class="panel-title">🏭 塑料污染来源统计</h3>
+                        <canvas id="source-chart"></canvas>
+                        <div class="panel-info"><span class="info-text">陆地来源占 80%</span></div>
+                    </div>
+                    <div class="huarong-piece panel stats-panel piece-3" data-key="eco" onclick="toggleEcoChart(this)">
+                        <h3 class="panel-title">🌍 生态影响统计</h3>
+                        <div class="large-stats-grid">
+                            <div class="large-stat-row">
+                                <div class="large-stat-item"><div class="large-stat-number">800+</div><div class="large-stat-label">受影响物种</div></div>
+                                <div class="large-stat-item"><div class="large-stat-number">5.25万亿</div><div class="large-stat-label">塑料颗粒</div></div>
+                            </div>
+                            <div class="large-stat-row">
+                                <div class="large-stat-item"><div class="large-stat-number">269,000</div><div class="large-stat-label">吨漂浮塑料</div></div>
+                                <div class="large-stat-item"><div class="large-stat-number">90%</div><div class="large-stat-label">海鸟含塑料</div></div>
+                            </div>
+                        </div>
+                        <canvas id="density-chart" style="margin-top:10px;height:100px;"></canvas>
+                    </div>
+                    <div class="huarong-piece panel chart-panel piece-4" data-key="trend">
+                        <h3 class="panel-title">📈 历史趋势</h3>
+                        <canvas id="trend-chart"></canvas>
+                    </div>
+                    <div class="huarong-piece panel chart-panel simulation-chart-panel piece-5" data-key="yearly">
+                        <h3 class="panel-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                            <span>年度误管理塑料趋势</span>
+                            <span id="rubbish-yearly-range-label" style="font-size:11px;color:#89c2d9;letter-spacing:.5px;opacity:.85;">近20年</span>
+                        </h3>
+                        <div class="yearly-controls" style="display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 8px 0;font-size:11px;align-items:center;">
+                            <label style="display:flex;align-items:center;gap:4px;">窗口
+                                <select id="rubbish-range" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#d8f3fd;padding:2px 6px;border-radius:6px;font-size:11px;">
+                                    <option value="10">近10年</option>
+                                    <option value="15">近15年</option>
+                                    <option value="20" selected>近20年</option>
+                                    <option value="30">近30年</option>
+                                </select>
+                            </label>
+                            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                                <input type="checkbox" id="rubbish-ma" checked style="accent-color:#4dbafd;"> 移动均值(5)
+                            </label>
+                            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                                <input type="checkbox" id="rubbish-forecast" style="accent-color:#ffc857;"> 预测+5年
+                            </label>
+                            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+                                <input type="checkbox" id="rubbish-yoy" style="accent-color:#ff6b6b;" checked> 同比图
+                            </label>
+                        </div>
+                        <div class="yearly-chart-wrap"><canvas id="rubbish-yearly-chart"></canvas></div>
+                        <canvas id="rubbish-yearly-mini-chart" style="margin-top:6px;height:56px;display:block;"></canvas>
+                        <canvas id="rubbish-yearly-yoy-chart" style="margin-top:8px;height:90px;display:none;"></canvas>
+                        <div id="rubbish-forecast-table" style="display:none;margin-top:10px;font-size:11px;line-height:1.4;color:#d8f3fd;"></div>
+                        <div class="panel-info" style="margin-top:6px;">
+                            <span class="info-text" id="rubbish-yearly-data-note">来源: OWID</span>
+                            <div id="rubbish-yearly-kpis" class="yearly-kpis" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px;"></div>
+                        </div>
+                    </div>
+                                        <div class="huarong-piece panel chart-panel simulation-chart-panel piece-6" data-key="city" data-embed="realtime-city">
+                                                <h3 class="panel-title" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+                                                    <span>🌐 国家误管理实时概览 <span id="rt-mode-label" style="font-size:11px;color:#86c9e6;font-weight:400;margin-left:4px;letter-spacing:.5px;">Auto</span></span>
+                                                    <div style="display:flex;align-items:center;gap:6px;">
+                                                        <div id="rt-connection-indicator" style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#8edfff;">
+                                                            
+                                                            
+                                                        </div>
+                                                        <button id="rt-refresh-btn" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.25);color:#c7f2ff;font-size:11px;padding:4px 10px;border-radius:18px;cursor:pointer;backdrop-filter:blur(4px);">刷新</button>
+                                                    </div>
+                                                </h3>
+                                                <div class="rt-toolbar" style="display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 6px;">
+                                                    <button class="rt-mode-btn active" data-mode="auto">自适应</button>
+                                                    <button class="rt-mode-btn" data-mode="top5">Top5</button>
+                                                    <button class="rt-mode-btn" data-mode="top8">Top8</button>
+                                                    <span style="flex:1 1 auto;text-align:right;font-size:10px;color:#7fbfd6;letter-spacing:.5px;">60s 自动刷新</span>
+                                                </div>
+                                                <div id="rt-country-list" class="rt-country-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:6px;align-content:start;flex:1 1 auto;min-height:120px;">
+                                                    <!-- 动态列表 -->
+                                                </div>
+                                                <div id="rt-spark-row" style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+                                                    <canvas id="rt-mini-spark" height="54" style="flex:1 1 auto;max-height:60px;min-height:54px;"></canvas>
+                                                    <div style="display:flex;flex-direction:column;gap:4px;font-size:10px;color:#9ed4e6;width:90px;">
+                                                        <div><span style="opacity:.7;">主观察:</span> <span id="rt-focus-country" style="color:#ffe3a1;">—</span></div>
+                                                        <div><span style="opacity:.7;">近15年Δ:</span> <span id="rt-focus-delta" style="color:#ffd4b0;">—</span></div>
+                                                    </div>
+                                                </div>
+                                                <div class="panel-info" style="margin-top:6px;">
+                                                    <span class="info-text" id="rt-footnote">来源: OWID Mismanaged Plastic (实时拉取, 离线回退模拟)</span>
+                                                </div>
+                                        </div>
+                    <div class="huarong-piece panel chart-panel simulation-chart-panel piece-7" data-key="river">
+                        <h3 class="panel-title">🌊 洋流速度分布</h3>
+                        <canvas id="ocean-river-chart"></canvas>
+                        <div class="panel-info"><span class="info-text">OSCAR 采样速度</span></div>
+                    </div>
+                    <div class="huarong-piece panel chart-panel simulation-chart-panel piece-8" data-key="gyre">
+                        <h3 class="panel-title">📈 洋流指标概览</h3>
+                        <canvas id="ocean-overview-chart"></canvas>
+                        <div class="panel-info"><span class="info-text">OSCAR 样本统计</span></div>
+                    </div>
+                    <div class="huarong-piece panel chart-panel simulation-chart-panel piece-9" data-key="bio">
+                        <h3 class="panel-title">🧬 沿海城市生物减少</h3>
+                        <canvas id="marine-bio-loss-chart"></canvas>
+                        <div class="panel-info">
+                            <span class="info-text">模拟数据 (data_simulated2)</span>
+                            <div id="bio-loss-missing" style="display:none;margin-top:6px;">
+                                <button id="generate-bio-loss" class="control-btn" style="padding:4px 10px;font-size:12px;">⚙ 生成 CSV</button>
+                                <span style="display:block;font-size:11px;color:#a8dadc;margin-top:4px;opacity:.85;">缺少源数据，正在使用内置模拟</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="huarong-piece panel chart-panel simulation-chart-panel piece-10" data-key="water">
+                        <h3 class="panel-title">💧 沿海城市水质影响</h3>
+                        <canvas id="water-quality-chart"></canvas>
+                        <div class="panel-info"><span class="info-text">模拟数据 (simulate_water)</span></div>
+                    </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="b22-links" aria-label="相关链接">
+                    <h3 class="box-title">相关链接</h3>
+                    <ul class="rel-links">
+                        <li><a href="https://ourworldindata.org/plastic-pollution" target="_blank" rel="noopener">OWID Plastic Pollution</a></li>
+                        <li><a href="https://www.unep.org/" target="_blank" rel="noopener">UNEP</a></li>
+                        <li><a href="https://podaac.jpl.nasa.gov/dataset/OSCAR_L4_OC_third-deg" target="_blank" rel="noopener">OSCAR 数据</a></li>
+                        <li><a href="https://obis.org" target="_blank" rel="noopener">OBIS</a></li>
+                        <li><a href="https://baike.baidu.com/item/%E6%B5%B7%E6%B4%8B%E6%B1%A1%E6%9F%93" target="_blank" rel="noopener">海洋污染(百科)</a></li>
+                        <li><a href="https://baike.baidu.com/item/%E5%A4%AA%E5%B9%B3%E6%B4%8B%E5%9E%83%E5%9C%BE%E5%B8%A6" target="_blank" rel="noopener">太平洋垃圾带(百科)</a></li>
+                        <li><a href="https://baike.baidu.com/item/%E5%BE%AE%E5%A1%91%E6%96%99" target="_blank" rel="noopener">微塑料(百科)</a></li>
+                        <li><a href="https://baike.baidu.com/item/%E6%B5%B7%E6%B4%8B%E7%8E%AF%E6%B5%81" target="_blank" rel="noopener">海洋环流(百科)</a></li>
+                        <li style="list-style:none;margin-top:.5rem;font-weight:600;color:#d6f7ff;">组件数据来源</li>
+                        <li>海洋污染概览：OWID Plastic Pollution</li>
+                        <li>来源统计 / 年度趋势 / 国家占比：OWID Mismanaged Plastic Waste</li>
+                        <li>生态影响统计：UNEP / WWF / NOAA 报告综合 + 模拟补足</li>
+                        <li>海流速度分布&指标：OSCAR 海表流场</li>
+                        <li>沿海生物减少：OBIS 资料框架 + 内置模拟</li>
+                        <li>沿海水质影响：演示用模拟数据</li>
+                    </ul>
+                </div>
+                <div class="b23-forecast" aria-labelledby="long-forecast-title">
+                    <h3 id="long-forecast-title" class="box-title">长期预测 2050</h3>
+                    <div id="forecast-warning" class="forecast-warning compact" role="alert" aria-live="polite" data-threshold="auto">⚠ <span class="fw-year">—</span> 年预测超过阈值 <span class="fw-th">—</span></div>
+                    <div class="forecast-compact-wrap"><canvas id="long-forecast-chart"></canvas></div>
+                    <div class="forecast-meta compact">
+                        <span id="forecast-reg-eq">模型: —</span>
+                        <span id="forecast-r2">R²: —</span>
+                        <span id="forecast-threshold-info">阈值: —</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <!-- 帮助页返回加载过渡遮罩：默认隐藏，检测 sessionStorage.fromHelp 时显示 -->
+    <div id="help-return-loader" class="help-return-loader" hidden aria-live="polite" role="status" aria-label="正在准备主页内容">
+        <div class="hrl-inner" tabindex="-1">
+            <div class="hrl-spinner" aria-hidden="true"></div>
+            <div class="hrl-text">正在加载主页模块<span class="dotting" aria-hidden="true">...</span></div>
+            <div class="hrl-sub" id="hrl-sub">初始化中</div>
+        </div>
+    </div>
+    <!-- 全屏背景保持在布局外层 -->
+    <video id="bg-video" class="bg-video blur-target" muted autoplay loop playsinline preload="auto" poster="imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg">
+        <source src="background.mp4" type="video/mp4">
+    </video>
+    <canvas id="particle-canvas" class="blur-target"></canvas>
+
+
+    <script src="particles.js"></script>
+    <script>
+    (function loadChartMultiCDN(){
+        const sources=[
+            'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js',
+            'https://unpkg.com/chart.js@4.4.1/dist/chart.umd.min.js',
+            'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js'
+        ];
+        let i=0; function attempt(){
+            if(window.Chart){ console.log('[Loader] Chart.js 已存在'); document.dispatchEvent(new Event('chart-ready')); return; }
+            if(i>=sources.length){ console.warn('[Loader] 所有 Chart.js CDN 失败'); window.__CHART_FAILED__=true; return; }
+            const src=sources[i++];
+            const s=document.createElement('script');
+            s.src=src; s.onload=()=>{ console.log('[Loader] Chart.js 加载成功:',src); document.dispatchEvent(new Event('chart-ready')); };
+            s.onerror=()=>{ console.warn('[Loader] Chart.js 失败:',src); setTimeout(attempt,200); };
+            document.head.appendChild(s);
+        } attempt();
+    })();
+    </script>
+    <script>
+    // 启用主页隐藏浏览器滚动条（仍可滚动）
+    document.addEventListener('DOMContentLoaded',()=>{ document.body.classList.add('hide-scrollbars'); });
+    </script>
+    <script>
+    // 主页卡片入场动画：初始加 home-anim-init，等待首屏布局稳定后逐个播放
+    (function initHomeCardEntrance(){
+        const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if(prefersReduce) return; // 尊重用户设置
+        document.body.classList.add('home-anim-init');
+        function play(){
+            const cards=[...document.querySelectorAll('.dashboard-grid .huarong-piece')];
+            if(!cards.length) return;
+            document.body.classList.add('home-anim-play');
+            // 交错：按视觉重要度（概览卡 piece-3 / piece-2 等）可自定义排序
+            const order = cards.map(c=>({el:c,prio:0}));
+            order.forEach(o=>{
+                const piece=o.el.className.match(/piece-(\d+)/); if(piece){
+                    const n=+piece[1];
+                    // 自定义优先级：中部大块先、其余后
+                    o.prio = (n===3?0:(n===2?1:(n===5?2:(n===4?3:n+3))));
+                }
+            });
+            order.sort((a,b)=>a.prio-b.prio);
+            order.forEach((o,i)=>{
+                // 增加基础延迟 0.5s，等待父容器 b21-widgets (0.4s) 出现后再播放卡片动画
+                o.el.style.animationDelay = (0.5 + 0.1 * i)+'s';
+            });
+            // 大块 (B21/B22/B23) 已在 CSS 中固定延迟，不在此处统一设置
+            // 清理：动画结束后移除初始类以免影响后续放大等 transform 操作
+            setTimeout(()=>{ document.body.classList.remove('home-anim-init'); }, 1800);
+        }
+        // 等待一帧再执行，确保 DOM 渲染完成 & 尺寸稳定
+        requestAnimationFrame(()=>{ setTimeout(play, 30); });
+    })();
+    </script>
+    <!-- 新增：数据服务抽象 (B1) 必须在 charts.js 之前 -->
+    <script src="dataService.js"></script>
+    <script src="charts.js"></script>
+    <script src="realtime-city.js"></script>
+    <script src="responsive-layout.js"></script>
+    <!-- 添加版本参数防缓存（调试阶段） -->
+    <script src="overflow-detector.js?v=dev2"></script>
+    <script src="dashboard.js?v=dev2"></script>
+    <script>
+    // ==== 方形比例回退 (旧浏览器不支持 aspect-ratio) ====
+    (function squareFallback(){
+        const test=document.createElement('div');
+        // 简单检测: 设置 style.aspectRatio 后读取是否保留
+        test.style.aspectRatio='1 / 1';
+        if(test.style.aspectRatio){ return; } // 支持则退出
+        function apply(){
+            const cards=[...document.querySelectorAll('.dashboard-grid > .huarong-piece')];
+            cards.forEach(c=>{
+                // 仅在宽度存在时设置高度
+                const w=c.getBoundingClientRect().width;
+                if(w>0){ c.style.height=w+'px'; }
+            });
+        }
+        apply();
+        window.addEventListener('resize',()=>{ apply(); });
+        console.log('[SquareFallback] aspect-ratio unsupported, JS enforced');
+    })();
+    </script>
+    <script>
+    // 侧边栏导航按钮光斑 & 涟漪交互增强（与 CSS 新规则配合）
+    (function enhanceSidebarNav(){
+        const nav=document.querySelector('.left-col .nav-links'); if(!nav) return;
+        const links=[...nav.querySelectorAll('a')]; if(!links.length) return;
+        links.forEach(a=>{ a.setAttribute('data-glow','1'); });
+        function updatePos(e){
+            const t=e.currentTarget; const r=t.getBoundingClientRect();
+            const x=((e.clientX - r.left)/r.width*100).toFixed(2)+'%';
+            const y=((e.clientY - r.top)/r.height*100).toFixed(2)+'%';
+            t.style.setProperty('--gx',x); t.style.setProperty('--gy',y);
+        }
+        links.forEach(a=>{
+            a.addEventListener('mousemove',updatePos);
+            a.addEventListener('mouseenter',updatePos);
+            a.addEventListener('click',e=>{
+                // 创建涟漪元素
+                const r=a.getBoundingClientRect();
+                const ripple=document.createElement('span');
+                ripple.className='nav-ripple';
+                const rx=((e.clientX - r.left));
+                const ry=((e.clientY - r.top));
+                ripple.style.left=rx+'px'; ripple.style.top=ry+'px';
+                a.appendChild(ripple);
+                setTimeout(()=>{ ripple.remove(); },900);
+            });
+        });
+        console.log('[NavFX] sidebar nav enhanced');
+    })();
+    </script>
+    <!-- 调试辅助：统一注入全局工具函数 (layoutDebug / forceGridFallback / forceDisableUnify / disableOverflowDetector / enableOverflowDetector) -->
+    <script>
+    (function(){
+        if(window.__DEV_UTILS_READY__) return; // 避免重复注入
+        window.__DEV_UTILS_READY__ = 'v1';
+        console.log('[DevTools] 调试工具注入 v1');
+        const SEL = '.huarong-puzzle-container.panel-grid-8';
+        function calcMinWidth(){
+            const c = document.querySelector(SEL); if(!c) return null;
+            const widths = [...c.querySelectorAll('.huarong-piece')].map(p=>p.getBoundingClientRect().width).filter(w=>w>0);
+            if(!widths.length) return null; return Math.min(...widths);
+        }
+        window.layoutDebug = function(){
+            return {
+                classes: document.body.className,
+                gridFallback: document.body.classList.contains('grid-fallback'),
+                unify: document.body.classList.contains('unify-cards'),
+                portraitFlex: document.body.classList.contains('portrait-flex-fallback'),
+                minWidth: calcMinWidth()
+            };
+        };
+        window.forceGridFallback = function(on){
+            if(on === false){ document.body.classList.remove('grid-fallback'); }
+            else { document.body.classList.add('grid-fallback'); document.body.classList.remove('unify-cards'); }
+            console.log('[DevTools] grid-fallback=' + document.body.classList.contains('grid-fallback'));
+        };
+        window.forceDisableUnify = function(){ document.body.classList.remove('unify-cards'); console.log('[DevTools] 已移除 unify-cards'); };
+        window.disableOverflowDetector = function(){ window.__DISABLE_OVERFLOW__=true; if(window.overflowDetector){ window.overflowDetector.disabled=true; window.overflowDetector.stopMonitoring(); } console.log('[DevTools] OverflowDetector 已禁用'); };
+        window.enableOverflowDetector = function(){ window.__DISABLE_OVERFLOW__=false; if(window.overflowDetector){ window.overflowDetector.disabled=false; window.overflowDetector.startMonitoring(); } console.log('[DevTools] OverflowDetector 已启用'); };
+    })();
+    </script>
+    <script>
+    // 背景视频加载与回退处理
+    (function initBgVideo(){
+        const v=document.getElementById('bg-video');
+        if(!v) return;
+        let loaded=false;
+        const timeout=setTimeout(()=>{
+            if(!loaded){ 
+                console.warn('[BGVideo] 加载超时 (20s)');
+                if(v.networkState === 3) { // NETWORK_NO_SOURCE
+                     v.load(); // 尝试重载
+                }
+            }
+        },20000);
+        v.addEventListener('canplay',()=>{ loaded=true; clearTimeout(timeout); v.classList.add('bg-video-ready'); },{once:true});
+        v.addEventListener('error',()=>{ clearTimeout(timeout); console.warn('[BGVideo] 加载失败'); });
+        // 提供手动暂停/播放调试接口
+        window.toggleBgVideo=()=>{ if(!v) return; if(v.paused){ v.play(); console.log('[BGVideo] play'); } else { v.pause(); console.log('[BGVideo] pause'); } };
+        // 强制尝试播放
+        v.play().catch(e => console.log('[BgVideo] 自动播放受阻:', e));
+    })();
+    </script>
+    <style>
+      /* 背景视频样式：保持在粒子 canvas 之下（z-index:-2），粒子仍为 -1 */
+      /* 修复：初始不透明度设为 1 避免加载延迟；提高亮度避免"消失"错觉 */
+      .bg-video{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:1; transition:opacity 1.2s ease; filter:brightness(0.25) saturate(1.1); }
+      .bg-video-ready{ opacity:1; }
+      /* 若需要在某些低性能设备禁用视频，可在 body 加 class no-video 再隐藏 */
+      body.no-video .bg-video{ display:none !important; }
+            /* 统一导航条 & 扩展卡片样式 */
+            #global-nav .mini-nav-link:hover{ text-decoration:underline; }
+            .ext-link-tile{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:12px 10px;border-radius:12px;color:#d4f3ff;text-decoration:none;backdrop-filter:blur(6px);transition:background .25s,border-color .25s,transform .25s;}
+            .ext-link-tile:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);transform:translateY(-2px);}
+            @media (max-width:980px){ #global-nav{flex-direction:column;align-items:flex-start;gap:6px;} }
+
+    /* === 扩展功能侧边栏与呼吸按钮 (替代原卡片) === */
+    /* 右下角呼吸按钮已移除（使用导航栏按钮触发展开） */
+    .ext-sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);z-index:118;opacity:0;pointer-events:none;transition:opacity .3s;}
+    .ext-sidebar-overlay.active{opacity:1;pointer-events:auto;} 
+    /* 侧边栏改为左侧滑出 */
+    #ext-sidebar{position:fixed;top:0;left:0;height:100%;width:340px;max-width:86vw;z-index:119;background:linear-gradient(215deg,rgba(8,33,54,0.82),rgba(6,26,58,0.72));border-right:1px solid rgba(255,255,255,.09);box-shadow:6px 0 18px -4px rgba(0,0,0,0.45);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);transform:translateX(-110%);transition:transform .38s cubic-bezier(.4,.14,.2,1);display:flex;flex-direction:column;padding:20px 20px 26px 22px;}
+    #ext-sidebar.open{transform:translateX(0);} 
+    #ext-sidebar header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+    #ext-sidebar h3{margin:0;font-size:18px;letter-spacing:.5px;color:#b6ecff;font-weight:600;display:flex;align-items:center;gap:6px;}
+    #ext-sidebar h3 span.badge{font-size:11px;padding:2px 7px;border-radius:16px;background:rgba(255,255,255,0.08);color:#8bdcff;border:1px solid rgba(255,255,255,0.18);letter-spacing:.5px;font-weight:500;}
+    #ext-sidebar-close{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#e8faff;cursor:pointer;width:34px;height:34px;border-radius:14px;font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;transition:background .25s,border-color .25s,transform .25s;}
+    #ext-sidebar-close:hover{background:rgba(255,255,255,0.16);transform:rotate(90deg);} 
+    .ext-links{display:grid;grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:10px;margin-bottom:14px;}
+    .ext-links a{position:relative;display:flex;align-items:center;justify-content:flex-start;gap:6px;padding:10px 12px;border-radius:14px;font-size:13px;text-decoration:none;color:#d9f5ff;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);transition:background .28s,border-color .28s,transform .28s,box-shadow .28s;} 
+    .ext-links a:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.28);transform:translateY(-3px);box-shadow:0 6px 14px -4px rgba(0,0,0,0.55);} 
+    .ext-hint{margin-top:auto;font-size:11px;line-height:1.6;color:#a7d5e6;padding-top:10px;border-top:1px dashed rgba(255,255,255,0.12);} 
+    @media (max-width:760px){#ext-sidebar{width:100%;max-width:none;}#ext-sidebar-toggle{right:16px;bottom:22px;width:54px;height:54px;}}
+    body.ext-sidebar-open{overflow:hidden;} 
+    /* 强制隐藏旧卡片 */
+    #ext-features-card{display:none !important;}
+     /* === 卡片放大预览 (非全屏 90%) === */
+     body.panel-enlarge-active{overflow:hidden;}
+     .panel-enlarge-overlay{position:fixed;inset:0;background:rgba(6,22,38,0.55);backdrop-filter:blur(10px) brightness(.9);-webkit-backdrop-filter:blur(10px) brightness(.9);z-index:149;opacity:0;transition:opacity .38s ease;}
+     .panel-enlarge-overlay.visible{opacity:1;}
+     .huarong-piece.panel-enlarging{box-shadow:0 18px 46px -10px rgba(0,0,0,0.65),0 0 0 1px rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:26px !important;overflow:hidden;}
+    .huarong-piece.panel-enlarging{animation:none !important;}
+    .huarong-piece.panel-enlarging::-webkit-scrollbar{width:10px;background:rgba(255,255,255,0.05);} 
+    .huarong-piece.panel-enlarging::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(255,255,255,0.25),rgba(255,255,255,0.07));border-radius:10px;border:1px solid rgba(255,255,255,0.25);} 
+     .panel-close-btn{position:absolute;top:10px;right:12px;width:40px;height:40px;border-radius:14px;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.08);color:#e9faff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .25s,border-color .25s,transform .25s;}
+     .panel-close-btn:hover{background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.4);transform:rotate(90deg);}    
+     .panel-placeholder{width:100%;height:100%;pointer-events:none;}
+    .huarong-piece.panel-enlarging{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;}
+    .huarong-piece.panel-enlarging{scrollbar-gutter:stable;}
+    .huarong-piece.panel-enlarging .panel-title, .huarong-piece.panel-enlarging canvas, .huarong-piece.panel-enlarging > *{animation:panelEnlargeFade .48s ease both;}
+    @keyframes panelEnlargeFade{from{opacity:0;transform:translateY(12px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);} }
+    /* 扩展内容容器与动画 */
+    .panel-extra-wrapper{margin-top:14px;padding:14px 16px;background:linear-gradient(145deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03));border:1px solid rgba(255,255,255,0.14);border-radius:20px;display:flex;flex-direction:column;gap:14px;opacity:0;transform:translateY(12px);animation:extraIn .5s .08s cubic-bezier(.4,.14,.2,1) forwards;}
+    .panel-extra-wrapper h4{margin:0;font-size:15px;letter-spacing:.5px;color:#c8f1ff;font-weight:600;display:flex;align-items:center;gap:6px;}
+    .panel-extra-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
+    .panel-stat-box{background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:4px;backdrop-filter:blur(6px);}
+    .panel-stat-box .k{font-size:11px;letter-spacing:.5px;color:#9dd4e8;}
+    .panel-stat-box .v{font-size:18px;font-weight:600;color:#fff;line-height:1;}
+    .panel-mini-table{width:100%;border-collapse:collapse;font-size:12px;}
+    .panel-mini-table th,.panel-mini-table td{padding:4px 6px;border-bottom:1px solid rgba(255,255,255,0.08);text-align:left;}
+    .panel-mini-table th{color:#8fd9ff;font-weight:500;font-size:11px;}
+    .panel-mini-table tbody tr:last-child td{border-bottom:none;}
+    .panel-note{font-size:11px;color:#a8d6e6;line-height:1.5;letter-spacing:.3px;}
+    @keyframes extraIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+    .closing-transitioning{pointer-events:none;}
+     @media (max-width:820px){
+         .panel-close-btn{top:6px;right:6px;width:36px;height:36px;font-size:20px;}
+     }
+    </style>
+    <style>
+    /* ===== 帮助页返回过渡遮罩 ===== */
+    .help-return-loader{position:fixed;inset:0;z-index:250;display:flex;align-items:center;justify-content:center;background:rgba(3,20,32,0.72);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);color:#d9f7ff;font-family:Roboto,Arial,sans-serif;}
+    .help-return-loader[hidden]{display:none !important;}
+    .help-return-loader .hrl-inner{display:flex;flex-direction:column;align-items:center;gap:14px;padding:34px 46px;border:1px solid rgba(255,255,255,0.18);border-radius:26px;background:linear-gradient(145deg,rgba(255,255,255,0.10),rgba(255,255,255,0.05));box-shadow:0 8px 28px -6px rgba(0,0,0,0.55),0 0 0 1px rgba(255,255,255,0.06);min-width:280px;}
+    .hrl-spinner{width:58px;height:58px;border-radius:50%;border:5px solid rgba(255,255,255,0.25);border-top-color:#5ec9ff;animation:hrlSpin 1s linear infinite;box-shadow:0 0 0 1px rgba(255,255,255,0.1);}
+    @keyframes hrlSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+    @media (prefers-reduced-motion: reduce){ .hrl-spinner{animation:none;border-top-color:#5ec9ff;} }
+    .hrl-text{font-size:16px;font-weight:500;letter-spacing:.8px;}
+    .hrl-sub{font-size:12px;color:#a9d8e6;letter-spacing:.5px;min-height:16px;}
+    .help-return-loader.fade-out{animation:hrlFade .55s cubic-bezier(.4,.14,.2,1) forwards;}
+    @keyframes hrlFade{to{opacity:0;transform:scale(.98);} }
+    .dotting::after{content:'';display:inline-block;width:1.2em;animation:dotAnim 1.4s steps(4,end) infinite;overflow:hidden;vertical-align:bottom;}
+    @keyframes dotAnim{0%{content:'';}25%{content:'.';}50%{content:'..';}75%{content:'...';}100%{content:'';}}
+    </style>
+    <style>
+    /* ===== Top5/Top8 面板放大布局修复 ===== */
+    .panel-enlarging.piece-6{display:flex;flex-direction:column;overflow:hidden;}
+    .panel-enlarging.piece-6 #rubbish-city-legend{max-height:80px;overflow:auto;margin-bottom:6px;}
+    .panel-enlarging.piece-6 .dual-chart-flex{flex:1 1 auto;display:flex;flex-direction:row;gap:12px;align-items:stretch;overflow:visible;}
+    .panel-enlarging.piece-6 .dual-chart-flex .city-chart-box{flex:1 1 50%;display:flex;flex-direction:column;}
+    .panel-enlarging.piece-6 canvas{width:100%!important;height:100%!important;min-height:0;}
+    /* 普通模式保持原垂直堆叠（窄屏下仍可换行） */
+    .piece-6 .dual-chart-flex{display:flex;flex-direction:column;gap:10px;}
+    @media (min-width:1080px){ .piece-6:not(.panel-enlarging) .dual-chart-flex{flex-direction:row;} }
+    </style>
+    <script>
+    // file:// 环境检测（本地直接双击可能导致 fetch CORS 失败）
+    (function detectFileMode(){
+        if(location.protocol === 'file:'){
+            window.__FILE_MODE__ = true;
+            console.warn('[Env] 当前以 file:// 方式打开，外部 fetch 将被浏览器阻止。将强制使用模拟数据。建议使用本地服务器，例如: npx serve 或 python -m http.server');
+        }
+    })();
+    // ===== 临时调试：图表全部不显示时的诊断与重试 =====
+    (function debugCharts(){
+        function logStatus(){
+            console.group('%c[ChartDebug] 状态快照','color:#4fc3f7');
+            console.log('Chart.js 存在?', !!window.Chart);
+            console.log('ChartManager 实例?', !!window.chartManager);
+            const ids=['source-chart','density-chart','species-impact-chart','trend-chart','rubbish-yearly-chart','rubbish-city-chart','ocean-overview-chart','marine-bio-loss-chart','water-quality-chart'];
+            ids.forEach(id=>{
+                const el=document.getElementById(id);
+                console.log(id,'DOM',!!el,'尺寸', el? (el.clientWidth+'x'+el.clientHeight):'N/A');
+            });
+            if(window.chartManager){
+                Object.entries(window.chartManager.charts).forEach(([k,v])=>{
+                    console.log('实例',k, !!v, v && v.config && v.config.type);
+                });
+            }
+            console.groupEnd();
+        }
+        // 移除临时图表重建调试逻辑（已清理按钮）
+    })();
+    </script>
+    
+    <!-- 移除重复的手动多次地球创建脚本，统一由 globe.js 处理 -->
+    
+    <!-- 已移除 3D 地球相关脚本与快捷键逻辑 -->
+    <!-- 扩展功能侧边栏结构 (放置在 body 尾部，避免阻塞首屏) -->
+    <div class="ext-sidebar-overlay" id="ext-sidebar-overlay"></div>
+    <aside id="ext-sidebar" aria-hidden="true" role="complementary">
+        <header>
+            <h3>🧩 扩展功能 </h3>
+            <button id="ext-sidebar-close" aria-label="关闭扩展功能面板">×</button>
+        </header>
+        <nav class="ext-links" aria-label="扩展功能链接">
+            <a href="monitor.html" class="data-wall-link">📊 数据大屏</a>
+            <a href="scenario_compare.html">🧪 情景对比</a>
+            <a href="prediction_lab.html">📈 预测实验室</a>
+            <a href="education_walkthrough.html">🎓 教育引导</a>
+        </nav>
+        <section class="ext-datasource" aria-label="数据来源 Data Sources">
+            <h4 style="margin:0 0 6px;font-size:14px;letter-spacing:.5px;color:#bfefff;">📚 组件数据来源</h4>
+            <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:11px;line-height:1.45;color:#d5f4ff;">
+                <li>海洋污染概览：OWID Plastic Pollution <a href="https://ourworldindata.org/plastic-pollution" target="_blank" style="color:#89d9ff;">链接</a></li>
+                <li>来源统计 / 年度趋势 / 国家占比：OWID Mismanaged Plastic Waste</li>
+                <li>生态影响统计：UNEP / WWF / NOAA 报告综合 + 模拟补足</li>
+                <li>洋流速度分布&指标：OSCAR 海表流场 <a href="https://podaac.jpl.nasa.gov/dataset/OSCAR_L4_OC_third-deg" target="_blank" style="color:#89d9ff;">OSCAR</a></li>
+                <li>沿海生物减少：OBIS 资料框架 + 内置模拟 <a href="https://obis.org" target="_blank" style="color:#89d9ff;">OBIS</a></li>
+                <li>沿海水质影响：演示用模拟数据</li>
+            </ul>
+            <div style="margin-top:6px;font-size:10px;line-height:1.4;color:#9ecedd;background:rgba(0,0,0,0.25);padding:6px 8px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);">离线 / file 模式时自动使用合成数据并标注。</div>
+        </section>
+        <div class="ext-hint">这些页面为教学 / 分析扩展模块，在离线或前端独立模式下使用合成或缓存数据。如需真实大规模数据，可启用 legacy 后端。</div>
+    </aside>
+    <!-- 浮动触发按钮已删除，改用导航条按钮 #ext-sidebar-open-nav -->
+    <script>
+    (function initExtensionSidebar(){
+        const sidebar = document.getElementById('ext-sidebar');
+        const closeBtn = document.getElementById('ext-sidebar-close');
+        const overlay = document.getElementById('ext-sidebar-overlay');
+        const navBtn = document.getElementById('ext-sidebar-open-nav');
+        if(!sidebar || !navBtn){ return; }
+        function open(){
+            // 左侧滑入：CSS 通过 .open 取消 translateX(-110%)
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+            document.body.classList.add('ext-sidebar-open');
+            sidebar.setAttribute('aria-hidden','false');
+        }
+        function close(){
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+            document.body.classList.remove('ext-sidebar-open');
+            sidebar.setAttribute('aria-hidden','true');
+        }
+        navBtn.addEventListener('click', open);
+        closeBtn && closeBtn.addEventListener('click', close);
+        overlay && overlay.addEventListener('click', close);
+        document.addEventListener('keydown', e=>{ if(e.key==='Escape' && sidebar.classList.contains('open')) close(); });
+        const old = document.getElementById('ext-features-card'); if(old) old.remove();
+        console.log('[ExtSidebar] 已初始化(导航按钮)');
+    })();
+    // 监听生物减少图表 fallback 事件，显示生成按钮（保留原有功能）
+    document.addEventListener('marine-bio-loss-fallback', ()=>{
+        const wrap = document.getElementById('bio-loss-missing');
+        if(wrap){ wrap.style.display='block'; }
+    });
+    document.addEventListener('click', e=>{
+        if(e.target && e.target.id==='generate-bio-loss'){
+            alert('请在项目根目录运行: python data_simulated2.py\n生成完成后刷新页面。');
+        }
+    });
+    </script>
+    <script>
+    // ===== 帮助页返回加载遮罩逻辑 =====
+    (function helpReturnLoader(){
+        let flag=false;
+        try{ flag = sessionStorage.getItem('fromHelp') === '1'; }catch(e){ flag=false; }
+        if(!flag) return; // 无标志不执行
+        const el = document.getElementById('help-return-loader');
+        if(!el) return;
+        el.hidden=false;
+        const inner = el.querySelector('.hrl-inner');
+        inner && inner.focus();
+        const sub = document.getElementById('hrl-sub');
+        let done=false;
+        const start = performance.now ? performance.now() : Date.now();
+        function safeDone(reason){
+            if(done) return; done=true;
+            if(sub) sub.textContent = reason || '完成';
+            el.classList.add('fade-out');
+            setTimeout(()=>{ 
+                // 最终隐藏并移除
+                el.hidden=true; 
+                el.parentElement && el.parentElement.removeChild(el);
+                try{ sessionStorage.removeItem('fromHelp'); }catch{}
+                console.log('[HelpLoader] 已关闭，耗时(ms):', (performance.now? performance.now():Date.now()) - start);
+            },560);
+        }
+        // 监听关键就绪事件：图表与主页初始化（这些事件需在 main.js 中派发）
+    // 事件只更新提示，不提前关闭，保证至少 3 秒展示
+    document.addEventListener('chart-ready', ()=>{ if(sub) sub.textContent='图表库就绪'; });
+    document.addEventListener('data-overview-ready', ()=>{ if(sub) sub.textContent='概览数据已载入'; });
+    document.addEventListener('login-state-ready', ()=>{ if(sub && !done) sub.textContent='登录状态同步'; });
+    window.addEventListener('load', ()=>{ if(sub && !done) sub.textContent='页面完成'; });
+    // 满 3 秒后进行关闭（统一时点）
+    setTimeout(()=>{ if(!done){ safeDone('准备完成'); } }, 3000);
+        // 二次兜底：5.2s 强制移除（防止任何异常）
+        setTimeout(()=>{ if(!done){ console.warn('[HelpLoader] 5.2s 兜底触发'); safeDone('超时关闭'); } }, 5200);
+        // Esc 允许用户手动跳过
+        document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ safeDone('已跳过'); } });
+        console.log('[HelpLoader] 显示加载遮罩');
+    })();
+    </script>
+    
+    <!-- 预加载容器与弹出层 -->
+    <div id="preload-container"></div>
+    <div id="popup-overlay">
+        <!-- 关闭按钮已移除，逻辑移交子页面返回按钮 -->
+    </div>
+
+    <script>
+    // ===== 侧边栏预加载与弹出动画逻辑 =====
+    document.addEventListener('DOMContentLoaded', () => {
+        const navLinks = document.querySelectorAll('.nav-links a');
+        const preloadContainer = document.getElementById('preload-container');
+        const popupOverlay = document.getElementById('popup-overlay');
+        
+        const iframeMap = {};
+        let activeLink = null;
+
+        // 关闭弹窗的核心函数
+        window.closePopup = function() {
+            if (!activeLink) return;
+
+            const rect = activeLink.getBoundingClientRect();
+
+            // 收起动画
+            popupOverlay.style.top = `${rect.top}px`;
+            popupOverlay.style.left = `${rect.left}px`;
+            popupOverlay.style.width = `${rect.width}px`;
+            popupOverlay.style.height = `${rect.height}px`;
+            popupOverlay.style.borderRadius = '12px';
+            popupOverlay.style.opacity = '0';
+            
+            popupOverlay.classList.remove('active');
+            document.body.classList.remove('popup-open');
+            const bgVideo = document.getElementById('bg-video');
+            if (bgVideo) bgVideo.play();
+
+            // 动画结束后清理
+            setTimeout(() => {
+                const currentFrame = popupOverlay.querySelector('iframe');
+                if (currentFrame) {
+                    preloadContainer.appendChild(currentFrame);
+                }
+                activeLink = null;
+            }, 600); // 对应 CSS transition 时间
+        };
+
+        // 监听来自 iframe 的关闭消息
+        window.addEventListener('message', (event) => {
+            if (event.data === 'closePopup') {
+                window.closePopup();
+            }
+        });
+
+        // 注入子页面点击劫持逻辑
+        function injectCloseHandler(iframe) {
+            try {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                // 查找所有指向 main.html 的链接，或者包含 'back-link' 类的元素
+                const backLinks = doc.querySelectorAll('a[href="main.html"], .back-link, .close-trigger');
+                
+                backLinks.forEach(btn => {
+                    // 避免重复绑定
+                    if (btn.dataset.hasCloseHandler) return;
+                    
+                    btn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        closePopup();
+                    });
+                    btn.dataset.hasCloseHandler = 'true';
+                    console.log('[Popup] 已接管子页面返回按钮:', btn);
+                });
+
+                // 也可以监听子页面的 ESC 键
+                doc.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') closePopup();
+                });
+
+            } catch (e) {
+                console.warn('[Popup] 无法注入子页面 (可能是跨域限制):', e);
+            }
+        }
+
+        // 1. 预加载逻辑
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href === 'index.html') return; // 跳过起始页
+
+            const iframe = document.createElement('iframe');
+            iframe.src = href;
+            iframe.setAttribute('loading', 'eager'); // 激进加载
+            
+            // 监听加载完成，注入关闭逻辑
+            iframe.onload = () => injectCloseHandler(iframe);
+
+            iframeMap[href] = iframe;
+            preloadContainer.appendChild(iframe);
+            console.log(`[Preload] 已预加载: ${href}`);
+        });
+
+        // 2. 点击事件处理
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                const href = link.getAttribute('href');
+                if (href === 'index.html') return;
+
+                e.preventDefault();
+                activeLink = link;
+
+                const rect = link.getBoundingClientRect();
+
+                // 初始定位
+                popupOverlay.style.transition = 'none';
+                popupOverlay.style.top = `${rect.top}px`;
+                popupOverlay.style.left = `${rect.left}px`;
+                popupOverlay.style.width = `${rect.width}px`;
+                popupOverlay.style.height = `${rect.height}px`;
+                popupOverlay.style.borderRadius = '12px';
+                popupOverlay.style.opacity = '0.5';
+
+                // 移动 iframe
+                const targetIframe = iframeMap[href];
+                if (targetIframe) {
+                    // 移除旧的
+                    const oldFrame = popupOverlay.querySelector('iframe');
+                    if (oldFrame) preloadContainer.appendChild(oldFrame);
+                    
+                    popupOverlay.insertBefore(targetIframe, popupOverlay.firstChild);
+                    
+                    // 再次尝试注入（防止预加载时未完成或页面被刷新）
+                    injectCloseHandler(targetIframe);
+                }
+
+                // 强制重绘
+                popupOverlay.offsetHeight;
+
+                document.body.classList.add('popup-open');
+                const bgVideo = document.getElementById('bg-video');
+                if (bgVideo) bgVideo.pause();
+
+                // 展开动画
+                popupOverlay.style.transition = '';
+                popupOverlay.classList.add('active');
+                popupOverlay.style.top = '0';
+                popupOverlay.style.left = '0';
+                popupOverlay.style.width = '100%';
+                popupOverlay.style.height = '100%';
+                popupOverlay.style.borderRadius = '0';
+                popupOverlay.style.opacity = '1';
+            });
+        });
+
+        // 3. 全局 ESC 关闭支持
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closePopup();
+        });
+    });
+    </script>
+    <script>
+    // ========== 主页卡片悬停视差（仅放大后启用） ==========
+    (function initHomeParallax(){
+        const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches; if(reduce) return;
+        const cards=[...document.querySelectorAll('.huarong-piece')]; if(!cards.length) return;
+        
+        cards.forEach(card=>{
+            let hovering=false, tx=0, ty=0, curX=0, curY=0, vx=0, vy=0;
+            let rafId=null;
+            
+            function stop(){ if(rafId){ cancelAnimationFrame(rafId); rafId=null; } }
+            
+            function frame(){
+                const expanded = card.classList.contains('panel-enlarging');
+                if(!expanded){ 
+                    hovering=false; tx=ty=curX=curY=vx=vy=0;
+                    // 只有当确实有视差变换残留时才清除，避免干扰 main.js 的关闭动画
+                    if(card.style.transform.includes('rotateX')) card.style.transform = ''; 
+                    // 恢复可能的 transition
+                    card.style.transition = '';
+                    stop(); return;
+                }
+                
+                if(hovering){
+                    const followEase=0.15; 
+                    curX += (tx - curX)*followEase;
+                    curY += (ty - curY)*followEase;
+                } else {
+                    const spring=0.1; const friction=0.85;
+                    vx += (-curX)*spring; vy += (-curY)*spring;
+                    vx *= friction; vy *= friction;
+                    curX += vx; curY += vy;
+                }
+                
+                const maxTilt=15; // 增大角度让效果更明显
+                
+                // 移除 transition 以避免视差延迟
+                card.style.transition = 'none';
+                
+                // 强制应用变换，使用 !important 确保覆盖
+                // 注意：main.js 可能会设置 scale(1)，我们需要保持它
+                const transformVal = `scale(1) perspective(1000px) rotateX(${-curY*maxTilt}deg) rotateY(${curX*maxTilt}deg)`;
+                card.style.setProperty('transform', transformVal, 'important');
+                
+                // 如果静止且未悬停，停止循环
+                if(!hovering && Math.abs(curX)<0.001 && Math.abs(curY)<0.001){
+                    card.style.setProperty('transform', 'scale(1)', 'important');
+                    // 恢复 transition (可选，为了后续可能的动画)
+                    card.style.transition = ''; 
+                    stop(); return; 
+                }
+                rafId=requestAnimationFrame(frame);
+            }
+            
+            card.addEventListener('mousemove',e=>{
+                if(!card.classList.contains('panel-enlarging')) return;
+                
+                // 确保移除可能阻挡 transform 的动画
+                card.style.animation = 'none';
+                
+                const r=card.getBoundingClientRect();
+                // 计算相对于卡片中心的坐标 (-0.5 ~ 0.5)
+                const x=(e.clientX-r.left)/r.width; 
+                const y=(e.clientY-r.top)/r.height; 
+                tx=(x-0.5); ty=(y-0.5);
+                
+                if(!rafId) rafId=requestAnimationFrame(frame);
+                hovering=true;
+            });
+            
+            card.addEventListener('mouseleave',()=>{ 
+                if(!card.classList.contains('panel-enlarging')) return;
+                hovering=false; 
+                if(!rafId) rafId=requestAnimationFrame(frame); 
+            });
+        });
+    })();
+    </script>
+    <script>
+        // 页面入场动画触发
+        window.addEventListener('load', () => {
+            requestAnimationFrame(() => {
+                document.body.classList.add('page-loaded');
+            });
+        });
+    </script>
+</body>
+</html>

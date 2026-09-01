@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>海洋塑料污染数据大屏展示</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* 大屏专用基础覆盖 */
+    body{margin:0;font-family:Roboto,Inter,system-ui,sans-serif;background:linear-gradient(135deg,#061c2b 0%,#0f3447 55%,#143d52 100%);color:#e0fbfc;overflow:hidden;}
+    .bg-video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;opacity:0;transition:opacity 1.2s ease;filter:brightness(.9) saturate(1.1);} .bg-video-ready{opacity:1;}
+    #particle-canvas{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.25;}
+    .wall-root{position:relative;z-index:1;width:100vw;height:100vh;display:flex;flex-direction:column;padding:18px 26px;box-sizing:border-box;gap:14px;}
+  .wall-header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;}
+  .header-left{display:flex;align-items:flex-start;gap:18px;}
+  .back-home-btn{cursor:pointer;padding:6px 14px;font-size:12px;letter-spacing:.1em;border:1px solid rgba(168,218,220,0.5);background:rgba(0,0,0,0.25);color:#e0fbfc;border-radius:16px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .25s,border-color .25s;}
+  .back-home-btn:hover{background:rgba(255,255,255,0.12);border-color:rgba(168,218,220,0.7);}    
+  .wall-title{font-size:clamp(1.6rem,2.6vw,2.8rem);letter-spacing:.08em;font-weight:600;margin:0;background:linear-gradient(90deg,#d8f3fd,#78c6f7 40%,#ffe29f 80%);-webkit-background-clip:text;background-clip:text;color:transparent;}
+    .wall-sub{font-size:clamp(.7rem,1vw,.95rem);color:#a8dadc;letter-spacing:.35em;font-weight:400;opacity:.85;margin-top:6px;}
+    .wall-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+  .refresh-indicator{position:relative;display:flex;align-items:center;gap:8px;font-size:.75rem;color:#cce9f6;letter-spacing:.15em;opacity:.95;padding:6px 12px 6px 10px;background:rgba(0,0,0,0.30);border:1px solid rgba(255,255,255,0.20);border-radius:18px;backdrop-filter:blur(8px) saturate(1.3);-webkit-backdrop-filter:blur(8px) saturate(1.3);}
+  .refresh-indicator.busy{box-shadow:0 0 0 1px rgba(120,198,247,0.35) inset;}
+  .refresh-indicator.error{border-color:rgba(255,110,110,0.75);color:#ffb3b3;box-shadow:0 0 0 1px rgba(255,110,110,0.45) inset,0 0 10px -2px rgba(255,110,110,0.55);}    
+  .refresh-ring{width:20px;height:20px;display:inline-block;}
+  .refresh-ring svg{width:20px;height:20px;display:block;overflow:visible;}
+  .refresh-ring .ring-bg{stroke:rgba(200,240,255,0.18);stroke-width:4;}
+  .refresh-ring .ring-fg{stroke:#78c6f7;stroke-width:4;stroke-linecap:round;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset 0.9s linear,stroke 0.3s ease;}
+  .refresh-indicator.busy .ring-fg{stroke:#ffe29f;animation:ringPulse 1.4s ease-in-out infinite alternate;}
+  @keyframes ringPulse{from{filter:drop-shadow(0 0 2px rgba(255,226,159,0.4));}to{filter:drop-shadow(0 0 6px rgba(255,226,159,0.75));}}
+  .refresh-indicator.error .ring-fg{stroke:#ff6b6b;animation:none;}
+  .refresh-text{min-width:84px;white-space:nowrap;}
+  .refresh-retry-btn{display:none;cursor:pointer;padding:4px 10px;font-size:11px;letter-spacing:.1em;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.08);color:#ffd9d9;border-radius:14px;transition:.25s;}
+  .refresh-indicator.error .refresh-retry-btn{display:inline-block;}
+  .refresh-retry-btn:hover{background:rgba(255,255,255,0.18);}    
+    .legend-mini-tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+    .legend-mini-tags span{font-size:10px;padding:4px 8px;background:rgba(255,255,255,0.08);border:1px solid rgba(168,218,220,.25);border-radius:20px;letter-spacing:.5px;}
+  /* ===== 筛选栏 Filter Bar ===== */
+  .filter-bar{display:flex;align-items:center;gap:24px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);padding:10px 18px;border-radius:18px;backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);}
+  .filter-group{display:flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.08em;color:#cce9f6;}
+  .filter-select{appearance:none;-webkit-appearance:none;background:rgba(0,0,0,0.35);color:#e0fbfc;border:1px solid rgba(255,255,255,0.18);padding:6px 34px 6px 12px;border-radius:10px;position:relative;font-size:12px;letter-spacing:.05em;min-width:110px;cursor:pointer;outline:none;}
+  .filter-select:focus{box-shadow:0 0 0 2px rgba(120,198,247,0.35);} 
+  .filter-select option{background:#082231;color:#e0fbfc;}
+  /* ===== KPI 指标行 ===== */
+  /* KPI 行：统一五等分卡片宽度，高度一致，左右与主体内边距对齐 */
+  .kpi-row-flex{display:flex;gap:14px;margin-top:2px;}
+  .kpi-row-flex .kpi-card{flex:1 1 0;display:flex;flex-direction:column;}
+  @media (max-width:1500px){ .kpi-row-flex{flex-wrap:wrap;} .kpi-row-flex .kpi-card{flex:1 1 calc(33.333% - 14px);} }
+  @media (max-width:1100px){ .kpi-row-flex .kpi-card{flex:1 1 calc(50% - 14px);} }
+  @media (max-width:780px){ .kpi-row-flex .kpi-card{flex:1 1 100%;} }
+  .kpi-card{position:relative;padding:14px 14px 12px 14px;border:1px solid rgba(255,255,255,0.16);background:linear-gradient(155deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03));border-radius:16px;display:flex;flex-direction:column;gap:4px;overflow:hidden;min-height:90px;}
+  .kpi-card:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 70% 25%,rgba(255,255,255,0.25),transparent 60%);opacity:.25;}
+  .kpi-label{font-size:12px;letter-spacing:.15em;color:#a8dadc;font-weight:500;white-space:nowrap;}
+  .kpi-value{font-size:1.6rem;font-weight:600;letter-spacing:.04em;background:linear-gradient(90deg,#d8f3fd,#78c6f7 50%,#ffe29f);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .kpi-note{font-size:10px;color:#89c2d9;letter-spacing:.1em;display:flex;align-items:center;gap:4px;}
+  .kpi-change-up{color:#6dd597;}
+  .kpi-change-down{color:#ff9d7d;}
+  .kpi-spark{position:absolute;right:10px;bottom:8px;font-size:10px;color:#ffce99;opacity:.75;letter-spacing:.15em;}
+  @media (max-width:900px){.filter-bar{flex-wrap:wrap;gap:14px;} .kpi-row{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));}}
+  /* ===== Dashboard 样式三列布局 ===== */
+  /* 重构布局：减少行数，避免底部组件被压到视窗外 */
+  /* 调整为两行：第一行(趋势/地图/右栈) 第二行(洋流/来源排名/物种水质) */
+  .dash-grid{flex:1 1 auto;display:grid;grid-template-columns:320px 1fr 360px;grid-template-rows:300px 1fr;gap:14px;min-height:0;overflow:hidden;}
+  /* 行语义：
+    Row1: 左趋势+生物  | KPI 下首行 (空) | 右上二图(国家占比+柱)
+    Row2: 中地图全宽   | 左空(或扩展)     | 右中(物种+水质)
+    Row3: 底部：洋流 + 来源&排名  | 右下空(未来扩展) */
+  .dash-grid::-webkit-scrollbar{width:8px;height:8px;}
+  .dash-grid::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:4px;}
+  .panel-left-large{grid-column:1 / 2;grid-row:1 / 2;display:flex;flex-direction:column;min-height:0;}
+  /* 中心地图占据中间列（恢复被左右包裹的视觉） */
+  .center-map{grid-column:2 / 3;grid-row:1 / 2;display:flex;flex-direction:column;padding:0;min-height:0;}
+  .panel-right-stack{grid-column:3 / 4;}
+  .panel-wide{grid-column:1 / 3;grid-row:3 / 4;min-height:0;}
+  .panel-ocean{grid-column:1 / 2;grid-row:3 / 4;}
+  .panel-right-lower{grid-column:3 / 4;grid-row:3 / 4;}
+  .panel-compact{padding:10px 12px;}
+  .dual-row{display:flex;gap:10px;flex:1 1 auto;min-height:0;}
+  .dual-row canvas{flex:1 1 50%;height:100%!important;}
+  .stack-small{display:flex;flex-direction:column;gap:10px;}
+  .stack-small .sub-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:6px 8px;display:flex;flex-direction:column;flex:1 1 0;min-height:0;}
+  .stack-small .sub-card h4{margin:0 0 4px;font-size:.75rem;letter-spacing:.08em;color:#bfe8ff;font-weight:600;}
+  /* 取消排名表格的固定高度与滚动，保证一次显示全部（前15条） */
+  .ranking-table{max-height:none;}
+  .panel-wide .ranking-table{max-height:none;}
+  .panel-tall{min-height:360px;}
+  @media (max-width:1600px){ .dash-grid{grid-template-columns:280px 1fr 320px;grid-template-rows:280px 1fr;} }
+  @media (max-width:1380px){ .dash-grid{grid-template-columns:260px 1fr 300px;} }
+  @media (max-width:1300px){ .dash-grid{grid-template-columns:240px 1fr 280px;} .kpi-value{font-size:1.3rem;} }
+  @media (max-width:1180px){ .dash-grid{grid-template-columns:1fr;grid-template-rows:auto;}
+    .panel-left-large{grid-column:1 / 2;grid-row:auto;}
+    .center-map{grid-column:1 / 2;grid-row:auto;}
+    .panel-right-stack{grid-column:1 / 2;}
+    .panel-wide,.panel-ocean,.panel-right-lower{grid-column:1 / 2;grid-row:auto;}
+    body{overflow:auto;}
+  }
+  @media (max-width:1200px){ body{overflow:auto;} .dash-grid{grid-template-columns:1fr;grid-auto-rows:minmax(230px,auto);overflow:auto;} .panel-left-large,.center-map,.panel-right-stack,.panel-wide{grid-column:1 / 2;grid-row:auto;} .center-map{min-height:360px;} }
+    /* 卡片基类 */
+    .panel-card{position:relative;display:flex;flex-direction:column;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.16);border-radius:18px;padding:12px 14px 10px 14px;backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);box-shadow:0 10px 36px -8px rgba(0,0,0,.5),0 2px 10px -2px rgba(0,0,0,.35);overflow:hidden;}
+    .panel-card h3{margin:0 0 6px;font-size:.9rem;font-weight:600;letter-spacing:.06em;color:#e8f9ff;display:flex;align-items:center;gap:6px;}
+    .panel-card canvas{flex:1 1 auto;width:100%!important;height:100%!important;}
+    .note{margin-top:4px;font-size:10px;color:#89c2d9;opacity:.85;}
+    /* 旧 area-* 网格已移除 */
+    /* 加载遮罩复用 charts.js 生成 */
+    .chart-loading-overlay{font-size:13px;letter-spacing:.15em;}
+    /* 背景指示水印 */
+    .watermark{position:fixed;bottom:14px;left:20px;font-size:10px;letter-spacing:.3em;color:rgba(200,230,255,0.35);pointer-events:none;user-select:none;}
+    /* 隐藏主站特定元素可能引入的动画干扰 */
+    .glass-card,.huarong-piece{animation:none!important;}
+    /* =========== 地图条样式 =========== */
+  .area-map{grid-column:span 8;grid-row:span 2;display:flex;align-items:stretch;justify-content:center;padding:0;overflow:hidden;}
+  .cesium-container{position:absolute;inset:0;}
+    .map-overlay{position:absolute;left:14px;top:12px;display:flex;flex-direction:column;gap:10px;z-index:10;background:rgba(0,0,0,0.25);backdrop-filter:blur(8px) saturate(1.4);padding:10px 14px 12px 14px;border:1px solid rgba(255,255,255,0.18);border-radius:16px;}
+  .map-title{font-size:.9rem;font-weight:600;letter-spacing:.08em;background:linear-gradient(90deg,#d8f3fd,#78c6f7 60%,#ffe29f);-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap;}
+    .map-legend{display:flex;flex-direction:column;gap:6px;}
+    .map-legend-bar{width:180px;height:14px;border-radius:8px;position:relative;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,0.25) inset;}
+    .map-legend-scale{display:flex;justify-content:space-between;font-size:10px;color:#cce9f6;letter-spacing:.4px;opacity:.9;}
+    .map-clock{position:absolute;right:16px;top:14px;z-index:11;font-size:1.05rem;font-family:"JetBrains Mono",monospace;background:rgba(0,0,0,0.3);padding:8px 14px;border:1px solid rgba(255,255,255,0.20);border-radius:18px;letter-spacing:.15em;color:#d8f3fd;font-weight:500;backdrop-filter:blur(8px);}
+  @media (max-width:1500px){ .area-map{grid-column:span 12;} }
+  @media (max-width:1100px){ .area-map{grid-column:span 12;grid-row:span 2;} .map-clock{font-size:.85rem;padding:6px 10px;} .map-title{font-size:.78rem;} }
+  @media (max-width:820px){ .area-map{grid-column:span 12;grid-row:span 2;} }
+  @media (max-width:640px){ .area-map{grid-column:span 12;grid-row:span 2;} .map-title{letter-spacing:.05em;} .map-legend-bar{width:150px;} }
+    /* Cesium 默认控件清理精简 */
+    .cesium-viewer-toolbar,.cesium-viewer-selectionIndicatorContainer,.cesium-viewer-infoBoxContainer{display:none!important;}
+    .cesium-viewer-bottom{display:none!important;}
+    /* ===== 排名表格 Ranking Table ===== */
+  .ranking-table{flex:1 1 auto;display:flex;flex-direction:column;font-size:12px;overflow:hidden;margin-top:4px;}
+    .ranking-table table{width:100%;border-collapse:collapse;}
+    .ranking-table thead th{position:sticky;top:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(6px);font-weight:500;color:#d8f3fd;padding:6px 4px;font-size:11px;letter-spacing:.08em;}
+    .ranking-table tbody td{padding:4px 6px;border-bottom:1px solid rgba(255,255,255,0.08);color:#e0fbfc;white-space:nowrap;}
+    .ranking-table tbody tr:hover{background:rgba(255,255,255,0.06);} 
+    /* ================= 数据来源角标（右上角，仅数据大屏） ================= */
+    .panel-card .data-source-tag{position:absolute;top:6px;right:8px;font-size:10px;padding:4px 8px;background:rgba(0,0,0,0.35);color:#d8f3fd;border:1px solid rgba(168,218,220,0.45);border-radius:12px;letter-spacing:.6px;font-weight:500;line-height:1;display:inline-flex;align-items:center;gap:4px;backdrop-filter:blur(8px) saturate(1.4);-webkit-backdrop-filter:blur(8px) saturate(1.4);box-shadow:0 2px 6px -2px rgba(0,0,0,0.5);pointer-events:none;opacity:.92;}
+    .panel-card .data-source-tag span{display:inline-block;}
+    .panel-card .data-source-tag em{font-style:normal;color:#ffe29f;font-weight:600;}
+    .panel-card .data-source-tag[data-src*='模拟'],
+    .panel-card .data-source-tag[data-src*='Synthetic']{border-color:rgba(255,255,255,0.28);color:#bfe8ff;}
+    @media (max-width:1180px){ .panel-card .data-source-tag{top:4px;right:6px;font-size:9px;padding:3px 6px;border-radius:10px;} }
+  </style>
+</head>
+<body>
+  <video id="bg-video" class="bg-video" muted autoplay loop playsinline preload="auto" poster="imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg">
+    <source src="https://cdn.pixabay.com/video/2016/09/13/5200-183786525_large.mp4" type="video/mp4" />
+  </video>
+  <canvas id="particle-canvas"></canvas>
+  <div class="wall-root" style="width:100%;">
+    <div class="wall-header">
+      <div class="header-left">
+        <a href="main.html" style="text-decoration:none;">
+          <button class="back-home-btn">← 返回主页</button>
+        </a>
+        <div class="title-block">
+          <h1 class="wall-title">海洋塑料污染数据大屏</h1>
+          <div class="wall-sub">MULTI-SOURCE · REALTIME · VISUAL INTELLIGENCE</div>
+        </div>
+      </div>
+      <div class="wall-meta">
+        <div class="legend-mini-tags">
+          <span>OWID</span><span>OSCAR</span><span>OBIS</span><span>Auto 15s</span>
+        </div>
+        <div class="refresh-indicator" id="wall-refresh">
+          <span class="refresh-ring" aria-hidden="true">
+            <svg viewBox="0 0 40 40" id="wall-refresh-ring">
+              <circle class="ring-bg" cx="20" cy="20" r="16"></circle>
+              <circle class="ring-fg" cx="20" cy="20" r="16"></circle>
+            </svg>
+          </span>
+          <span class="refresh-text" id="wall-refresh-text">初始化…</span>
+          <button type="button" id="wall-refresh-retry" class="refresh-retry-btn">重试</button>
+        </div>
+      </div>
+    </div>
+    <!-- 筛选栏（当前仅展示 UI，不改变数据；后续可绑定逻辑） -->
+    <div class="filter-bar">
+      <div class="filter-group">年度
+        <select class="filter-select" id="filter-year">
+          <option value="2025">2025</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+        </select>
+      </div>
+      <div class="filter-group">季度
+        <select class="filter-select" id="filter-quarter">
+          <option value="Q1">Q1</option>
+          <option value="Q2">Q2</option>
+          <option value="Q3">Q3</option>
+          <option value="Q4">Q4</option>
+        </select>
+      </div>
+      <div class="filter-group">区域
+        <select class="filter-select" id="filter-region">
+          <option value="global">全球</option>
+          <option value="pacific">太平洋</option>
+          <option value="atlantic">大西洋</option>
+          <option value="indian">印度洋</option>
+        </select>
+      </div>
+      <div class="filter-group">类别
+        <select class="filter-select" id="filter-category">
+          <option value="all">全部</option>
+          <option value="water">水质</option>
+          <option value="species">生物</option>
+          <option value="current">洋流</option>
+        </select>
+      </div>
+      <div class="filter-group">更新
+        <select class="filter-select" id="filter-refresh">
+          <option value="15">15s</option>
+          <option value="30">30s</option>
+          <option value="60">60s</option>
+        </select>
+      </div>
+    </div>
+    <!-- KPI 指标行 -->
+    <div class="kpi-row-flex" id="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">全球误管理 (Mt)</div>
+        <div class="kpi-value" id="kpi-global-mismanaged">--</div>
+        <div class="kpi-note" id="kpi-global-change">同比 --</div>
+        <div class="kpi-spark" id="kpi-global-spark">--</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">平均洋流速度 (m/s)</div>
+        <div class="kpi-value" id="kpi-current-mean">--</div>
+        <div class="kpi-note" id="kpi-current-max">最大 --</div>
+        <div class="kpi-spark" id="kpi-current-count">--</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">物种记录 Top5 合计</div>
+        <div class="kpi-value" id="kpi-species-top">--</div>
+        <div class="kpi-note" id="kpi-species-note">OBIS</div>
+        <div class="kpi-spark" id="kpi-species-total">--</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">水质指标平均</div>
+        <div class="kpi-value" id="kpi-water-avg">--</div>
+        <div class="kpi-note" id="kpi-water-metric">叶绿素/SST/浊度/氧</div>
+        <div class="kpi-spark" id="kpi-water-count">--</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">前5国家占全球</div>
+        <div class="kpi-value" id="kpi-top-share">--</div>
+        <div class="kpi-note" id="kpi-top-abs">合计 -- Mt</div>
+        <div class="kpi-spark" id="kpi-mode">Top5</div>
+      </div>
+    </div>
+    <div class="dash-grid" id="wall-grid">
+        <!-- Row1 左：趋势（移除沿海生物减少，扩大占位） -->
+        <div class="panel-card panel-left-large panel-compact" style="grid-column:1 / 2;grid-row:1 / 2;display:flex;flex-direction:column;">
+          <h3 style="margin:0 0 6px;font-size:.8rem;">📈 全球误管理趋势</h3>
+          <div style="flex:1 1 auto;min-height:0;">
+            <canvas id="trend-chart"></canvas>
+          </div>
+        </div>
+        <!-- Row1 右：仅国家误管理 (千吨) 柱状 -->
+        <div class="panel-card panel-right-stack panel-compact" style="grid-column:3 / 4;grid-row:1 / 2;display:flex;flex-direction:column;">
+          <h3 style="margin:0 0 4px;font-size:.8rem;">🏳️ 国家误管理 (千吨)</h3>
+          <canvas id="rubbish-city-bar-chart" style="flex:1 1 auto;min-height:0;"></canvas>
+        </div>
+  <!-- Row1 中：地图补位 -->
+  <div class="panel-card center-map" style="position:relative;grid-column:2 / 3;grid-row:1 / 2;">
+          <h3 style="margin:8px 12px 4px;font-size:.8rem;letter-spacing:.1em;">沿海城市污染强度热点 (2D)</h3>
+          <div id="geoMap" style="flex:1 1 auto;min-height:0;position:relative;"></div>
+          <!-- 合并原“热点强度”角标进统一数据来源角标，避免与动态 data-source-tag 重叠 -->
+          <div id="geo-legend" style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);width:60%;height:10px;border-radius:6px;background:linear-gradient(90deg,#1976d2,#42a5f5,#ffb74d,#ef5350,#c62828);box-shadow:0 0 0 1px rgba(255,255,255,0.25) inset;"></div>
+        </div>
+  <!-- Row2 左：洋流 -->
+  <div class="panel-card panel-compact" style="grid-column:1 / 2;grid-row:2 / 3;display:flex;flex-direction:column;">
+          <h3 style="margin:0 0 4px;font-size:.8rem;">🌊 洋流速度分布 & 指标</h3>
+          <div class="dual-row" style="flex:1 1 auto;min-height:0;">
+            <canvas id="ocean-river-chart"></canvas>
+            <canvas id="ocean-overview-chart"></canvas>
+          </div>
+        </div>
+  <!-- Row2 中：来源结构 & 排名 -->
+  <div class="panel-card panel-wide panel-compact" style="grid-column:2 / 3;grid-row:2 / 3;display:flex;flex-direction:column;">
+          <h3 style="margin:0 0 6px;font-size:.8rem;">🏭 来源结构 & 🏆 国家排名</h3>
+          <div style="display:flex;gap:12px;flex:1 1 auto;min-height:0;">
+            <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
+              <canvas id="source-chart" style="flex:1 1 auto;min-height:0;"></canvas>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;min-height:0;">
+              <div id="country-ranking-table" class="ranking-table" style="flex:1 1 auto;min-height:0;"></div>
+            </div>
+          </div>
+        </div>
+        <!-- Row2 右：仅水质指标 -->
+        <div class="panel-card panel-compact" style="grid-column:3 / 4;grid-row:2 / 3;display:flex;flex-direction:column;">
+          <h3 style="margin:0 0 4px;font-size:.8rem;">💧 近岸水质指标</h3>
+          <canvas id="water-quality-chart" style="flex:1 1 auto;min-height:0;"></canvas>
+        </div>
+      <!-- 旧重复面板已移除 -->
+    </div>
+  </div>
+  <div class="watermark">Ocean Plastic Visualization ©2025</div>
+  <script>
+    // 禁止页面缩放 (Ctrl+滚轮 / Ctrl +/- / Ctrl 0) 保持 100% 视觉基准
+    (function lockDisplayWallZoom(){
+      function block(e){ e.preventDefault(); e.stopPropagation(); }
+      window.addEventListener('wheel',e=>{ if(e.ctrlKey) block(e); }, {passive:false});
+      window.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey) && ['+','=','-','_','0'].includes(e.key)) block(e); });
+      document.addEventListener('gesturestart',block,{passive:false}); // Safari pinch
+      console.log('[DisplayWall] Zoom locked');
+    })();
+  </script>
+  <script src="particles.js"></script>
+  <!-- 移除原 90% 缩放逻辑：大屏已锁定 100% 比例 -->
+  <script>
+    // 背景视频回退
+    (function initBg(){const v=document.getElementById('bg-video');if(!v)return;let ok=false;const to=setTimeout(()=>{if(!ok&&v.parentElement){v.parentElement.removeChild(v);}},12000);v.addEventListener('canplay',()=>{ok=true;clearTimeout(to);v.classList.add('bg-video-ready');},{once:true});v.addEventListener('error',()=>{clearTimeout(to);v.parentElement&&v.parentElement.removeChild(v);});})();
+    // file:// 检测
+    if(location.protocol==='file:'){window.__FILE_MODE__=true;console.warn('[Wall] file:// 模式，使用模拟数据');}
+    // 多 CDN 加载 Chart.js
+    (function loadChart(){const srcs=['https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js','https://unpkg.com/chart.js@4.4.1/dist/chart.umd.min.js','https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js'];let i=0;function go(){if(window.Chart){document.dispatchEvent(new Event('chart-ready'));return;}if(i>=srcs.length){console.warn('[Wall] Chart.js 加载失败');return;}const s=document.createElement('script');s.src=srcs[i++];s.onload=()=>{console.log('[Wall] Chart.js OK');document.dispatchEvent(new Event('chart-ready'));};s.onerror=()=>setTimeout(go,200);document.head.appendChild(s);}go();})();
+  </script>
+  <script src="dataService.js"></script>
+  <script src="charts.js"></script>
+  <script>
+    <!-- 旧 wallRefresh 逻辑已整合进 bindFilters.restartTicker，避免双倒计时 -->
+    // 自适应 resize
+    window.addEventListener('resize',()=>{ if(window.chartManager?.handleResize){ window.chartManager.handleResize(); } });
+
+    // ===== KPI 计算逻辑 =====
+    function updateKPIs(){
+      try{
+        // 全球误管理 (取趋势图最后两年值)
+        const trend=window.chartManager?.charts?.trend; if(trend){
+          const data=trend.data.datasets[0].data; const len=data.length;
+          if(len>=2){
+            const latest=data[len-1]; const prev=data[len-2];
+            const change=prev? ((latest-prev)/prev*100):0;
+            setKPI('kpi-global-mismanaged',latest.toFixed(2));
+            setKPIHtml('kpi-global-change',`同比 <span class="${change>=0?'kpi-change-up':'kpi-change-down'}">${change>=0?'+':''}${change.toFixed(2)}%</span>`);
+            setKPI('kpi-global-spark',sparkline(data.slice(-20)));
+          }
+        }
+        // 洋流平均 / 最大 （来自 oceanOverview 图表数据）
+        const oceanOv=window.chartManager?.charts?.oceanOverview; if(oceanOv){
+          const labels=oceanOv.data.labels; const vals=oceanOv.data.datasets[0].data;
+          const meanIdx=labels.indexOf('平均速度'); const maxIdx=labels.indexOf('最大速度'); const countIdx=labels.indexOf('采样点数');
+          if(meanIdx>-1){ setKPI('kpi-current-mean',(+vals[meanIdx]).toFixed(3)); }
+            if(maxIdx>-1){ setKPIHtml('kpi-current-max',`最大 ${(+vals[maxIdx]).toFixed(3)} m/s`); }
+            if(countIdx>-1){ setKPI('kpi-current-count',vals[countIdx]+' pts'); }
+        }
+        // 物种 Top5 合计
+        const species=window.chartManager?.charts?.speciesImpact; 
+        if(species){
+          const arr=species.data.datasets[0].data; if(arr.length){
+            const sum=arr.reduce((a,b)=>a+b,0); setKPI('kpi-species-top',sum); setKPI('kpi-species-total',arr.length+' 类'); }
+        } else {
+          // 页面未放置物种图表，但仍需 KPI -> 独立获取一次 OBIS 组合 (有缓存避免重复)
+          if(!window.__speciesTop5Cache && !window.__speciesTop5CacheFetching && window.dataService?.getBiodiversityComposition){
+            window.__speciesTop5CacheFetching=true;
+            (async()=>{
+              try{
+                const res=await window.dataService.getBiodiversityComposition({forceRefresh:false});
+                const list=res?.data; if(Array.isArray(list) && list.length){
+                  const top5=list.slice(0,5); const sum=top5.reduce((a,b)=>a+(b.count||0),0);
+                  window.__speciesTop5Cache={sum,total:list.length,timestamp:Date.now()};
+                }
+              }catch(e){ console.warn('[KPI] 物种 Top5 获取失败',e); }
+              finally{ window.__speciesTop5CacheFetching=false; }
+            })();
+          }
+          if(window.__speciesTop5Cache?.sum!=null){
+            setKPI('kpi-species-top',window.__speciesTop5Cache.sum);
+            setKPI('kpi-species-total',window.__speciesTop5Cache.total+' 类');
+          }
+        }
+        // 水质平均
+        const wq=window.chartManager?.charts?.waterQuality; if(wq){
+          const ds=wq.data.datasets[0].data; if(ds.length){
+            const avg=ds.reduce((a,b)=>a+b,0)/ds.length; setKPI('kpi-water-avg',avg.toFixed(2)); setKPI('kpi-water-count',ds.length+' 指标');
+          }
+        }
+        // Top5 国家占比
+        if(window.chartManager?._rubbishState){
+          const st=window.chartManager._rubbishState; const global=st.globalTotalTons; if(global && st.rawList){
+            const top5=st.rawList.slice(0,5); const sumTop=top5.reduce((a,b)=>a+(b.mismanaged||0),0); const pct=sumTop/global*100; setKPI('kpi-top-share',pct.toFixed(1)+'%'); setKPIHtml('kpi-top-abs','合计 '+(sumTop/1e6).toFixed(2)+' Mt'); setKPI('kpi-mode',st.mode==='top8'?'Top8':'Top5'); }
+        }
+      }catch(err){ console.warn('[KPI] 计算失败',err); }
+    }
+    function setKPI(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+    function setKPIHtml(id,html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
+    function sparkline(data){ if(!data.length) return '--'; const max=Math.max(...data); const min=Math.min(...data); const chars='▁▂▃▄▅▆▇█'; return data.map(v=>{ const t=(v-min)/(max-min||1); const idx=Math.min(chars.length-1,Math.round(t*(chars.length-1))); return chars[idx]; }).join(''); }
+
+    // ===== 国家排名表格 =====
+    function renderCountryRanking(){
+      const wrap=document.getElementById('country-ranking-table'); if(!wrap) return; wrap.innerHTML='';
+      const st=window.chartManager?._rubbishState; if(!st?.rawList){ wrap.textContent='(暂无数据)'; return; }
+      const list=st.rawList.slice(0,15); // 显示前15
+      const table=document.createElement('table');
+      table.innerHTML='<thead><tr><th>#</th><th>国家</th><th>误管理 (Mt)</th><th>全球占比</th></tr></thead>';
+      const tb=document.createElement('tbody');
+      list.forEach((r,i)=>{ const tr=document.createElement('tr'); const share=st.globalTotalTons? (r.mismanaged/st.globalTotalTons*100):null; tr.innerHTML=`<td>${i+1}</td><td>${r.country.replace(/\\s*\\(.*\\)/,'')}</td><td>${(r.mismanaged/1e6).toFixed(2)}</td><td>${share?share.toFixed(2)+'%':''}</td>`; tb.appendChild(tr); });
+      table.appendChild(tb); wrap.appendChild(table);
+    }
+    // ===== 过滤条交互（启用数据筛选 + 动态刷新 + 类别面板显示控制） =====
+    (function bindFilters(){
+      const selIds=['filter-year','filter-quarter','filter-region','filter-category','filter-refresh'];
+      window.__wallFilters=window.__wallFilters||{}; // 全局过滤状态
+      let refreshInterval=15000; // 默认 15s
+      let tickerTimer=null;
+      function restartTicker(){
+        const el=document.getElementById('wall-refresh');
+        const textEl=document.getElementById('wall-refresh-text');
+        const ring=document.getElementById('wall-refresh-ring');
+        const retryBtn=document.getElementById('wall-refresh-retry');
+        if(tickerTimer) clearInterval(tickerTimer);
+        let next=Date.now()+refreshInterval; let busy=false;
+        let hadError=false;
+        const CIRC=100; // stroke-dasharray
+        function setProgress(p){ // p: 0..1
+          if(!ring) return; const fg=ring.querySelector('.ring-fg'); if(!fg) return; fg.style.strokeDashoffset=(CIRC - CIRC*Math.min(1,Math.max(0,p)))+''; }
+        if(ring){ const fg=ring.querySelector('.ring-fg'); if(fg){ fg.style.strokeDasharray=CIRC; fg.style.strokeDashoffset=CIRC; }}
+        if(retryBtn){ retryBtn.onclick=()=>{ if(busy) return; hadError=false; el?.classList.remove('error'); textEl && (textEl.textContent='重试中…'); setTimeout(()=>doRefresh(true),100); }; }
+        async function doRefresh(){
+          if(busy) return; busy=true; el?.classList.add('busy'); el?.classList.remove('error'); hadError=false; if(textEl) textEl.textContent='刷新中…'; setProgress(1);
+          try {
+            if(window.chartManager){
+              const now=Date.now();
+              if(!window.__oceanLast || now-window.__oceanLast>60000){
+                window.__oceanLast=now;
+                await window.chartManager.createOceanCurrentChart(true);
+              }
+              await Promise.allSettled([
+                window.chartManager.createTrendChart(),
+                window.chartManager.createSourceChart(),
+                window.chartManager.createRubbishChart(true),
+                window.chartManager.createMarineBioLossChart(),
+                window.chartManager.createWaterQualityChart()
+              ]);
+              renderCountryRanking(); updateKPIs();
+            }
+          } catch(e){ console.warn('[WallTicker] 刷新失败',e); }
+          finally {
+            busy=false; next=Date.now()+refreshInterval;
+            el?.classList.remove('busy');
+            if(hadError){
+              el?.classList.add('error');
+              if(textEl) textEl.textContent='刷新失败';
+            }else{
+              if(textEl) textEl.textContent='下次刷新 '+Math.ceil(refreshInterval/1000)+'s';
+            }
+            // 立即把进度归零开始重新走
+            setProgress(0);
+          }
+        }
+        tickerTimer=setInterval(()=>{
+          const remain=next-Date.now(); if(!el) return;
+          if(busy) return; // 忙碌中由刷新逻辑控制文本
+          if(remain<=0){ doRefresh(); return; }
+          const pct=(refreshInterval-remain)/refreshInterval; setProgress(pct);
+          if(textEl) textEl.textContent='下次刷新 '+Math.ceil(remain/1000)+'s';
+        },1000);
+        // 首次立即刷新（延迟一点等待 ChartManager 初始化）
+        setTimeout(doRefresh, 300);
+      }
+      selIds.forEach(id=>{ const el=document.getElementById(id); if(!el) return; el.addEventListener('change',()=>{
+        window.__wallFilters=window.__wallFilters||{}; window.__wallFilters[id]=el.value;
+        if(id==='filter-refresh'){
+          const v=parseInt(el.value,10); if(isFinite(v)&&v>0){ refreshInterval=v*1000; restartTicker(); }
+          console.log('[WallFilter] 刷新间隔选择',el.value,'s');
+        }
+        if(id==='filter-category'){
+          // 类别 → 控制面板显示：all 显示全部；water 仅水质；species 仅与物种/生物（此页保留：沿海生物减少图 marine-bio-loss-chart）；current 仅洋流
+          const cat=el.value;
+          const panels={
+            trend: document.getElementById('trend-chart')?.closest('.panel-card'),
+            rubbish: document.getElementById('rubbish-city-bar-chart')?.closest('.panel-card'),
+            marine: document.getElementById('marine-bio-loss-chart')?.closest('.panel-card'),
+            water: document.getElementById('water-quality-chart')?.closest('.panel-card'),
+            current: document.getElementById('ocean-river-chart')?.closest('.panel-card')
+          };
+          Object.values(panels).forEach(p=> p && (p.style.display=''));
+          if(cat && cat!=='all'){
+            Object.entries(panels).forEach(([key,p])=>{
+              if(!p) return;
+              const matchMap={water:'water',species:'marine',current:'current'};
+              const keep = key===matchMap[cat];
+              if(!keep) p.style.display='none';
+            });
+          }
+        }
+        // 轻量触发：来源结构与排名、趋势、国家误管理刷新（使用缓存避免频繁网络）
+        if(window.chartManager){
+          window.chartManager.createSourceChart();
+          window.chartManager.createRubbishChart(false);
+          window.chartManager.createTrendChart();
+          setTimeout(()=>{renderCountryRanking(); updateKPIs();},100);
+        }
+      }); });
+      // 初始化一次定时器
+      restartTicker();
+    })();
+  </script>
+  <!-- ========== ECharts 地图热点 (替换 3D Cesium) ========== -->
+  <script>
+    (function loadECharts(){
+      if(window.echarts) { ensureChinaGeo(startGeo); return; }
+      const cdns=['https://fastly.jsdelivr.net/npm/echarts@5/dist/echarts.min.js','https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js','https://unpkg.com/echarts@5/dist/echarts.min.js'];
+      let i=0;function next(){if(window.echarts){ensureChinaGeo(startGeo);return;} if(i>=cdns.length){console.warn('[GeoMap] ECharts 加载失败');return;} const s=document.createElement('script');s.src=cdns[i++];s.onload=()=>ensureChinaGeo(startGeo);s.onerror=()=>setTimeout(next,250);document.head.appendChild(s);}next();
+    })();
+    const coastalPoints=[
+      {name:'上海',value:[121.47,31.23,0.92,430000]},
+      {name:'广州',value:[113.27,23.13,0.78,280000]},
+      {name:'深圳',value:[114.06,22.55,0.81,260000]},
+      {name:'宁波',value:[121.55,29.87,0.65,150000]},
+      {name:'青岛',value:[120.38,36.07,0.58,120000]},
+      {name:'厦门',value:[118.1,24.46,0.55,110000]},
+      {name:'天津',value:[117.2,39.13,0.63,140000]},
+      {name:'大连',value:[121.62,38.92,0.44,80000]},
+      {name:'香港',value:[114.17,22.32,0.70,200000]}
+    ];
+    function ensureChinaGeo(cb){
+      if(!window.echarts) return; if(echarts.getMap('china')){cb();return;}
+      // === 内联简化版（选取国界主轮廓, 极度压缩仅示意，不保证精细度） ===
+  const CHINA_GEO_INLINE={"type":"FeatureCollection","features":[{"type":"Feature","properties":{"name":"China"},"geometry":{"type":"Polygon","coordinates":[[[73,18],[135,18],[135,54],[73,54],[73,18]]]}}]};
+      const sources=[
+        'https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json',
+        'https://fastly.jsdelivr.net/npm/echarts-countries-js@1.1.1/dist/echarts-countries-js/chn.geo.json.js'
+      ];
+      let idx=0; let usedInline=false; const isFile=!!window.__FILE_MODE__;
+      const MAX_TIME=4000; let done=false; const timer=setTimeout(()=>{ if(!done){ console.warn('[GeoMap] 超时，使用内联简化版'); fallbackInline(); } },MAX_TIME);
+      function fallbackInline(){ if(done) return; usedInline=true; try{ echarts.registerMap('china',CHINA_GEO_INLINE); }catch(e){} done=true; clearTimeout(timer); cb(); showMapNote('已使用内联简化轮廓'); }
+      function load(){ if(done) return; // 先尝试线上，无论 file:// 与否；仅在全部失败或超时才 fallback
+        if(idx>=sources.length){ if(!done){ console.warn('[GeoMap] 所有远程源失败'); if(!usedInline) fallbackInline(); else cb(); } return; }
+        const url=sources[idx++]; fetch(url).then(r=>{ if(!r.ok) throw new Error('fetch fail '+url); return r.text();})
+        .then(txt=>{ if(done) return; try{ let geojson; if(txt.trim().startsWith('{')) geojson=JSON.parse(txt); else if(txt.includes('echarts.registerMap')){ eval(txt); }
+            if(geojson){ echarts.registerMap('china',geojson); showMapNote('已加载完整版边界'); }
+            done=true; clearTimeout(timer); cb();
+        }catch(e){ console.warn('[GeoMap] parse fail',e); setTimeout(load,200); }} )
+        .catch(()=>setTimeout(load,250)); }
+      function showMapNote(msg){ const host=document.getElementById('geoMap'); if(!host) return; let box=host.querySelector('.map-msg'); if(!box){ box=document.createElement('div'); box.className='map-msg'; box.style.cssText='position:absolute;left:10px;bottom:10px;padding:4px 8px;font-size:10px;color:#cce9f6;background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,.2);border-radius:8px;backdrop-filter:blur(4px);'; host.appendChild(box);} box.textContent=msg; setTimeout(()=>{ box && (box.style.opacity='0'); },5000); }
+      load();
+    }
+    function startGeo(){
+      if(!window.echarts) return; const el=document.getElementById('geoMap'); if(!el) return;
+      // 清理占位错误层
+      const err=document.getElementById('geo-error-layer'); if(err) err.remove();
+      const chart=echarts.init(el,'dark',{renderer:'canvas'});
+      const option={
+        backgroundColor:'transparent',
+        geo:{
+          map:'china',
+          roam:true,
+          zoom:1.2,
+          center:[105,32],
+          itemStyle:{areaColor:'rgba(0,110,150,0.18)',borderColor:'rgba(140,210,255,0.45)',borderWidth:1},
+          emphasis:{itemStyle:{areaColor:'rgba(0,170,210,0.45)'}}
+        },
+        tooltip:{formatter:p=>`${p.name}<br/>强度:${(p.value[2]*100).toFixed(0)}%<br/>误管理:${(p.value[3]/1000).toFixed(0)}k 吨`},
+        visualMap:{min:0,max:1,show:false,inRange:{color:['#1976d2','#42a5f5','#ffb74d','#ef5350','#c62828']}},
+        series:[{
+          name:'城市热点',type:'effectScatter',coordinateSystem:'geo',data:coastalPoints,
+          symbolSize:v=>10+v[2]*28,
+          rippleEffect:{scale:3,brushType:'stroke'},
+          itemStyle:{color:args=>args.data ? args.data.itemColor || null: '#fff'},
+          label:{show:true,formatter:p=>`${p.name}\n${(p.value[3]/1000).toFixed(0)}k吨`,color:'#fff',fontSize:10,offset:[0,4]},
+          emphasis:{scale:true}
+        }]
+      };
+      chart.setOption(option);
+      window.addEventListener('resize',()=>chart.resize());
+      window.__geoChart=chart;
+    }
+    // 地图加载超时 + 重试按钮占位
+    (function mapTimeoutGuard(){ const host=document.getElementById('geoMap'); if(!host) return; const LAYER_ID='geo-error-layer'; const TO=5000; const t=setTimeout(()=>{ if(window.__geoChart) return; if(document.getElementById(LAYER_ID)) return; const layer=document.createElement('div'); layer.id=LAYER_ID; layer.style.cssText='position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;color:#cce9f6;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);border:1px dashed rgba(255,255,255,0.25);'; layer.innerHTML='<div style="margin-bottom:8px;letter-spacing:.1em;">地图加载超时</div><button id="geo-retry" style="cursor:pointer;padding:6px 14px;border-radius:14px;border:1px solid rgba(168,218,220,0.6);background:rgba(0,0,0,0.3);color:#e0fbfc;">重试</button>'; host.appendChild(layer); layer.querySelector('#geo-retry').onclick=()=>{ layer.remove(); ensureChinaGeo(startGeo); }; },TO); window.addEventListener('echarts-map-ready',()=>clearTimeout(t)); })();
+  </script>
+  <script>
+    // === KPI 格式优化：统一千位与空值处理 ===
+    (function enhanceKPI(){ function fmt(num,dec=2){ if(num==null || !isFinite(num)) return '--'; const f=Number(num).toFixed(dec); const parts=f.split('.'); parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,','); return dec? parts.join('.') : parts[0]; }
+      const oldSet=window.setKPI; const oldSetHtml=window.setKPIHtml; if(oldSet){ window.setKPI=(id,val)=> oldSet(id, typeof val==='number'? fmt(val,2): val); }
+      if(oldSetHtml){ window.setKPIHtml=(id,html)=> oldSetHtml(id, html); }
+      ['kpi-global-mismanaged','kpi-current-mean'].forEach(id=>{ const el=document.getElementById(id); if(!el) return; const n=+el.textContent; if(isFinite(n)) el.textContent=fmt(n,2); });
+    })();
+  </script>
+  <script>
+    // ================= 数据来源角标注入（右上角） =================
+    (function addSourceBadges(){
+      const mapping={
+        '#trend-chart':'OWID 全球塑料误管理 (聚合)',
+        '#rubbish-city-bar-chart':'OWID 国家误管理',
+  '#geoMap':'Synthetic 热点模拟 · 热点强度',
+        '#ocean-river-chart':'OSCAR 洋流 (汇总)',
+        '#ocean-overview-chart':'OSCAR 指标聚合',
+        '#source-chart':'Synthetic 来源结构',
+        '#country-ranking-table':'OWID 排名截取',
+  // 缩短文案以便单行展示: 去除多余空格 & 括号空格
+  '#water-quality-chart':'卫星/NOAA水质·模拟混合'
+      };
+      function inject(){
+        Object.entries(mapping).forEach(([sel,src])=>{
+          const el=document.querySelector(sel); if(!el) return;
+          const panel=el.closest('.panel-card'); if(!panel) return;
+          if(panel.querySelector('.data-source-tag')) return;
+          const tag=document.createElement('div');
+          tag.className='data-source-tag';
+          tag.dataset.src=src;
+          tag.innerHTML='<span>'+src.replace(/(OWID|OSCAR|Synthetic|NOAA)/g,'<em>$1<\/em>')+'</span>';
+          panel.appendChild(tag);
+        });
+      }
+      if(document.readyState==='loading'){
+        document.addEventListener('DOMContentLoaded',()=>{ setTimeout(inject,120); });
+      }else{ setTimeout(inject,120); }
+      setTimeout(inject,1200);
+      setTimeout(inject,3000);
+      // 单行自适应：压缩字体避免换行（针对较长角标，尤其水质）
+      function fitSourceTags(){
+        document.querySelectorAll('.data-source-tag').forEach(tag=>{
+          // 只处理还在多行的
+            const originalFS = parseFloat(getComputedStyle(tag).fontSize);
+            if(!tag.dataset._fitInit){ tag.dataset._fitInit=originalFS; }
+            tag.style.whiteSpace='nowrap';
+            let fs = originalFS;
+            // 若仍溢出宽度则递减字体
+            while(fs>9 && tag.scrollWidth>tag.clientWidth){ fs-=0.5; tag.style.fontSize=fs+'px'; }
+        });
+      }
+      setTimeout(fitSourceTags,180);
+      setTimeout(fitSourceTags,800);
+      window.addEventListener('resize',()=>{ clearTimeout(window.__fitTagTimer); window.__fitTagTimer=setTimeout(fitSourceTags,120); });
+    })();
+  </script>
+  <style>
+    /* 统一数据来源角标样式 + 自动换行，避免与其他固定标签重叠 */
+    .panel-card{position:relative;}
+    .panel-card .data-source-tag{position:absolute;top:8px;right:10px;z-index:6;font-size:11px;line-height:1.15;padding:6px 10px;border-radius:18px;background:rgba(0,0,0,0.38);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,0.25);color:#d9f4ff;max-width:46%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px -2px rgba(0,0,0,0.45);text-align:center;word-break:break-all;white-space:normal;}
+    .panel-card .data-source-tag em{font-style:normal;color:#ffe3a1;font-weight:700;}
+    @media (max-width:1200px){ .panel-card .data-source-tag{max-width:60%;font-size:10px;padding:5px 8px;} }
+  </style>
+  <!-- 卡片放大与主站统一交互 -->
+  <script>
+  (function enablePanelEnlarge(){
+     const cards=[...document.querySelectorAll('.panel-card')]; if(!cards.length) return;
+     let overlay=null, placeholder=null, active=null;
+     function close(){ if(!active) return; active.classList.remove('panel-enlarging'); active.style.position=''; if(placeholder&&placeholder.parentNode){ placeholder.replaceWith(active); } overlay&&overlay.remove(); overlay=null; placeholder=null; document.body.classList.remove('panel-enlarge-active'); active=null; }
+     function open(card){ if(active===card) return; if(active) close(); const rect=card.getBoundingClientRect(); placeholder=document.createElement('div'); placeholder.className='panel-placeholder'; placeholder.style.width=rect.width+'px'; placeholder.style.height=rect.height+'px'; card.parentNode.insertBefore(placeholder,card); overlay=document.createElement('div'); overlay.className='panel-enlarge-overlay visible'; document.body.appendChild(overlay); overlay.addEventListener('click',close); const closeBtn=document.createElement('button'); closeBtn.className='panel-close-btn'; closeBtn.textContent='×'; closeBtn.addEventListener('click',close); card.appendChild(closeBtn); card.classList.add('panel-enlarging'); card.style.position='fixed'; card.style.zIndex=180; card.style.top='50%'; card.style.left='50%'; card.style.transform='translate(-50%,-50%)'; card.style.width='min(92vw,1600px)'; card.style.height='min(88vh,900px)'; document.body.classList.add('panel-enlarge-active'); active=card; }
+     cards.forEach(c=>{ c.style.cursor='zoom-in'; c.addEventListener('dblclick',()=>open(c)); });
+     window.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
+  })();
+  </script>
+</body>
+</html>

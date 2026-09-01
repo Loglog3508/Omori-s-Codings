@@ -1,0 +1,479 @@
+/* shared-ui.css 统一起始页风格到各扩展页�?
+   简化：不大改原 panel 结构，仅提供主题背景 + 按钮/返回链接基类
+   引入方式：在各页�?<link rel="stylesheet" href="shared-ui.css"> ，并�?<body class="themed-page"> */
+
+:root {
+  --landing-gradient: linear-gradient(135deg,#061c2b 0%,#0f3447 55%,#143d52 100%);
+  --glass-panel-bg: rgba(255,255,255,0.06);
+  --glass-panel-border: rgba(168,218,220,.25);
+  --glass-panel-radius: 24px;
+  --glass-panel-blur: blur(20px) saturate(1.35);
+  --text-soft: #cce9f6;
+  --accent-grad: linear-gradient(135deg,rgba(120,198,247,.55),rgba(120,198,247,.18));
+  --accent-grad-soft: linear-gradient(135deg,rgba(120,198,247,.35),rgba(120,198,247,.10));
+}
+
+body.themed-page {
+  background: var(--landing-gradient) fixed;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  color:#e0fbfc;
+}
+
+/* 统一返回与导�?pill 按钮 */
+.pill-btn, .back-link, .nav-pill-btn {
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 22px;
+  font-size:13px;
+  letter-spacing:.05em;
+  border-radius:50px;
+  border:1px solid rgba(168,218,220,.45);
+  background: var(--accent-grad-soft);
+  color:#e8f9ff;
+  font-weight:500;
+  text-decoration:none;
+  cursor:pointer;
+  backdrop-filter:blur(8px);
+  transition:background .35s,transform .25s,border-color .35s;
+}
+.pill-btn:hover, .back-link:hover, .nav-pill-btn:hover { background: var(--accent-grad); transform:translateY(-2px); }
+.pill-btn:active, .back-link:active, .nav-pill-btn:active { transform:translateY(1px); }
+
+/* 返回链接（左上角小型化场景） */
+.back-link.small { padding:6px 14px; font-size:12px; }
+
+/* 面板柔化（可选添�?.glass-panel 到现有容器） */
+.glass-panel-lite {
+  background: var(--glass-panel-bg);
+  border:1px solid var(--glass-panel-border);
+  border-radius: var(--glass-panel-radius);
+  backdrop-filter: var(--glass-panel-blur);
+  -webkit-backdrop-filter: var(--glass-panel-blur);
+  box-shadow:0 14px 40px -10px rgba(0,0,0,.45),0 4px 12px rgba(0,0,0,.35);
+}
+
+/* 卡片 hover 轻浮效果（不叠加位移冲突�?*/
+.glass-panel-lite.hoverable:hover { box-shadow:0 18px 48px -12px rgba(0,0,0,.6),0 6px 16px rgba(0,0,0,.4); }
+
+/* 统一小标�?/ 说明文字色彩 */
+.muted-note { font-size:11px; color:#89c2d9; opacity:.78; letter-spacing:.04em; }
+
+/* 扩展功能网格链接（复�?main.html ext-link-tile 语义�?*/
+.ext-link-pill { display:flex;align-items:center;justify-content:center; padding:12px 10px; border-radius:18px; background:rgba(255,255,255,0.06); border:1px solid rgba(168,218,220,0.28); color:#d4f3ff; text-decoration:none; font-size:12px; letter-spacing:.04em; transition:.28s; backdrop-filter:blur(8px); }
+.ext-link-pill:hover { background:rgba(255,255,255,0.12); border-color:rgba(168,218,220,0.5); transform:translateY(-3px); }
+
+/* 兼容�?.panel：若页面已有 .panel，附�?.panel.thematic 获取统一视觉 */
+.panel.thematic { background:rgba(255,255,255,0.05)!important; border:1px solid rgba(168,218,220,0.28)!important; backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+
+/* Scroll 容器背板统一（避免不同页�?gradient 色差�?*/
+html, body.themed-page { background-attachment:fixed; }
+
+/* Header 半透明条快速类 */
+.frost-header { background:rgba(0,0,0,0.35); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+
+/* 轻量表格 (fallback) 与字体色融合 */
+table.basic { width:100%; border-collapse:collapse; font-size:12px; }
+table.basic th, table.basic td { padding:4px 6px; border:1px solid rgba(255,255,255,0.15); }
+table.basic th { background:rgba(255,255,255,0.08); }
+
+/* 兼容窄屏按钮堆叠 */
+@media (max-width:640px){ .pill-btn, .nav-pill-btn { width:100%; } }
+
+/* Nav 扩展按钮�?main.html 内使�?*/
+#global-nav .nav-pill-btn { padding:6px 18px; font-size:12px; }
+#global-nav .nav-pill-btn:hover { box-shadow:0 0 0 4px rgba(120,198,247,0.15); }
+
+/* nav-pill-btn 默认外观 (若不�?#global-nav 下也可使�? */
+.nav-pill-btn { border:1px solid rgba(168,218,220,.45); background:var(--accent-grad-soft); color:#e8f9ff; border-radius:50px; font-size:12px; letter-spacing:.05em; padding:6px 18px; cursor:pointer; backdrop-filter:blur(8px); transition:.3s; }
+.nav-pill-btn:hover { background:var(--accent-grad); transform:translateY(-2px); }
+.nav-pill-btn:active { transform:translateY(0); }
+
+/* ===== 统一滚动条样�?(Unified Scrollbar) ===== */
+/* 默认应用于所�?webkit 滚动条，确保风格一�?*/
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.04);
+}
+::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    border-radius: 14px;
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(160, 230, 255, 0.55), rgba(90, 180, 255, 0.38));
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 14px;
+    box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.45);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(185, 243, 255, 0.8), rgba(110, 200, 255, 0.55));
+}
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* 强制特定容器使用统一滚动�?(如果被其他样式覆�? */
+.unified-scroll::-webkit-scrollbar { 
+    width: 6px; 
+    height: 6px; 
+    background: transparent; 
+}
+.unified-scroll::-webkit-scrollbar-track { 
+    background: rgba(255, 255, 255, 0.02); 
+    border-radius: 10px; 
+    border-top: 12px solid transparent; /* 视觉上缩短滚动条轨道 */
+    border-bottom: 12px solid transparent;
+    background-clip: content-box;
+}
+.unified-scroll::-webkit-scrollbar-thumb { 
+    background: linear-gradient(180deg, rgba(160, 230, 255, 0.55), rgba(90, 180, 255, 0.38)); 
+    border-radius: 10px; 
+}
+.unified-scroll::-webkit-scrollbar-thumb:hover { 
+    background: linear-gradient(180deg, rgba(185, 243, 255, 0.8), rgba(110, 200, 255, 0.55)); 
+}
+/* futuristic_ui.css - DeepFlow Design Language */
+
+:root {
+    --neon-blue: #00f3ff;
+    --neon-purple: #bc13fe;
+    --glass-bg: rgba(10, 20, 30, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --tech-gradient: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+}
+
+/* === 新材�? 全息面板 (Holo Panel) === */
+.holo-panel {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    position: relative;
+    overflow: hidden; /* 必须隐藏溢出以防止流光超出圆角 */
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 1;
+    /* 修复滚动时的渲染层同步问题 */
+    transform: translate3d(0,0,0);
+}
+
+/* 动态流光边框效果 - 增强版 (Conic Gradient) */
+@property --holo-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.holo-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px; 
+    padding: 2px; /* 边框宽度 */
+    
+    /* 使用 conic-gradient 实现无缝圆角流光 */
+    background: conic-gradient(
+        from var(--holo-angle), 
+        transparent 0%, 
+        transparent 30%, 
+        #00f3ff 45%, 
+        #bc13fe 50%, 
+        #00f3ff 55%, 
+        transparent 70%, 
+        transparent 100%
+    );
+    
+    /* 遮罩：确保只显示边框 */
+    -webkit-mask: 
+       linear-gradient(#fff 0 0) content-box, 
+       linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    
+    animation: holo-rotate 4s linear infinite;
+    z-index: 1; /* Lower z-index to be behind content */
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px rgba(0, 243, 255, 0.5));
+    
+    /* 修复：强制背景固定，防止随内容滚动 (虽然 pointer-events: none 但某些浏览器渲染层可能绑定) */
+    /* 实际上 inset:0 应该是相对于 .holo-panel 的，如果 .holo-panel 不滚动，它就不动 */
+    /* 确保 transform 不会创建新的包含块导致意外 */
+    transform: translateZ(0);
+    will-change: transform; /* 提示浏览器优化 */
+    position: absolute; /* Ensure absolute positioning */
+    top: 0; left: 0; right: 0; bottom: 0;
+}
+
+@keyframes holo-rotate {
+    from { --holo-angle: 0deg; }
+    to { --holo-angle: 360deg; }
+}
+
+/* 移除之前的 ::after 背景层 */
+.holo-panel::after {
+    display: none;
+}
+
+.holo-panel:hover {
+    box-shadow: 0 15px 50px rgba(0, 243, 255, 0.15);
+    border-color: rgba(0, 243, 255, 0.6);
+}
+
+/* === 新控�? 分段式选择�?(Segmented Control) === */
+/* 替代传统�?<select> */
+.segmented-control {
+    display: flex;
+    background: rgba(0,0,0,0.4);
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+    user-select: none;
+}
+
+.segmented-control input[type="radio"] {
+    display: none;
+}
+
+.segmented-control label {
+    flex: 1;
+    text-align: center;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #8bbad4;
+    cursor: pointer;
+    z-index: 2;
+    transition: color 0.3s;
+    font-weight: 500;
+}
+
+.segmented-control input:checked + label {
+    color: #fff;
+    text-shadow: 0 0 8px rgba(255,255,255,0.5);
+}
+
+/* 滑块背景动画 */
+.segmented-bg {
+    position: absolute;
+    top: 4px; bottom: 4px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    z-index: 1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* === 新控�? 赛博开�?(Cyber Switch) === */
+.cyber-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.cyber-switch input { opacity: 0; width: 0; height: 0; }
+
+.cyber-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255,255,255,0.1);
+    transition: .4s;
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.cyber-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px; width: 16px;
+    left: 3px; bottom: 3px;
+    background-color: #8bbad4;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.cyber-switch input:checked + .cyber-slider {
+    background-color: rgba(0, 243, 255, 0.2);
+    border-color: var(--neon-blue);
+}
+
+.cyber-switch input:checked + .cyber-slider:before {
+    transform: translateX(20px);
+    background-color: #fff;
+    box-shadow: 0 0 10px var(--neon-blue);
+}
+
+/* === 新控�? 光晕滑块 (Glow Slider) === */
+.tech-slider-container {
+    position: relative;
+    width: 100%;
+    padding: 10px 0;
+}
+
+.tech-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    outline: none;
+}
+
+.tech-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #000;
+    border: 2px solid var(--neon-blue);
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--neon-blue);
+    margin-top: -7px;
+    transition: transform 0.2s;
+}
+
+.tech-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.2);
+    background: var(--neon-blue);
+}
+
+/* === 新效�? 状态指示灯 === */
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #555;
+    margin-right: 6px;
+    box-shadow: 0 0 0 rgba(0,0,0,0);
+    transition: all 0.3s;
+}
+
+.status-dot.active {
+    background: #0f0;
+    box-shadow: 0 0 8px #0f0;
+    animation: pulse-green 2s infinite;
+}
+
+.status-dot.processing {
+    background: var(--neon-blue);
+    box-shadow: 0 0 8px var(--neon-blue);
+    animation: pulse-blue 1.5s infinite;
+}
+
+@keyframes pulse-green { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+@keyframes pulse-blue { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+/* === 按钮升级 === */
+.cyber-btn {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.cyber-btn:hover {
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+    text-shadow: 0 0 8px rgba(0, 243, 255, 0.8);
+}
+
+.cyber-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg) translateY(-100%);
+    transition: transform 0.5s;
+}
+
+.cyber-btn:hover::after {
+    transform: rotate(45deg) translateY(100%);
+}
+
+/* === �²���: ȫϢ״̬�� === */
+.holo-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 22px;
+    padding: 16px 20px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.holo-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 12px 16px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.05);
+    background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+    color: #dff7ff;
+    min-height: 82px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.holo-chip:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 243, 255, 0.15);
+    border-color: rgba(0, 243, 255, 0.3);
+}
+
+.holo-chip::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at 50% 0%, rgba(0, 243, 255, 0.1), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.holo-chip:hover::before {
+    opacity: 1;
+}
+
+.holo-chip strong {
+    font-size: 24px;
+    letter-spacing: 1px;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+    z-index: 1;
+}
+
+.holo-chip small {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--neon-blue);
+    text-transform: uppercase;
+    font-weight: 700;
+    z-index: 1;
+}
+
+.holo-chip .chip-meta {
+    font-size: 11px;
+    color: #8bbad4;
+    letter-spacing: 0.5px;
+    z-index: 1;
+}
+

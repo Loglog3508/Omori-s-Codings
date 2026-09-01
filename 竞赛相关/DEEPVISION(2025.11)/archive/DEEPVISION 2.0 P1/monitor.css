@@ -1,0 +1,191 @@
+/* DeepVision Data Wall Enhanced Styles */
+
+/* 1. 全局背景与氛围增强 */
+body {
+    background: radial-gradient(circle at 50% 0%, #0f3447 0%, #061c2b 60%, #020a10 100%) !important;
+    color: #e0fbfc;
+}
+
+/* 添加背景网格纹理 */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: -1;
+    mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 90%);
+}
+
+/* 2. 顶部标题区增强 */
+.wall-title {
+    font-size: clamp(1.8rem, 3vw, 3.2rem) !important;
+    background: linear-gradient(180deg, #fff, #bdeeff) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    text-shadow: 0 0 30px rgba(120, 198, 247, 0.4);
+    letter-spacing: 2px !important;
+}
+
+.wall-sub {
+    color: rgba(168, 218, 220, 0.8) !important;
+    letter-spacing: 0.5em !important;
+    text-transform: uppercase;
+    font-size: 0.85rem !important;
+}
+
+/* 返回按钮美化 */
+.back-home-btn {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    font-weight: 500;
+}
+
+.back-home-btn:hover {
+    background: rgba(76, 201, 240, 0.15) !important;
+    border-color: rgba(76, 201, 240, 0.4) !important;
+    box-shadow: 0 0 20px rgba(76, 201, 240, 0.25);
+    transform: translateY(-1px);
+}
+
+/* 3. KPI 卡片增强 */
+.kpi-card {
+    background: rgba(6, 28, 43, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(12px) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+    overflow: hidden;
+}
+
+.kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(120, 198, 247, 0.2) !important;
+    background: rgba(6, 28, 43, 0.6) !important;
+}
+
+/* KPI 内部光效 */
+.kpi-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at top right, rgba(76, 201, 240, 0.15), transparent 60%);
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.kpi-value {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700 !important;
+    background: linear-gradient(120deg, #e0fbfc, #4cc9f0) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    color: transparent !important;
+    filter: drop-shadow(0 0 8px rgba(76, 201, 240, 0.3));
+}
+
+.kpi-label {
+    color: rgba(224, 251, 252, 0.7) !important;
+    font-weight: 400 !important;
+}
+
+/* 4. 主面板卡片增强 */
+.panel-card {
+    background: rgba(11, 29, 42, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.12) !important; /* 顶部高光 */
+    border-radius: 20px !important;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5) !important;
+}
+
+.panel-card h3 {
+    font-size: 1rem !important;
+    color: #fff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    border-left: 3px solid #4cc9f0;
+    padding-left: 10px;
+    margin-bottom: 12px !important;
+}
+
+/* 地图容器特殊处理 */
+.center-map .panel-card {
+    background: rgba(11, 29, 42, 0.3) !important; /* 地图背景更通透 */
+    border: 1px solid rgba(76, 201, 240, 0.15) !important;
+}
+
+/* 5. 筛选栏增强 */
+.filter-bar {
+    background: rgba(11, 29, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
+}
+
+.filter-select {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #e0fbfc !important;
+    border-radius: 12px !important;
+    transition: all 0.3s ease;
+}
+
+.filter-select:hover {
+    border-color: rgba(76, 201, 240, 0.5) !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 6. 滚动条美化 (Webkit) */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(76, 201, 240, 0.3);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(76, 201, 240, 0.6);
+}
+
+/* 7. 排名表格美化 */
+.ranking-table thead th {
+    background: rgba(76, 201, 240, 0.1) !important;
+    color: #4cc9f0 !important;
+    border-bottom: 1px solid rgba(76, 201, 240, 0.2);
+    padding: 8px 4px !important;
+}
+
+.ranking-table tbody tr:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.ranking-table tbody tr:hover {
+    background: rgba(76, 201, 240, 0.1) !important;
+}
+
+.ranking-table td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+    padding: 6px 6px !important;
+}
+
+/* 前三名高亮 */
+.ranking-table tbody tr:nth-child(1) td:first-child { color: #ffd700; font-weight: bold; text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+.ranking-table tbody tr:nth-child(2) td:first-child { color: #c0c0c0; font-weight: bold; }
+.ranking-table tbody tr:nth-child(3) td:first-child { color: #cd7f32; font-weight: bold; }

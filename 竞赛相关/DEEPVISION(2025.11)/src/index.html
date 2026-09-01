@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DeepVision | Ocean Intelligence</title>
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="base.css" />
+  <link rel="stylesheet" href="ui_kit.css" />
+  <link rel="stylesheet" href="landing.css" />
+  <script src="particles.js" defer></script>
+  <script src="transitions.js" defer></script>
+</head>
+<body class="landing-body">
+  <!-- Minimal Background Layer -->
+  <video id="bg-video" class="bg-video" muted autoplay loop playsinline preload="auto" poster="imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg">
+    <source src="background.mp4" type="video/mp4" />
+  </video>
+  <div class="bg-overlay"></div>
+  <canvas id="particle-canvas"></canvas>
+
+  <!-- Audio Control (Minimal) -->
+  <audio id="bg-music" preload="auto" loop muted>
+    <source src="Kan R. Gao - For River - Piano (Johnny's Version).mp3" type="audio/mpeg" />
+  </audio>
+  <button id="music-toggle" class="music-btn-minimal" aria-label="Toggle Music">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="minimal-icon-sm" stroke="currentColor">
+        <path d="M9 18V5l12-2v13"></path>
+        <circle cx="6" cy="18" r="3"></circle>
+        <circle cx="18" cy="16" r="3"></circle>
+    </svg>
+  </button>
+
+  <!-- Main Content Layout -->
+  <div class="landing-layout">
+    <header class="landing-header">
+        <div class="brand">DeepVision</div>
+        <div class="status-indicator">
+            <span class="status-dot"></span> System Operational v3.0SE
+        </div>
+    </header>
+
+    <main class="landing-hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                The Future of
+                <span class="gradient-text">Ocean Intelligence</span>
+            </h1>
+            <p class="hero-subtitle">
+                基于沉浸式数字孪生技术的海洋生态科普与环境监测系统。<br/>
+                Digital Twin Technology for Marine Ecological Monitoring.
+            </p>
+            
+            <div class="hero-actions">
+                <button id="enter-platform" class="btn-primary">
+                    Enter Platform
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: 8px;">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="landing-footer">
+        <div class="footer-links">
+            <span>OWID Sources</span>
+            <span>Open-Meteo Marine</span>
+            <span>USGS Earthquakes</span>
+        </div>
+        <div class="copyright">© 2026 DeepVision</div>
+    </footer>
+  </div>
+
+  <script>
+    // Music Toggle Logic
+    document.addEventListener('DOMContentLoaded', () => {
+        const music = document.getElementById('bg-music');
+        const btn = document.getElementById('music-toggle');
+        
+        btn.addEventListener('click', () => {
+            if (music.paused) {
+                music.play().then(() => {
+                    btn.classList.add('playing');
+                    btn.style.opacity = '1';
+                }).catch(e => console.log('Audio error:', e));
+            } else {
+                music.pause();
+                btn.classList.remove('playing');
+                btn.style.opacity = '0.5';
+            }
+        });
+
+        // Enter Platform
+        document.getElementById('enter-platform').addEventListener('click', () => {
+            document.body.classList.add('page-exit');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 800);
+        });
+
+        // Split Button Logic (Hover Expand + Delay Collapse)
+        const splitNav = document.getElementById('split-nav');
+        let collapseTimer;
+
+        splitNav.addEventListener('mouseenter', () => {
+            clearTimeout(collapseTimer); // Cancel pending collapse
+            splitNav.classList.add('active'); // Force expanded state
+        });
+
+        splitNav.addEventListener('mouseleave', () => {
+            // Wait 2 seconds before collapsing
+            collapseTimer = setTimeout(() => {
+                splitNav.classList.remove('active');
+            }, 2000);
+        });
+
+        // File Protocol Warning
+        if(location.protocol === 'file:') { 
+            console.warn('Running in file:// mode'); 
+        }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+/* =========================================
+   Future Lab - Internal Integration Styles
+   ========================================= */
+
+/* --- Internal Layout (Sidebar + Content) --- */
+.lab-container {
+    display: flex;
+    height: 100%; /* Fill the View 2 area */
+    gap: 20px;
+    overflow: hidden;
+    position: relative;
+    padding-top: 10px; /* Slight offset */
+}
+
+.lab-nav {
+    flex: 0 0 200px; /* Increased width for better balance */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 16px; /* Fully symmetrical padding */
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Sidebar Animation */
+.lab-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center content horizontally */
+    gap: 8px; /* Reduced gap slightly */
+    padding: 12px 10px; /* Reduced side padding */
+    width: 100%; /* Force full width */
+    border-radius: 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: #94aeb8;
+    cursor: pointer;
+    font-size: 13px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    font-weight: 500;
+    position: relative;
+    overflow: hidden;
+}
+
+.lab-nav-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(4, 20, 32, 0.8);
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease, opacity 0.3s;
+    z-index: -1;
+}
+
+.lab-nav-btn:hover { color: #d1e8ff; background: rgba(255, 255, 255, 0.03); }
+
+.lab-nav-btn.active {
+    border-color: rgba(76, 201, 240, 0.3);
+    color: #4cc9f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: transparent; /* Handled by pseudo */
+}
+
+.lab-nav-btn.active::before {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Prediction Chart Box & Forecast Optimization */
+.forecast-container {
+    padding: 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.forecast-chart-full {
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden;
+    background: rgba(0,0,0,0.2);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+    padding: 16px;
+}
+.forecast-chart-full canvas { flex: 1; min-height: 0; }
+
+.chart-box {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 14px;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+.chart-box canvas { flex: 1; width: 100% !important; height: 100% !important; }
+
+.lab-view-port {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.lab-sub-view {
+    position: absolute;
+    inset: 0;
+    display: flex; /* Always flex, hide via opacity/visibility */
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(30px); /* Simple slide up */
+    transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background: transparent; 
+    z-index: 0;
+    will-change: transform, opacity;
+}
+
+.lab-sub-view.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    z-index: 1;
+}
+
+/* Make sure charts don't render oddly when hidden */
+.lab-sub-view:not(.active) canvas {
+    visibility: hidden;
+}
+
+/* =========================================
+   Module: Scenario Compare (Ported from compare.html)
+   Namespace: .comp-*
+   ========================================= */
+
+.comp-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    grid-template-rows: minmax(0, 1fr); /* Strictly confine rows to container height */
+    gap: 16px;
+    flex: 1;        
+    height: 100%;   /* Fill the flex parent height */
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Replaces .panel from compare.html */
+.comp-panel {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 16px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%; /* Fill the grid cell */
+    backdrop-filter: blur(10px);
+    overflow: hidden; /* Ensure internal scrolling works */
+}
+
+.comp-scroll-col {
+    flex: 1; /* Take remaining height */
+    min-height: 0;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Scenarios List */
+.sc-list { display: flex; flex-direction: column; gap: 8px; }
+.sc-item {
+    display: flex; align-items: center; gap: 6px; font-size: 13px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #cfd8dc;
+}
+.sc-item:hover { background: rgba(255, 255, 255, 0.08); transform: translateX(2px); }
+.sc-item.active {
+    background: rgba(76, 201, 240, 0.1);
+    border-color: rgba(76, 201, 240, 0.3);
+    color: #fff;
+}
+
+.charts-wrap { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 16px; 
+    /* Removed overflow-y: auto, handled by parent comp-scroll-col */
+    padding-right: 6px; 
+}
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    padding-bottom: 20px;
+}
+
+.chart-card {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    height: 320px; /* Fixed height prevents infinite resize loop with Chart.js */
+    position: relative;
+    transition: transform 0.2s;
+    overflow: hidden; /* Ensure content stays inside */
+}
+.chart-card h4 {
+    margin: 0 0 10px 0; font-size: 13px; color: #e0fbfc; display: flex; justify-content: space-between; flex-shrink: 0;
+}
+.chart-card canvas { 
+    width: 100% !important; 
+    height: 100% !important; 
+    flex: 1; 
+    min-height: 0; /* Critical for flex child scrolling/resizing */
+}
+
+/* Special case for Overlay Card which might need more height */
+#overlayCard {
+    height: auto !important; 
+    min-height: 380px;
+}
+
+/* Insight Strip */
+.insight-strip {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+}
+.holo-chip { display: flex; flex-direction: column; gap: 4px; }
+.holo-chip small { font-size: 11px; color: #89aab5; text-transform: uppercase; }
+.holo-chip strong { color: #fff; font-size: 18px; letter-spacing: 0.5px; }
+
+/* =========================================
+   Module: Prediction Lab (Ported from lab.html)
+   Namespace: .pred-*
+   ========================================= */
+
+.pred-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 16px;
+    min-height: 0;
+}
+
+.pred-panel {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden; /* Ensure internal scrolling works */
+}
+
+.tech-slider-container {
+    padding: 10px 0;
+}
+input[type=range].tech-slider {
+    width: 100%; -webkit-appearance: none; background: transparent;
+}
+input[type=range].tech-slider::-webkit-slider-runnable-track {
+    width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;
+}
+input[type=range].tech-slider::-webkit-slider-thumb {
+    height: 14px; width: 14px; border-radius: 50%; background: #4cc9f0;
+    margin-top: -5px; -webkit-appearance: none; cursor: pointer;
+    box-shadow: 0 0 8px rgba(76, 201, 240, 0.5);
+}
+
+.cyber-btn {
+    background: rgba(76, 201, 240, 0.1);
+    border: 1px solid rgba(76, 201, 240, 0.3);
+    color: #4cc9f0;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+.cyber-btn:hover {
+    background: rgba(76, 201, 240, 0.2);
+    box-shadow: 0 0 12px rgba(76, 201, 240, 0.2);
+}
+
+.segmented-control {
+    position: relative; display: flex; background: rgba(0,0,0,0.3);
+    border-radius: 8px; padding: 3px; margin-top: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.segmented-control input { display: none; }
+.segmented-control label {
+    flex: 1; text-align: center; font-size: 11px; color: #aaa;
+    padding: 6px 0; cursor: pointer; z-index: 2; transition: 0.3s;
+    margin: 0 !important;
+}
+.segmented-control input:checked + label { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.5); }
+.segmented-bg {
+    position: absolute; top: 3px; bottom: 3px;
+    background: rgba(76, 201, 240, 0.25);
+    border: 1px solid rgba(76, 201, 240, 0.4);
+    border-radius: 6px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+}
+
+/* Tablet/Mobile Adjustments for Inner Lab */
+@media (max-width: 1200px) {
+    .comp-layout { grid-template-columns: 240px 1fr; }
+    .pred-grid { grid-template-columns: 260px 1fr; }
+}
+@media (max-width: 900px) {
+    .lab-container { flex-direction: column; }
+    .lab-nav { flex: 0 0 auto; flex-direction: row; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+    .lab-nav-btn { flex: 1; justify-content: center; padding: 8px 10px; font-size: 12px; }
+    .comp-layout, .pred-grid { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .comp-panel, .pred-panel { max-height: 1000px; /* remove previous limit */ }
+}

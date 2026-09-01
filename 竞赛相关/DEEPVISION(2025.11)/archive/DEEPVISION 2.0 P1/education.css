@@ -1,0 +1,142 @@
+/* education_walkthrough.css
+   专用于 education_walkthrough.html 的样式，放在 shared-ui.css 之后以覆盖通用样式。
+   生成时间: 2025-09-30
+*/
+.help-page-fix-note{display:none;} /* 标记用 */
+/* === Help Page 滚动修复覆写 =============================
+  原因：全局 styles.css 中 body 设置了 overflow:hidden 以实现主页全屏布局，
+      导致本帮助页无法垂直滚动。这里通过为 body.help-page 添加覆写恢复滚动。
+  说明：仅恢复垂直滚动，继续隐藏水平滚动；当弹出查询模态框时 (body.modal-open) 仍禁止滚动。 */
+body.help-page { overflow-y:auto !important; overflow-x:hidden; height:auto; }
+body.help-page.modal-open { overflow:hidden !important; }
+html.help-page, html.help-page body.help-page { height:auto; }
+/* ======================================================= */
+.bg-video{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:-2; opacity:0; transition:opacity 1.2s ease; filter:brightness(0.9) saturate(1.05); }
+.bg-video-ready{ opacity:1; }
+body.no-video .bg-video{ display:none !important; }
+#particle-canvas, .particle-canvas{ position:fixed; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; }
+header, .frost-header{ position:relative; z-index:10; }
+.bg-overlay{ position:fixed; inset:0; background:rgba(2,8,12,0.42); z-index:-1; pointer-events:none; transition:background .25s ease; }
+main{ position:relative; z-index:5; }
+.step{
+  max-width:1400px;
+  width:calc(100% - 160px);
+  margin:56px auto;
+  padding:28px 56px;
+  border-radius:12px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01));
+  box-shadow: 0 8px 28px rgba(0,12,24,0.45);
+  transform:translateX(-28px);
+  opacity:0;
+  transition:transform .6s cubic-bezier(.2,.9,.2,1), opacity .5s ease;
+  border:1px solid rgba(255,255,255,0.04);
+  backdrop-filter: blur(6px);
+  min-height:180px;
+}
+@media (max-width: 1000px){ .step{ max-width:94%; width:auto; padding:18px 20px; margin:22px auto; min-height:120px; } }
+.step:nth-child(odd){ transform:translateX(-36px); }
+.step:nth-child(even){ transform:translateX(36px); }
+.step[data-active="true"]{ transform:translateX(0); opacity:1; }
+.step h2{ font-size:30px; margin:0 0 12px 0; color:#eafcff; }
+.step p{ font-size:17px; color: #cfefff; opacity:0.95; line-height:1.8; margin:0; }
+.step h2{ font-size:36px !important; font-weight:700 !important; letter-spacing:0.3px !important; }
+.step h2 span{ font-size:20px !important; opacity:0.95 !important; margin-left:10px !important; }
+.step p{ font-size:18px !important; line-height:1.9 !important; }
+@media (max-width:1000px){ .step h2{ font-size:24px !important; } .step h2 span{ font-size:16px !important; } .step p{ font-size:16px !important; } }
+@media (max-width:1000px){ .step h2{ font-size:20px; } .step p{ font-size:15px; } }
+.step-media{ float:left; width:38%; max-width:460px; margin-right:28px; overflow:hidden; border-radius:10px; }
+.step-media img{ display:block; width:100%; height:220px; object-fit:cover; }
+@media (max-width:1000px){ .step-media{ float:none; width:100%; margin:0 0 12px 0; } .step-media img{ height:160px; width:100%; } }
+.step-media{ display:none !important; }
+.step{ display:flex; align-items:center; }
+.step h2, .step p{ max-width:72%; }
+@media (max-width:1000px){ .step{ display:block; padding:18px 20px; } .step h2, .step p{ max-width:100%; } }
+.step{ position:relative; overflow:hidden; }
+.step-bg{ position:absolute; inset:0; z-index:-2; pointer-events:none; }
+.step-bg img{ position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; }
+@media (max-width:1000px){ .step-bg img{ width:100%; height:auto; max-width:100%; max-height:none; transform:none; left:0; top:0; } }
+#s1, #s2{ background-repeat:no-repeat; background-position:center; }
+.step::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(2,8,12,0.48), rgba(2,8,12,0.48)); z-index:0; pointer-events:none; }
+.step > h2, .step > p{ position:relative; z-index:1; }
+@media (max-width:1000px){ .step{ padding:18px 20px; } .step-bg img{ object-position:center; } }
+.step h2{ font-size:40px !important; }
+.step h2 span{ font-size:22px !important; }
+.step p{ font-size:20px !important; }
+header a{ font-size:15px !important; }
+.jump-menu a{ font-size:13px !important; padding:8px 12px !important; }
+footer{ font-size:14px !important; }
+@media (max-width:1000px){ .step h2{ font-size:26px !important; } .step h2 span{ font-size:18px !important; } .step p{ font-size:17px !important; } }
+
+/* 查询浮动按钮 */
+.query-fab{
+  position:fixed;
+  bottom:26px;
+  right:26px;
+  z-index:60;
+  background:linear-gradient(145deg,#0099cc,#00b4e6);
+  color:#fff;
+  border:none;
+  padding:14px 20px;
+  border-radius:36px;
+  font-size:15px;
+  font-weight:600;
+  letter-spacing:.5px;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,180,255,0.35),0 0 0 1px rgba(255,255,255,0.15) inset;
+  backdrop-filter:blur(8px);
+  transition:transform .25s ease, box-shadow .3s ease, background .4s;
+}
+.query-fab:hover{ transform:translateY(-3px); box-shadow:0 10px 28px rgba(0,180,255,0.5),0 0 0 1px rgba(255,255,255,0.3) inset; }
+.query-fab:active{ transform:translateY(0); }
+@media (max-width:640px){ .query-fab{ bottom:18px; right:18px; padding:12px 18px; font-size:14px; } }
+
+/* 模态框结构 */
+.pollution-modal.hidden{ display:none; }
+.pollution-modal{ position:fixed; inset:0; z-index:100; font-family:inherit; }
+.pollution-modal .modal-backdrop{ position:absolute; inset:0; background:rgba(0,15,25,0.55); backdrop-filter:blur(6px); opacity:0; transition:opacity .18s ease; }
+.pollution-modal.show .modal-backdrop{ opacity:1; }
+.pollution-modal .modal-panel{ position:absolute; top:50%; left:50%; transform:translate(-50%, -44%) scale(.92); width:min(1080px,90vw); max-height:80vh; display:flex; flex-direction:column; background:linear-gradient(165deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.12); border-radius:22px; box-shadow:0 18px 46px -4px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08) inset; padding:0; overflow:hidden; opacity:0; transition:transform .35s cubic-bezier(.2,.85,.25,1), opacity .25s; }
+.pollution-modal.show .modal-panel{ transform:translate(-50%, -50%) scale(1); opacity:1; }
+.pollution-modal .modal-header{ display:flex; align-items:center; justify-content:space-between; padding:18px 24px 12px; }
+.pollution-modal .modal-header h2{ margin:0; font-size:22px; color:#e8fbff; letter-spacing:.6px; }
+.pollution-modal .close-btn{ background:rgba(255,255,255,0.1); border:none; color:#fff; width:38px; height:38px; border-radius:12px; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; transition:background .25s; }
+.pollution-modal .close-btn:hover{ background:rgba(255,255,255,0.2); }
+.pollution-modal .modal-body{ padding:0 24px 24px; overflow-y:auto; }
+.pollution-modal .search-row{ display:flex; gap:12px; margin:16px 0 14px; }
+.pollution-modal input[type=text]{ flex:1; padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.18); background:rgba(0,25,35,0.42); color:#e6fbff; font-size:15px; letter-spacing:.3px; }
+.pollution-modal select{ padding:10px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.18); background:rgba(0,25,35,0.42); color:#e6fbff; font-size:14px; }
+.pollution-modal input:focus, .pollution-modal select:focus{ outline:2px solid #00b2ff; outline-offset:1px; }
+.pollution-modal .stats-bar{ font-size:13px; color:#b7e9ff; margin-bottom:10px; }
+.result-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px; }
+.pollution-item{ padding:14px 18px 16px; background:linear-gradient(120deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02)); border:1px solid rgba(255,255,255,0.12); border-radius:16px; box-shadow:0 4px 14px rgba(0,0,0,0.35); position:relative; }
+.pollution-item .pi-type{ font-size:17px; font-weight:600; color:#eafcff; margin-bottom:6px; letter-spacing:.4px; }
+.pollution-item .pi-desc{ font-size:14px; line-height:1.55; color:#cfefff; margin-bottom:8px; }
+.pollution-item .pi-strat-label{ font-size:12px; color:#9fdfff; letter-spacing:.5px; margin-bottom:4px; opacity:.8; }
+.pollution-item .pi-strategies{ list-style:disc; margin:0 0 0 20px; padding:0; columns:2; column-gap:26px; }
+.pollution-item .pi-strategies li{ font-size:13px; color:#d9f7ff; margin:2px 0; break-inside:avoid; }
+@media (max-width:800px){ .pollution-item .pi-strategies{ columns:1; } }
+.no-result{ padding:28px 18px; text-align:center; font-size:14px; background:rgba(255,255,255,0.05); border:1px dashed rgba(255,255,255,0.25); border-radius:14px; color:#bdeeff; }
+.no-result.hidden{ display:none; }
+.data-notes{ margin-top:18px; font-size:13px; color:#9fd6e8; }
+.data-notes summary{ cursor:pointer; font-weight:600; color:#bdefff; }
+.data-notes p{ margin:8px 0 0; line-height:1.6; }
+.pollution-modal mark{ background:#ffdd55; color:#103040; padding:0 3px; border-radius:4px; }
+body.modal-open{ overflow:hidden; }
+
+
+/* 模拟区样式 */
+#policy-sim{ padding:26px 40px; background:linear-gradient(180deg, rgba(0,0,0,0.18), rgba(0,0,0,0.12)); border-radius:12px; margin:36px auto; }
+.sim-grid{ display:flex; gap:20px; align-items:flex-start; }
+.controls{ width:320px; background:rgba(255,255,255,0.02); padding:14px; border-radius:10px; }
+.controls label{ display:block; margin-bottom:10px; font-size:14px; color:#dff7ff; }
+.controls input[type=number], .controls select{ width:100%; padding:6px 8px; border-radius:6px; border:1px solid rgba(255,255,255,0.06); background:rgba(0,0,0,0.25); color:#eafcff; }
+.controls input[type=range]{ width:100%; }
+.controls .buttons{ display:flex; gap:8px; margin-top:8px; }
+.controls button{ padding:8px 10px; border-radius:8px; background:#0496c7; color:#fff; border:none; cursor:pointer; }
+.chart-wrap{ flex:1; }
+.chart-wrap canvas{ width:100% !important; height:320px !important; border-radius:8px; background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.02)); }
+.kpi-row{ display:flex; gap:18px; margin-top:12px; }
+.kpi{ background:rgba(255,255,255,0.03); padding:12px 16px; border-radius:10px; min-width:150px; }
+.kpi-value{ font-size:20px; font-weight:700; color:#eafcff; }
+.kpi-label{ font-size:12px; color:#cfefff; }
+@media (max-width:1000px){ .sim-grid{ display:block; } .controls{ width:100%; } .chart-wrap canvas{ height:260px !important; } }

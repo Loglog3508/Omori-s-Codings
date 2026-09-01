@@ -1,0 +1,960 @@
+
+/* =========================================
+   DEEP OCEAN DASHBOARD - STRICT LAYOUT v4.0 (Slider Edition)
+   ========================================= */
+
+:root {
+    --bg-body: #000205; /* Match Landing Page */
+    --bg-sidebar: #050c16;
+    --bg-card: rgba(18, 30, 45, 0.55);
+    --bg-card-hover: rgba(25, 40, 60, 0.7);
+    
+    --text-primary: #e0fbfc;
+    --text-secondary: #94aeb8;
+    --text-muted: #5e7a8a;
+    
+    --accent-cyan: #4cc9f0;
+    --accent-blue: #4361ee;
+    
+    --border-subtle: rgba(255, 255, 255, 0.06);
+    --border-focus: rgba(76, 201, 240, 0.3);
+    
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.25);
+    --glass-blur: blur(12px);
+    
+    --sidebar-width: 240px;
+    --header-height: auto; /* Changed for tabs */
+}
+
+/* Unified Background Styles */
+.bg-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.15;
+    filter: saturate(0) contrast(1.1);
+    z-index: -3; /* Behind everything */
+    pointer-events: none;
+}
+.bg-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 50% 40%, rgba(20, 40, 60, 0.2), transparent 70%),
+                linear-gradient(to bottom, transparent 0%, var(--bg-body) 100%);
+    z-index: -2;
+    pointer-events: none;
+}
+#particle-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; 
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: var(--bg-body);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--text-primary);
+}
+
+.homepage-layout {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+/* ============ SIDEBAR MAKEOVER ============ */
+.left-col {
+    width: var(--sidebar-width);
+    flex: 0 0 var(--sidebar-width);
+    background: var(--bg-sidebar);
+    border-right: 1px solid var(--border-subtle);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 24px;
+    z-index: 20;
+}
+
+.a1-title { 
+    margin-bottom: 50px; 
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center;    /* 垂直居中 (如果容器有高度) */
+}
+.site-title { font-size: 1.2rem; font-weight: 800; color: #fff; letter-spacing: -0.5px; opacity: 0.95; margin: 0; }
+.site-sub { display: none; } /* Too noisy, hide for minimalism */
+
+/* Enhanced Quick Glance - 2x2 Bento Grid */
+.quick-glance { margin-top: 20px; flex: 0 0 auto; }
+.qg-header { 
+    font-size: 0.8rem; 
+    font-weight: 600;
+    color: var(--text-muted); /* Neutralized from Blue */
+    margin-bottom: 16px; 
+    padding-left: 4px;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+}
+.qg-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin-left: 10px;
+}
+
+.qg-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2x2 Grid */
+    gap: 10px;
+}
+
+.qg-item {
+    background: rgba(255, 255, 255, 0.03); /* Extremely subtle fill */
+    border: none; /* No Border as requested */
+    border-radius: 16px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 90px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.qg-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-2px);
+}
+
+.qg-item .k { 
+    color: var(--text-muted); 
+    font-size: 0.65rem; 
+    margin-bottom: 6px; 
+    font-weight: 500;
+    white-space: nowrap;
+}
+.qg-item .v { 
+    font-size: 1.35rem; 
+    color: #fff; 
+    font-weight: 700; 
+    line-height: 1;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: -0.5px;
+    margin-bottom: 2px;
+}
+.qg-item .u { 
+    font-size: 0.65rem; 
+    color: var(--text-muted); 
+    opacity: 0.8;
+}
+
+/* Specific Style for Network Status Card (Grid Slot 4) */
+.qg-net-card {
+    margin: 0; padding: 0;
+    border: none;
+    background: rgba(255, 255, 255, 0.03); /* Match other cards */
+}
+
+.qg-net-status {
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column; /* Stack Dot and Text */
+    align-items: flex-start;
+    justify-content: center;
+    background: transparent;
+    padding: 12px;
+    gap: 8px;
+}
+
+.qg-net-dot { 
+    width: 10px; height: 10px; 
+    background: #ff6b6b; /* Default to red/error state for visual pop mostly */
+    border-radius: 50%; 
+    box-shadow: 0 0 8px rgba(255, 107, 107, 0.6);
+}
+/* Dynamic state colors handled by JS usually, but setting defaults */
+[data-state="ok"] .qg-net-dot { background: #00f2ea !important; box-shadow: 0 0 8px #00f2ea !important; }
+[data-state="error"] .qg-net-dot { background: #ff4757 !important; box-shadow: 0 0 8px #ff4757 !important; }
+
+.qg-net-text {
+    font-size: 0.75rem;
+    color: #fff;
+    font-weight: 500;
+}
+
+/* More Metrics Link */
+.qg-more { 
+    display: none !important; /* User requested removal */
+}
+.qg-extra { display: none; } /* Keep details hidden for now to save space */
+.a3-footer { display: none; }
+
+/* Navigation */
+.a2-nav {
+    width: 100%;
+    margin-top: auto; /* Push to bottom of sidebar */
+    padding-bottom: 20px;
+}
+.a2-nav ul { 
+    list-style: none; 
+    padding: 0; 
+    margin: 0;
+}
+.nav-links li { margin-bottom: 8px; } /* Increased spacing */
+.nav-links a {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.nav-links a:hover { background: rgba(255,255,255,0.08); color: #fff; transform: translateX(4px); }
+
+/* ============ RIGHT COL & TABS ============ */
+.right-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
+    background: radial-gradient(circle at top right, rgba(10, 25, 40, 0.4), transparent 60%);
+    position: relative;
+}
+
+/* Header with Tabs */
+.b1-top {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column; /* Stack Greeting & Tabs */
+    padding: 30px 40px 0 40px; 
+    border-bottom: 1px solid var(--border-subtle);
+    background: rgba(3, 8, 15, 0.8); /* Slight sticky header feel */
+    backdrop-filter: blur(10px);
+    z-index: 10;
+}
+
+.top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px; /* Reduced margin */
+}
+
+.b11-greet h2 { font-size: 1.5rem; font-weight: 600; color: #fff; margin: 0; }
+#current-time { font-weight: 300; opacity: 0.5; margin-left: 12px; font-size: 1.1rem; }
+
+/* The New Tab Bar */
+.main-tabs {
+    display: flex;
+    gap: 0; /* Removing gap for pill layout */
+    position: relative;
+    background: rgba(255,255,255,0.04);
+    border-radius: 8px;
+    padding: 4px;
+    border: 1px solid var(--border-subtle);
+    width: fit-content;
+    margin-bottom: 20px;
+}
+
+/* Sliding Indicator */
+.tab-indicator {
+    position: absolute;
+    top: 4px; /* match padding */
+    bottom: 4px;
+    left: 0;
+    width: 0; /* JS will set */
+    border-radius: 6px;
+    background: var(--accent-blue); /* Solid color, no gradient */
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), 
+                width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 0;
+    box-shadow: none; /* Removed shadow for cleaner look */
+    pointer-events: none;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    padding: 8px 20px; /* Horizontal padding determines width */
+    cursor: pointer;
+    font-weight: 500;
+    transition: color 0.3s;
+    position: relative;
+    z-index: 1; /* Above indicator */
+}
+
+.tab-btn:hover { color: #fff; }
+
+.tab-btn.active {
+    color: #fff;
+    font-weight: 600;
+}
+
+.tab-btn.active::after {
+    display: none;
+}
+
+/* ============ SLIDING CONTENT AREA ============ */
+
+/* Mask that hides the off-screen views */
+.b2-content-mask {
+    flex: 1; /* Fill remaining height */
+    overflow: hidden; 
+    position: relative;
+    width: 100%;
+}
+
+/* The long track containing 3 views side-by-side */
+.b2-content-track {
+    display: flex;
+    width: 300%; /* 3 Pages */
+    height: 100%;
+    will-change: transform;
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); /* Smooth Slide */
+}
+
+/* Each View Page */
+.view-section {
+    width: 33.333%; /* 1/3 of track */
+    height: 100%;
+    overflow-y: auto; /* Internal Vertical Scroll */
+    padding: 30px 40px 80px 40px;
+    /* Remove borders as requested */
+    border: none !important; 
+    background: none !important;
+}
+
+/* ============ VIEW 1: DASHBOARD GRID (Existing) ============ */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 280px 480px 320px;
+    grid-auto-rows: 320px;
+    gap: 24px;
+    width: 100%;
+    max-width: 1800px;
+    margin: 0 auto;
+}
+
+.huarong-piece, .panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    backdrop-filter: var(--glass-blur);
+    transition: transform 0.2s, border-color 0.2s;
+    position: relative; 
+}
+.huarong-piece:hover {
+    border-color: var(--border-focus);
+    transform: translateY(-2px);
+    background: var(--bg-card-hover);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.panel-title {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 16px 0;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Chart/Canvas Fixes */
+canvas { max-width: 100%; max-height: 100%; }
+.chart-panel canvas, .yearly-chart-wrap canvas, #ocean-river-chart, #ocean-overview-chart, #marine-bio-loss-chart {
+    display: block; width: 100% !important; height: 100% !important; flex: 1; min-height: 0;
+}
+.chart-panel, .simulation-chart-panel { min-height: 0; }
+
+/* Grid Slots */
+.piece-1 { grid-column: span 1; }
+.piece-2 { grid-column: span 1; }
+.piece-3 { grid-column: span 1; }
+.piece-4 { grid-column: span 1; }
+
+.piece-5 { grid-column: span 2; }
+.piece-6 { grid-column: span 2; }
+
+.piece-7 { grid-column: span 1; }
+.piece-8 { grid-column: span 1; }
+.piece-9 { grid-column: span 1; }
+.piece-10 { grid-column: span 1; }
+
+/* Internal Tweaks */
+.ocean-pollution-card { display: flex; flex-direction: column; height: 100%; justify-content: flex-end; }
+.ocean-pollution-main .main-value { font-size: 3.2rem; font-weight: 700; color: #fff; line-height: 1; letter-spacing: -2px; margin-bottom: 4px; }
+.ocean-pollution-main .main-label { color: var(--accent-cyan); font-size: 0.8rem; margin-bottom: 20px; }
+.ocean-pollution-sub { display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
+.sub-value { font-size: 1.1rem; font-weight: 600; color: #fff; }
+.sub-label { font-size: 0.7rem; color: var(--text-muted); }
+
+.large-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; height: 100%; }
+.large-stat-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; display: flex; flex-direction: column; justify-content: center; }
+.large-stat-number { font-size: 1.2rem; color: #fff; font-weight: 700; }
+.large-stat-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+
+.yearly-controls { flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.yearly-chart-wrap { flex: 1; min-height: 0; position: relative; }
+
+.rt-country-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; overflow-y: auto; flex: 1; min-height: 0; }
+.rt-country-item { background: rgba(255,255,255,0.03); padding: 6px; text-align: center; border-radius: 4px; font-size: 0.75rem; }
+
+/* ============ VIEW 2: RESOURCES LIST (Styled as Cards) ============ */
+.resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.resource-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    padding: 24px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+.resource-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-cyan);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card);
+}
+.res-title { font-size: 1.1rem; color: #fff; font-weight: 600; margin-bottom: 8px; }
+.res-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
+
+/* ============ VIEW 3: FORECAST (Full Page) ============ */
+.forecast-container {
+    width: 100%;
+    height: 100%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+.forecast-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.forecast-chart-full { flex: 1; width: 100%; min-height: 0; }
+
+/* Responsive */
+@media (max-width: 1400px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: repeat(2, 280px) repeat(2, 450px) repeat(2, 300px);
+    }
+    .piece-1, .piece-2 { grid-row: 1; grid-column: span 1; }
+    .piece-3, .piece-4 { grid-row: 2; grid-column: span 1; }
+    .piece-5 { grid-row: 3; grid-column: span 2; }
+    .piece-6 { grid-row: 4; grid-column: span 2; }
+    .piece-7, .piece-8 { grid-row: 5; grid-column: span 1; }
+    .piece-9, .piece-10 { grid-row: 6; grid-column: span 1; }
+}
+
+@media (max-width: 768px) {
+    /* Mobile: Tabs become scrollable, Sidebar hidden/hamburger */
+    .homepage-layout { flex-direction: column; overflow-y: auto; }
+    .left-col { display: none; } /* Simplified mobile for now */
+    
+    .right-col { height: auto; overflow: visible; }
+    .b2-content-mask { height: auto; overflow: visible; }
+    .b2-content-track { width: 100%; flex-direction: column; transform: none !important; } /* Disable slider on mobile, stack */
+    .view-section { width: 100%; height: auto; padding: 20px; display: block !important; } /* Force show all */
+    
+    .main-tabs { display: none; } /* No tabs on mobile, just scroll */
+    .dashboard-grid { display: flex; flex-direction: column; gap: 20px; }
+    .huarong-piece { min-height: 320px; }
+}
+
+
+/* =========================================
+ Navigation Exit Animation (Bottom-to-Top Left Fade)
+ ========================================= */
+@keyframes navExitLeft {
+ 0% { opacity: 1; transform: translateX(0); }
+ 100% { opacity: 0; transform: translateX(-30px); }
+}
+
+body.page-exit .nav-links li {
+ animation: navExitLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+ pointer-events: none;
+}
+
+/* Stagger from bottom to top */
+body.page-exit .nav-links li:nth-last-child(1) { animation-delay: 0ms; }
+body.page-exit .nav-links li:nth-last-child(2) { animation-delay: 50ms; }
+body.page-exit .nav-links li:nth-last-child(3) { animation-delay: 100ms; }
+body.page-exit .nav-links li:nth-last-child(4) { animation-delay: 150ms; }
+body.page-exit .nav-links li:nth-last-child(5) { animation-delay: 200ms; }
+
+
+/* =========================================
+   User Feedback Fixes (v4.1)
+   ========================================= */
+
+/* 1. Force Neutral Sidebar Header */
+.qg-header {
+    color: rgba(255, 255, 255, 0.45) !important; /* Pure neutral gray */
+    font-weight: 500 !important;
+    text-transform: uppercase;
+    letter-spacing: 1.5px !important;
+}
+
+/* 2. Resource Link Buttons */
+.res-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 20px;
+    height: 140px; /* Uniform Height */
+}
+
+.res-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.res-btn .res-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+}
+
+.res-btn .res-name {
+    color: #e0fbfc;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* 3. Future Lab Chart Size Overrides */
+.forecast-container canvas#long-forecast-chart {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 400px; /* Ensure visual weight */
+}
+
+
+/* =========================================
+   UI Refinements v4.2 (Icons & Positioning)
+   ========================================= */
+
+/* 1. Sidebar Nav Positioning */
+.a2-nav {
+    margin-top: 40px !important;
+}
+
+/* 2. Unified Buttons in Piece 6 */
+.rt-mode-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+.rt-mode-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+.rt-mode-btn.active {
+    background: var(--accent-cyan);
+    color: #050c16;
+    border-color: var(--accent-cyan);
+    font-weight: 700;
+}
+
+/* 3. Minimal Icons Base */
+.minimal-icon-sm {
+    vertical-align: text-bottom;
+    display: inline-block;
+    opacity: 0.9;
+}
+
+
+/* =========================================
+ Navigation Exit Animation (Bottom-to-Top Left Fade)
+ ========================================= */
+@keyframes navExitLeft {
+ 0% { opacity: 1; transform: translateX(0); }
+ 100% { opacity: 0; transform: translateX(-30px); }
+}
+
+body.page-exit .nav-links li {
+ animation: navExitLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+ pointer-events: none;
+}
+
+/* Stagger from bottom to top */
+body.page-exit .nav-links li:nth-last-child(1) { animation-delay: 0ms; }
+body.page-exit .nav-links li:nth-last-child(2) { animation-delay: 50ms; }
+body.page-exit .nav-links li:nth-last-child(3) { animation-delay: 100ms; }
+body.page-exit .nav-links li:nth-last-child(4) { animation-delay: 150ms; }
+body.page-exit .nav-links li:nth-last-child(5) { animation-delay: 200ms; }
+
+
+/* Page Transitions */
+body {
+    transition: opacity 0.6s ease;
+    opacity: 0; /* Init invisible */
+}
+body.page-loaded {
+    opacity: 1; /* Fade in */
+}
+body.page-exit {
+    opacity: 0 !important;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+}
+
+
+/* =========================================
+ Navigation Exit Animation (Bottom-to-Top Left Fade)
+ ========================================= */
+@keyframes navExitLeft {
+ 0% { opacity: 1; transform: translateX(0); }
+ 100% { opacity: 0; transform: translateX(-30px); }
+}
+
+body.page-exit .nav-links li {
+ animation: navExitLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+ pointer-events: none;
+}
+
+/* Stagger from bottom to top */
+body.page-exit .nav-links li:nth-last-child(1) { animation-delay: 0ms; }
+body.page-exit .nav-links li:nth-last-child(2) { animation-delay: 50ms; }
+body.page-exit .nav-links li:nth-last-child(3) { animation-delay: 100ms; }
+body.page-exit .nav-links li:nth-last-child(4) { animation-delay: 150ms; }
+body.page-exit .nav-links li:nth-last-child(5) { animation-delay: 200ms; }
+
+
+/* =========================================
+   Universal Entry Animations (Home Page Load)
+   ========================================= */
+
+@keyframes slideInLeftFade {
+    0% { opacity: 0; transform: translateX(-30px); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInDownFade {
+    0% { opacity: 0; transform: translateY(-30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUpFade {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Sidebar Elements Entry */
+.left-col > * {
+    opacity: 0;
+    animation: slideInLeftFade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.0) forwards;
+}
+.left-col .a1-title { animation-delay: 0.1s; }
+.left-col .quick-glance { animation-delay: 0.2s; }
+.left-col .a2-nav { animation-delay: 0.3s; }
+.left-col .a3-footer { animation-delay: 0.4s; }
+
+/* Header Entry */
+.b1-top {
+    opacity: 0;
+    animation: slideInDownFade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.0) forwards;
+    animation-delay: 0.3s;
+}
+
+/* Dashboard Pieces Entry (View 1) */
+.huarong-piece {
+    opacity: 0;
+    animation: fadeInUpFade 0.6s cubic-bezier(0.2, 0.8, 0.2, 1.0) forwards;
+}
+
+/* Stagger delays for pieces */
+.huarong-piece.piece-1 { animation-delay: 0.20s; }
+.huarong-piece.piece-2 { animation-delay: 0.25s; }
+.huarong-piece.piece-3 { animation-delay: 0.30s; }
+.huarong-piece.piece-4 { animation-delay: 0.35s; }
+.huarong-piece.piece-5 { animation-delay: 0.40s; }
+.huarong-piece.piece-6 { animation-delay: 0.45s; }
+.huarong-piece.piece-7 { animation-delay: 0.50s; }
+.huarong-piece.piece-8 { animation-delay: 0.55s; }
+.huarong-piece.piece-9 { animation-delay: 0.60s; }
+.huarong-piece.piece-10 { animation-delay: 0.65s; }
+.huarong-piece.piece-11 { animation-delay: 0.70s; }
+.huarong-piece.piece-12 { animation-delay: 0.75s; }
+
+
+/* Glossary Tooltips */
+.glossary-term {
+    border-bottom: 1px dashed rgba(142, 223, 255, 0.6);
+    cursor: help;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.glossary-term:hover {
+    color: #fff;
+    border-bottom-color: #fff;
+    background: rgba(142, 223, 255, 0.1);
+}
+
+#glossary-tooltip {
+    position: fixed;
+    background: rgba(12, 28, 44, 0.95);
+    border: 1px solid rgba(100, 200, 255, 0.3);
+    backdrop-filter: blur(10px);
+    padding: 12px;
+    border-radius: 8px;
+    color: #e0fbfc;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 260px;
+    z-index: 10000;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    display: none;
+}
+
+#glossary-tooltip h4 {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    color: #4dbafd;
+}
+
+
+/* =========================================
+   Print / PDF Export Styles (Optimized v3)
+   ========================================= */
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 10mm; 
+    }
+
+    /* 1. Global Reset & Hiding */
+    body, html {
+        background: #fff !important;
+        color: #000 !important;
+        height: auto !important;
+        font-size: 10pt; /* Default reduced font size */
+    }
+
+    /* Hide EVERYTHING non-essential */
+    .left-col, .main-tabs, .rt-toolbar, #rt-connection-indicator, .overlay-glass, 
+    .pill-btn, .refresh-indicator, .back-link, #glossary-tooltip, 
+    .b1-top, /* Hide Greeting Header completely per user request */
+    .a3-footer, .qg-more {
+        display: none !important;
+    }
+
+    /* 2. Layout Structure */
+    .right-col {
+        background: none !important;
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    .b2-content-mask, .b2-content-track {
+        height: auto !important;
+        overflow: visible !important;
+        transform: none !important;
+        width: 100% !important;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    /* Force show Monitoring View only */
+    .view-section { display: none !important; margin: 0 !important; padding: 0 !important; }
+    .view-section:first-child { display: block !important; }
+
+    /* 3. Compact Grid Layout */
+    .dashboard-grid {
+        display: grid !important;
+        /* 2 Columns, tight gap */
+        grid-template-columns: repeat(2, 1fr) !important; 
+        grid-auto-rows: auto !important; /* Allow rows to shrink */
+        gap: 12px !important; /* Reduced from 20px */
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* 4. Compact Card Styling */
+    .huarong-piece.panel {
+        background: #fff !important;
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        padding: 8px 12px !important; /* Reduced padding */
+        min-height: 0 !important; /* Allow shrinking */
+        height: auto !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* Specific Grid Placements for Compactness */
+    /* Piece 1 (Pollution) & 9 (Quake) & 10 (Water) usually need width */
+    /* Try to fit 2 small cards side-by-side */
+    .piece-1, .piece-9, .piece-4, .piece-5 { grid-column: span 2 !important; } 
+    /* Others define as span 1 implicitly */
+
+    /* Typography Reduction */
+    .panel-title {
+        color: #000 !important;
+        font-size: 11pt !important;
+        margin-bottom: 6px !important;
+        padding-bottom: 4px !important;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .panel-info { margin-top: 4px !important; }
+    .info-text { font-size: 8pt !important; color: #666 !important; }
+
+    /* Values */
+    .main-value, .sub-value, .large-stat-number { color: #000 !important; }
+    .main-value { font-size: 2rem !important; } /* Reduce from huge size */
+    .sub-value { font-size: 1.2rem !important; }
+    
+    .main-label, .sub-label, .large-stat-label { color: #555 !important; font-size: 9pt !important; }
+
+    /* Chart Optimization */
+    canvas {
+        filter: invert(1) hue-rotate(180deg) blur(0) contrast(1.2) !important;
+        background: transparent !important;
+        max-height: 200px !important; /* Cap chart height */
+        width: 100% !important;
+    }
+    
+    /* Specific tweaks */
+    #bio-impact-chart { height: 160px !important; } /* Restore quake height */
+    .ocean-pollution-main .main-value { font-size: 2.5rem !important; }
+
+    /* Hide scrollbars */
+    ::-webkit-scrollbar { display: none; }
+}
+
+
+/* PDF Button specific style override to prevent too much width */
+.top-row .pill-btn:hover {
+    background: rgba(255,255,255,0.15);
+}
+@media print {
+    /* Hide the print button itself */
+    .top-row, .top-row button { display: none !important; }
+    /* Re-enable Greeting for context but hide the row container mechanics */
+    .b1-top .top-row { display: block !important; margin-bottom: 0 !important; }
+    .b11-greet { display: block !important; color: #000 !important; }
+    .b11-greet h2 { color: #000 !important; font-size: 2rem !important; margin-bottom: 20px !important; }
+    #current-time { color: #555 !important; display: inline !important; }
+}
+
+
+/* Clean up the appended redundant media queries from previous steps */
+@media print {
+   /* Override any leftover display:blocks for greeting */
+   .b1-top, .b11-greet { display: none !important; }
+}
+
+
+/* Align panel info to bottom */
+.panel-info {
+    margin-top: auto;
+}
+
+/* 比赛水印 - 固定左下角 */
+.watermark-logo {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    width: 100px; /* 可改大小 */
+    height: auto;
+    z-index: 999; /* 保证在最上层 */
+    opacity: 0.8; /* 半透明不刺眼 */
+    pointer-events: none; /* 不影响点击 */
+    transition: opacity 0.2s;
+}
+.watermark-logo:hover {
+    opacity: 1;
+}
+
+/* ===== Enhanced Card Hover (DeepVision Polish) ===== */
+.huarong-piece.panel {
+    transition: transform 0.35s cubic-bezier(0.25, 0.8, 0.25, 1),
+                box-shadow 0.35s cubic-bezier(0.25, 0.8, 0.25, 1),
+                border-color 0.35s ease;
+}
+
+.huarong-piece.panel:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(76, 201, 240, 0.15);
+    border-color: rgba(76, 201, 240, 0.25) !important;
+}
+
+/* Enhanced entrance stagger for cards */
+.huaron-piece { animation: cardRise 0.5s ease-out both; }
+.piece-1 { animation-delay: 0.05s; }
+.piece-2 { animation-delay: 0.1s; }
+.piece-3 { animation-delay: 0.15s; }
+.piece-4 { animation-delay: 0.2s; }
+.piece-5 { animation-delay: 0.25s; }
+
+@keyframes cardRise {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+}

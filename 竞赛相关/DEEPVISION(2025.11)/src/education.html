@@ -1,0 +1,793 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"/><title>DeepVision (深蓝视界) - 教育引导</title><link rel="icon" href="icon.png" type="image/png"><meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="stylesheet" href="base.css"/><link rel="stylesheet" href="ui_kit.css"/><link rel="stylesheet" href="education.css"/>
+<script src="core.js"></script><style>
+/* 强制隐藏工具类 */
+.hidden { display: none !important; }
+
+body{margin:0;font-family:Roboto,Arial,sans-serif;scroll-behavior:smooth}header{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:10px 20px;background:rgba(0,0,0,0.35);backdrop-filter:blur(10px);z-index:10}header a{text-decoration:none;font-size:13px}nav a:not(:first-child){margin-left:14px}.help-actions{position:relative;z-index:50;flex-shrink:0}#progressBar{position:fixed;top:0;left:0;height:3px;background:#49c4ff;width:0;z-index:20;transition:width .15s}footer{padding:40px 0;text-align:center;font-size:12px;opacity:.65;background:#02111b} .jump-menu{position:fixed;right:14px;top:70px;display:flex;flex-direction:column;gap:6px;z-index:15} .jump-menu a{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:6px 10px;font-size:11px;color:#bdefff;border-radius:14px;text-decoration:none;opacity:.75} .jump-menu a.active{background:#0496c7;color:#fff;opacity:1}
+/* ===== 顶部搜索与沉浸轮播升级样式 ===== */
+.help-header{gap:16px;flex-wrap:wrap}
+.help-header.single-nav{flex-wrap:nowrap;justify-content:space-between;}
+.help-search-wrap{position:relative;display:flex;align-items:center;gap:10px;margin-left:auto;min-width:340px;}
+.help-search-wrap.centered{margin:0 auto;min-width:520px;max-width:760px;width:66%;order:3;}
+.help-search-wrap.elevate{padding:6px 10px;border-radius:14px;background:rgba(0,40,60,.55);box-shadow:0 6px 22px -8px rgba(0,150,255,.45),0 2px 8px -2px rgba(0,0,0,.55);backdrop-filter:blur(12px) saturate(1.3);-webkit-backdrop-filter:blur(12px) saturate(1.3);}
+.help-search-wrap input{flex:1;padding:10px 18px;border:0;background:rgba(0,0,0,.38);color:#eaf9ff;border-radius:10px;font-size:15px;letter-spacing:.55px;outline:none;transition:background .4s,box-shadow .45s;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);} 
+.help-search-wrap input:focus{background:rgba(0,0,0,.62);box-shadow:inset 0 0 0 1px rgba(120,210,255,.75),0 0 0 3px rgba(73,196,255,.35),0 0 22px -2px rgba(120,230,255,.6);} 
+.help-search-wrap input::placeholder{color:#c9e8fb;opacity:.6;}
+.help-search-status{font-size:11px;color:#9fe1ff;letter-spacing:.3px;min-width:88px;}
+.help-search-dropdown{position:absolute;top:46px;left:0;right:0;background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.25);border-radius:12px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);max-height:340px;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:6px;z-index:30;}
+.help-search-dropdown.hidden{display:none;}
+.help-search-dropdown .dd-item{display:flex;align-items:center;gap:10px;font-size:12px;padding:7px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:9px;cursor:pointer;line-height:1.3;transition:.25s;}
+.help-search-dropdown .dd-item:hover{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35);}
+.help-search-dropdown .dd-item.external{border-color:rgba(120,198,247,.45);}
+.help-search-dropdown .dd-type{font-size:10px;padding:3px 6px;background:rgba(255,255,255,.18);border-radius:6px;letter-spacing:.5px;color:#d8f3fd;}
+.help-search-dropdown mark{background:#ffe29f;color:#002b36;padding:0 3px;border-radius:3px;}
+.help-search-dropdown .dd-empty{font-size:11px;padding:6px 4px;color:#bfe8ff;}
+@media (max-width:760px){ .help-search-wrap{min-width:100%;order:3;} }
+
+
+/* ===== 照片墙背景样式 ===== */
+body.themed-page { 
+    background: #000508 !important; /* 更黑的底色 */
+    overflow-y: auto !important; /* 允许滚动 */
+    overflow-x: hidden;
+}
+.immersive-carousel {
+    position: fixed;
+    inset: 0;
+    z-index: -10; /* 最底层 */
+    overflow: hidden;
+    pointer-events: none; /* 禁用交互 */
+    opacity: 0.08; /* 降低不透明度：0.15 -> 0.08 */
+    filter: blur(4px) grayscale(0.8) contrast(0.9); /* 增强模糊和灰度 */
+}
+.photo-wall {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px;
+    width: 120vw; /* 超出屏幕以防边缘穿帮 */
+    animation: gentle-drift 120s linear infinite alternate; /* 极慢漂移 */
+}
+@keyframes gentle-drift {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-45%, -45%) rotate(2deg); }
+}
+
+.photo-item {
+    aspect-ratio: 16/9;
+    background: #112; 
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: none;
+    transition: none;
+}
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.7;
+}
+
+/* 隐藏不需要的元素 */
+#bg-video, #particle-canvas, .bg-overlay { display: none !important; }
+
+/* ===== 新版布局容器 ===== */
+.main-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 900px; /* 阅读舒适宽度 */
+    margin: 120px auto 60px; /* 顶部留出 Header 空间 */
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+/* 搜索增强 */
+.search-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+.search-title {
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff 0%, #bdefff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 24px;
+    letter-spacing: 1px;
+}
+
+/* 覆盖旧的搜索样式 */
+.help-header .help-search-wrap, .pollution-sidebar { display: none !important; }
+
+/* 新搜索框样式 */
+.large-search-box {
+    position: relative;
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    background: rgba(2, 20, 35, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    align-items: center;
+    padding: 6px;
+}
+.large-search-box:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 50px -10px rgba(0, 150, 255, 0.15);
+    border-color: rgba(76, 201, 240, 0.4);
+}
+.large-search-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 16px 20px;
+    color: #fff;
+    font-size: 18px;
+    outline: none;
+}
+.large-search-box input::placeholder { color: rgba(255,255,255,0.4); }
+.search-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #4cc9f0;
+    opacity: 0.8;
+}
+
+/* 污染对策卡片 - 网格展示 */
+.content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+.info-card {
+    position: relative;
+    /* 加深背景，不再是几乎透明 */
+    background: rgba(2, 20, 35, 0.75); 
+    /* 增加毛玻璃模糊，虚化背景杂质 */
+    backdrop-filter: blur(12px) saturate(1.8);
+    -webkit-backdrop-filter: blur(12px) saturate(1.8);
+    /* 增加边框亮度和厚度 */
+    border: 1px solid rgba(76, 201, 240, 0.25);
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /* 增加投影，使卡片浮起来 */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+}
+.info-card::before {
+    /* 顶部高光条 */
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(76, 201, 240, 0.6), transparent);
+    opacity: 0.5;
+}
+.info-card:hover {
+    background: rgba(2, 25, 45, 0.85);
+    border-color: rgba(76, 201, 240, 0.5);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+    transform: translateY(-2px);
+}
+.card-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #e0fbfc; /* 更亮的文字 */
+    margin: 0 0 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.5px;
+}
+.card-desc {
+    font-size: 14px;
+    color: #b8cce0; /* 提高对比度 */
+    line-height: 1.6;
+}
+
+/* 底部悬浮返回按钮 */
+.floating-home-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 48px;
+    height: 48px;
+    background: rgba(2, 15, 25, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #4cc9f0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.floating-home-btn:hover {
+    background: rgba(76, 201, 240, 0.2);
+    transform: translateY(-2px) scale(1.05);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(76, 201, 240, 0.25);
+}
+.floating-home-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+</style>  <script src="transitions.js" defer></script>
+</head><body class="themed-page help-page">
+  
+  <header class="frost-header help-header single-nav" style="position: fixed; top: 0; left: 0; width: 100%; z-index: 2000; background: rgba(2, 11, 20, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+    <div class="help-title" style="margin-right: auto; font-weight: 600; color: #e0fbfc; letter-spacing: 0.5px;">🎓 DeepVision 帮助中心</div>
+    <nav class="help-actions" style="margin-left: auto;">
+      <a href="./dashboard.html" class="back-link small only-home" target="_self">← 返回主页</a>
+    </nav>
+  </header>
+
+  <!-- 全新 UI 结构 -->
+  <div class="main-content">
+      
+      <!-- 搜索区 -->
+      <div class="search-container">
+          <h1 class="search-title">探索海洋数据与指南</h1>
+          <div class="large-search-box">
+              <div class="search-icon">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              </div>
+              <input type="text" placeholder="输入关键词查找相关数据..." id="mainSearchInput" autocomplete="off">
+          </div>
+          <!-- 搜索结果下拉 (复用原有逻辑，重新定位) -->
+          <div id="helpSearchDropdown" class="help-search-dropdown hidden" style="position:relative; top:10px; max-width:680px; margin:0 auto; max-height:400px;"></div>
+      </div>
+
+      <!-- 内容展示区 (原侧边栏内容重构) -->
+      <div>
+          <h2 style="font-size: 18px; color: rgba(255,255,255,0.7); margin-bottom: 20px; font-weight:400;">污染种类与应对策略</h2>
+          <div class="content-grid" id="pollutionGrid">
+             <!-- JS 将动态填充这里 -->
+          </div>
+      </div>
+  </div>
+
+  <div id="immersiveCarousel" class="immersive-carousel" aria-label="氛围背景">
+    <div class="photo-wall" id="photoWall"></div>
+  </div>
+
+
+<!-- 底部返回按钮移除：仅顶部链接保留 -->
+
+<!-- 已移除完成标记脚本：简化导航 -->
+
+<!-- Styles migrated to styles.css (migrated from education_walkthrough.html on 2025-09-30) -->
+
+
+<script>
+// 背景视频加载回退逻辑（超时移除）
+(function initBgVideo(){
+  const v=document.getElementById('bg-video');
+  if(!v) return;
+  let loaded=false;
+  const timeout=setTimeout(()=>{
+    if(!loaded){ v.parentElement && v.parentElement.removeChild(v); console.warn('[BGVideo] 加载超时，已移除 video'); }
+  },12000);
+  v.addEventListener('canplay',()=>{ loaded=true; clearTimeout(timeout); v.classList.add('bg-video-ready'); },{once:true});
+  v.addEventListener('error',()=>{ clearTimeout(timeout); if(v.parentElement){ v.parentElement.removeChild(v); console.warn('[BGVideo] 加载失败，移除 video'); } });
+  window.toggleBgVideo=()=>{ if(!v) return; if(v.paused){ v.play(); } else { v.pause(); } };
+})();
+
+// 轻量粒子占位：简单移动小圆点（避免引入大型库）
+(function simpleParticles(){
+  const canvas=document.getElementById('particle-canvas');
+  if(!canvas || !canvas.getContext) return;
+  const ctx=canvas.getContext('2d');
+  let w,h,particles=[];
+  function resize(){ w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; }
+  function init(){ resize(); particles=[]; for(let i=0;i<60;i++){ particles.push({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.6+0.4, vx:(Math.random()-0.5)*0.2, vy:(Math.random()-0.5)*0.2, alpha:0.6+Math.random()*0.4}); } }
+  function step(){ ctx.clearRect(0,0,w,h); for(const p of particles){ p.x+=p.vx; p.y+=p.vy; if(p.x<0||p.x>w) p.vx*=-1; if(p.y<0||p.y>h) p.vy*=-1; ctx.beginPath(); ctx.fillStyle='rgba(173,228,255,'+p.alpha+')'; ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill(); } requestAnimationFrame(step); }
+  window.addEventListener('resize', ()=>{ resize(); });
+  init(); step();
+})();
+
+// 动态照片墙：无限循环移动 + 拖拽交互
+(function photoWall(){
+  const container = document.getElementById('immersiveCarousel');
+  if(!container) return;
+  
+  // 重置容器内容
+  container.innerHTML = '<div class="photo-wall" id="photoWall"></div>';
+  const wall = document.getElementById('photoWall');
+  
+  const IMAGES = [
+    'imgs/1054835_20211004152747917060_0.jpg',
+    'imgs/20230427180108ZrcbO.jpg',
+    'imgs/21d86cc3cf78356293bd199f192f95c3.jpg',
+    'imgs/4acd392b37a0d564ec34c9d19c50cf78.jpg',
+    'imgs/5585d1d96a19215ccfbd41f8cc7f88c7.jpg',
+    'imgs/6024.jpg_wh860.jpg',
+    'imgs/6443ae31327048d1b00e68343be2f2f9.jpeg',
+    'imgs/6e665ad7d8ad250d246bdf0244507911.jpg',
+    'imgs/8a87-31a3fda6af0c2646428b78f1a11b0e7f.jpg',
+    'imgs/90.jpg',
+    'imgs/b6bf5b0bb9e93c662193f8104e2cf505.jpg',
+    'imgs/c83b305457dec35c308d7a794f64427a.jpg',
+    'imgs/deep-blue-ocean-gradient-abstract-background.jpg',
+    'imgs/deep_blue_dark_ocean_gradient_background.jpg',
+    'imgs/deep_blue_ocean_gradient_abstract_background_navy.jpg',
+    'imgs/deep_blue_ocean_gradient_abstract_background_scientific.jpg',
+    'imgs/deep_blue_ocean_light_rays_gradient_background.jpg',
+    'imgs/dynamic_white_flowing_lines_abstract_black_background.jpg',
+    'imgs/modern_stacked_bar_chart_rounded_corners.jpg',
+    'imgs/ocean_plastic_pollution_infographic_icons_deep_blue.jpg',
+    'imgs/ocean_plastic_pollution_infographic_icons_marine_waste_illustration.jpg',
+    'imgs/ocean_plastic_pollution_infographic_marine_waste_statistics.jpg',
+    'imgs/R-C.jpg'
+  ];
+
+  // 配置参数
+  const ITEM_WIDTH = 180;
+  const ITEM_HEIGHT = 100; // 这里的尺寸仅作参考，现在由 CSS Grid 控制
+  
+  function initGrid(){
+    wall.innerHTML = '';
+    
+    // 生成足够多的图片以填满背景
+    const count = 48; // 固定数量，足够填满屏幕即可
+    const fragment = document.createDocumentFragment();
+    
+    for(let i=0; i<count; i++) {
+        const url = IMAGES[i % IMAGES.length];
+        const item = document.createElement('div');
+        item.className = 'photo-item';
+        const img = document.createElement('img');
+        img.src = url;
+        img.loading = "lazy";
+        item.appendChild(img);
+        fragment.appendChild(item);
+    }
+    wall.appendChild(fragment);
+  }
+
+  initGrid();
+  // 移除所有交互事件监听
+})();
+
+// 新增：动态生成污染对策内容
+(function initPollutionGrid() {
+    const data = [
+      { title: "塑料微粒", desc: "微塑料进入食物链，影响海洋生物消化系统，最终危害人类健康。需加强过滤与源头管控。", tags: ["紧急", "生态"] },
+      { title: "石油泄漏", desc: "覆盖海面阻隔氧气，毒害鸟类与鱼类。使用生物降解剂与围油栏进行快速清理。", tags: ["工业", "突发"] },
+      { title: "农业径流", desc: "过量氮磷导致藻类爆发（富营养化），形成死区。推广精准农业与湿地缓冲带。", tags: ["长期", "政策"] },
+      { title: "重金属", desc: "汞、铅等累积在鱼类体内，造成神经毒素。严格监控工业废水排放标准。", tags: ["毒性", "监控"] },
+      { title: "海洋酸化", desc: "吸收过多CO2导致pH降低，溶解贝壳类生物外壳。需全球减少碳排放。", tags: ["气候", "全球"] },
+      { title: "过度捕捞", desc: "破坏生态平衡，导致物种灭绝。实施休渔期与可持续捕捞配额。", tags: ["资源", "管理"] }
+    ];
+
+    const grid = document.getElementById('pollutionGrid');
+    if(!grid) return;
+
+    data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'info-card';
+        
+        let tagsHtml = item.tags.map(t => `<span class="ps-tag" style="font-size:12px; padding:2px 8px; border:1px solid rgba(76,201,240,0.3); border-radius:12px; color:#4cc9f0;">${t}</span>`).join('');
+        
+        card.innerHTML = `
+            <h3 class="card-title">${item.title}</h3>
+            <p class="card-desc">${item.desc}</p>
+            <div style="margin-top:12px; display:flex; gap:8px;">${tagsHtml}</div>
+        `;
+        grid.appendChild(card);
+    });
+})();
+
+
+/* 
+   [已移除冗余代码] 
+*/
+
+
+// file:// 兼容提示（保留原有页面模式建议）
+(function detectFileMode(){ if(location.protocol==='file:'){ window.__FILE_MODE__=true; console.warn('[Env] file:// 模式，外部 fetch 可能被阻止；建议使用简单静态服务器: npx serve 或 python -m http.server'); } })();
+</script>
+
+<!-- 海洋污染类型与治理策略 查询按钮 + 弹窗 -->
+<!-- 原查询按钮替换为顶部搜索框，保留弹窗可通过外部扩展再次启用：已移除 query-fab -->
+<div id="pollutionQueryModal" class="pollution-modal hidden" role="dialog" aria-modal="true" aria-labelledby="pollutionModalTitle">
+  <div class="modal-backdrop" data-close="1"></div>
+  <div class="modal-panel" role="document">
+    <div class="modal-header">
+      <h2 id="pollutionModalTitle">海洋污染类型与治理策略查询</h2>
+      <button id="pollutionModalClose" class="close-btn" aria-label="关闭">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="search-row">
+        <input id="pollutionSearch" type="text" placeholder="输入关键词（类型 / 策略 / 说明），例如：塑料、富营养化、回收、治理" autocomplete="off" />
+        <select id="pollutionFilter">
+          <option value="all">全部字段</option>
+          <option value="type">仅类型</option>
+          <option value="strategy">仅策略</option>
+        </select>
+      </div>
+      <div id="pollutionStats" class="stats-bar">共 <span id="resultCount">0</span> 条相关记录。</div>
+      <ul id="pollutionResultList" class="result-list" aria-live="polite"></ul>
+      <div class="no-result hidden" id="noResult">未找到匹配项。可尝试换一个关键词。</div>
+      <details class="data-notes"><summary>数据说明 / Disclaimer</summary><p>此列表为教学演示用的精简概念集合，并非完整或权威数据库；策略效果需结合情景建模与区域特征进行综合评估。</p></details>
+    </div>
+  </div>
+</div>
+
+<script>
+// === 海洋污染查询数据 & 逻辑 ===
+// 保留原查询数据供顶部搜索复用（不再弹窗显示）
+(function exposePollutionData(){
+  const DATA = [
+    { type:'塑料污染 (Plastic Debris)', desc:'宏观与微塑料进入海洋，影响生态链并可吸附有害化学物。', strategies:['源头减量','生产者延伸责任 (EPR)','循环回收体系','河口 & 入海口拦截','海滩 / 离岸清理','可降解 / 替代材料','公众教育'] },
+    { type:'微塑料 (Microplastics)', desc:'粒径 <5mm，来源于磨损、化纤洗涤、颗粒树脂 & 二次碎裂。', strategies:['纺织过滤与改性','城市雨污分流优化','颗粒树脂防泄漏规范','污水处理升级','监测与标准体系','塑料减量'] },
+    { type:'石油与烃类 (Oil / Hydrocarbon)', desc:'油轮泄漏、钻井事故、日常排放形成的烃类污染。', strategies:['溢油应急预案','双层船体监管','生物 / 化学分散剂慎用','吸附回收技术','风险监测与航线管控'] },
+    { type:'营养盐富营养化 (Eutrophication)', desc:'氮磷等营养盐过量引起赤潮 / 缺氧。', strategies:['农业控肥 & 缓释肥','湿地 / 缓冲带构建','生活污水深度除磷脱氮','点源排放许可','生态修复 (增氧, 水动力)'] },
+    { type:'重金属 (Heavy Metals)', desc:'来自采矿、工业排放与沉积再悬浮，易生物累积。', strategies:['源头清洁生产','排放标准 & 监测','受污染沉积物治理 (固化/疏浚)','风险分级管理','土壤—河流协同治理'] },
+    { type:'持久性有机污染物 POPs', desc:'难降解、有毒、生物富集，跨界迁移。', strategies:['淘汰 / 替代化学品','封闭式工艺改造','国际公约协同 (斯德哥尔摩等)','监测溯源','安全处置与回收'] },
+    { type:'噪声污染 (Underwater Noise)', desc:'航运、地震勘测、施工影响海洋生物通讯与行为。', strategies:['安静船舶设计','航速优化与航线调整','施工时段避让敏感季','缓冲区划定','实时声学监测'] },
+    { type:'海洋酸化 (Ocean Acidification)', desc:'CO₂ 吸收导致 pH 下降，影响碳酸钙生物。', strategies:['减排 (能源转型)','蓝碳生态保护 (红树林/海草)','局地缓冲 (部分养殖场)','增强监测网络','与气候政策协同'] },
+    { type:'海洋热浪 (Marine Heatwaves)', desc:'异常高温事件损伤珊瑚与生态系统。', strategies:['全球温室气体减排','早期预警系统','生态多样性缓冲','受影响区域临时保护','动态海洋管理'] },
+    { type:'外来入侵物种 (Invasive Species)', desc:'压舱水 / 船体附着传播，扰乱本地生态。', strategies:['压舱水处理系统','船体防污涂层优化','高风险港口监测','快速清除与生物安全计划','生物风险评估'] }
+  ];
+
+  const btn = document.getElementById('pollutionQueryBtn');
+  const modal = document.getElementById('pollutionQueryModal');
+  const closeBtn = document.getElementById('pollutionModalClose');
+  const searchInput = document.getElementById('pollutionSearch');
+  const filterSelect = document.getElementById('pollutionFilter');
+  const listEl = document.getElementById('pollutionResultList');
+  const countEl = document.getElementById('resultCount');
+  const noResultEl = document.getElementById('noResult');
+  let lastFocus = null;
+
+  function escapeHTML(str){ return str.replace(/[&<>\"]+/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[s])); }
+  function highlight(text, term){
+    if(!term) return escapeHTML(text);
+    try{
+      const re=new RegExp('(' + term.replace(/[.*+?^${}()|[\\]\\]/g,'\\$&') + ')','ig');
+      return escapeHTML(text).replace(re,'<mark>$1</mark>');
+    }catch{ return escapeHTML(text); }
+  }
+
+  function render(term=''){ const scope = filterSelect.value; const kw = term.trim(); let results = DATA.filter(row=>{ if(!kw) return true; const t = kw.toLowerCase(); if(scope==='type') return row.type.toLowerCase().includes(t); if(scope==='strategy') return row.strategies.some(s=>s.toLowerCase().includes(t)); return (row.type+row.desc+row.strategies.join(',')).toLowerCase().includes(t); }); listEl.innerHTML=''; if(!results.length){ noResultEl.classList.remove('hidden'); countEl.textContent='0'; return; } noResultEl.classList.add('hidden'); results.forEach(row=>{ const li=document.createElement('li'); li.className='pollution-item'; li.innerHTML = '<div class="pi-type">'+highlight(row.type, kw)+'</div>'+
+      '<div class="pi-desc">'+highlight(row.desc, kw)+'</div>'+
+      '<div class="pi-strat-label">治理策略:</div>'+
+      '<ul class="pi-strategies">'+ row.strategies.map(s=>'<li>'+highlight(s, kw)+'</li>').join('') +'</ul>';
+      listEl.appendChild(li); }); countEl.textContent=results.length; }
+
+  function openModal(){ if(!modal.classList.contains('hidden')) return; lastFocus = document.activeElement; modal.classList.remove('hidden'); document.body.classList.add('modal-open'); setTimeout(()=>modal.classList.add('show'),10); render(searchInput.value); searchInput.focus({preventScroll:true}); }
+  function closeModal(){ if(modal.classList.contains('hidden')) return; modal.classList.remove('show'); setTimeout(()=>{ modal.classList.add('hidden'); document.body.classList.remove('modal-open'); lastFocus && lastFocus.focus(); },180); }
+
+  window.__HELP_POLLUTION_DATA__ = DATA;
+})();
+
+// ================= 搜索核心逻辑 (智能联想 + 自动抓取) =================
+(function initSmartSearch(){
+  const input = document.getElementById('mainSearchInput');
+  const dropdown = document.getElementById('helpSearchDropdown');
+  if(!input || !dropdown) return;
+
+  let debounceTimer = null;
+  let currentQuery = '';
+  
+  // 1. 监听输入 - 触发联想
+  input.addEventListener('input', (e) => {
+      const val = e.target.value.trim();
+      currentQuery = val;
+      if(debounceTimer) clearTimeout(debounceTimer);
+      
+      if(!val) {
+          dropdown.innerHTML = '';
+          dropdown.classList.add('hidden');
+          return;
+      }
+
+      // 300ms 防抖，避免请求过于频繁
+      debounceTimer = setTimeout(() => {
+          fetchSuggestions(val);
+      }, 300);
+  });
+  
+  // 2. 监听回车 - 触发重度搜索/抓取
+  input.addEventListener('keypress', (e) => {
+      if(e.key === 'Enter' && currentQuery) {
+          performSearch(currentQuery);
+      }
+  });
+
+  // 获取联想词 (Baidu JSONP)
+  function fetchSuggestions(kw) {
+      const cbName = 'baidu_sug_cb_' + Date.now();
+      window[cbName] = (data) => {
+          renderDropdown(data.s, kw);
+          delete window[cbName];
+          document.body.removeChild(script);
+      };
+
+      const script = document.createElement('script');
+      script.src = `https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su?wd=${encodeURIComponent(kw)}&cb=${cbName}`;
+      script.onerror = () => {
+          // 失败时仅显示本地匹配
+          renderDropdown([], kw); 
+          delete window[cbName];
+          if(script.parentNode) document.body.removeChild(script);
+      };
+      document.body.appendChild(script);
+  }
+
+  // 渲染下拉菜单
+  function renderDropdown(suggestions, kw) {
+      dropdown.innerHTML = '';
+      
+      // A. 本地数据匹配 (优先显示)
+      const localMatches = (window.__HELP_POLLUTION_DATA__ || []).filter(item => 
+          item.type.includes(kw) || item.desc.includes(kw) || item.strategies.some(s=>s.includes(kw))
+      );
+      
+      if(localMatches.length > 0) {
+          const groupHeader = document.createElement('div');
+          groupHeader.className = 'dd-group-title';
+          groupHeader.textContent = '本地知识库';
+          groupHeader.style.cssText = 'font-size:12px;color:#4cc9f0;padding:4px 10px;background:rgba(255,255,255,0.05);';
+          dropdown.appendChild(groupHeader);
+          
+          localMatches.forEach(item => {
+              const div = document.createElement('div');
+              div.className = 'dd-item';
+              div.innerHTML = `<span class="dd-text" style="color:#fff;">${item.type.split('(')[0]}</span> <span style="font-size:11px;color:#888;">- 本地数据</span>`;
+              div.onclick = () => {
+                  // 滚动到对应卡片并高亮
+                  highlightLocalCard(item.title || item.type);
+                  dropdown.classList.add('hidden');
+              };
+              dropdown.appendChild(div);
+          });
+      }
+
+      // B. 网络联想词
+      if(suggestions && suggestions.length > 0) {
+           const groupHeader = document.createElement('div');
+           groupHeader.className = 'dd-group-title';
+           groupHeader.textContent = '网络联想 (点击抓取解释)';
+           groupHeader.style.cssText = 'font-size:12px;color:#F5D061;padding:4px 10px;background:rgba(255,255,255,0.05);margin-top:4px;';
+           dropdown.appendChild(groupHeader);
+
+           suggestions.slice(0, 6).forEach(s => {
+               const div = document.createElement('div');
+               div.className = 'dd-item external';
+               div.innerHTML = `<span class="dd-text">${s}</span>`;
+               div.onclick = () => {
+                   input.value = s;
+                   performSearch(s); // 点击即抓取
+               };
+               dropdown.appendChild(div);
+           });
+      }
+      
+      // C. 兜底选项：直接搜索当前词
+      if(localMatches.length === 0 && (!suggestions || suggestions.length === 0)) {
+           const div = document.createElement('div');
+           div.className = 'dd-item external';
+           div.innerHTML = `<span class="dd-text">🔍 联网搜索解释: "<b>${kw}</b>"</span>`;
+           div.onclick = () => performSearch(kw);
+           dropdown.appendChild(div);
+      }
+
+      dropdown.classList.remove('hidden');
+  }
+
+  // 执行核心搜索 (含智能抓取 - 升级版)
+  async function performSearch(queryTerm) {
+      dropdown.classList.remove('hidden');
+      dropdown.innerHTML = `<div class="dd-item" style="cursor:wait;justify-content:center;padding:20px;"><div style="text-align:center;"><div style="font-size:16px;margin-bottom:8px;">🔄</div><div style="font-size:12px;color:#88beec;">正在联网检索: "${queryTerm}"...</div></div></div>`;
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000); 
+
+      try {
+          const isComplexQuery = queryTerm.length > 4 && (queryTerm.includes('吗') || queryTerm.includes('为什么') || queryTerm.includes('能') || queryTerm.includes('?'));
+          let success = false;
+          let resultData = null;
+
+          /* 1. 尝试网络搜索 (Local Proxy) */
+          const searchUrl = 'https://www.baidu.com/s?wd=' + encodeURIComponent(queryTerm);
+          const proxySearchUrl = '/api/proxy?url=' + encodeURIComponent(searchUrl);
+          
+          try {
+              const res = await fetch(proxySearchUrl, { signal: controller.signal });
+              if(res.ok) {
+                  const html = await res.text();
+                  const parser = new DOMParser();
+                  const doc = parser.parseFromString(html, 'text/html');
+                  
+                  /* 尝试提取精选摘要 */
+                  const bestAnswer = doc.querySelector('.op_best_answer_question') || doc.querySelector('.c-abstract') || doc.querySelector('.c-container .c-abstract') || doc.querySelector('.wa-oa-wiki-lemma-content');
+                                   
+                  if (bestAnswer && bestAnswer.innerText.length > 20) {
+                      let text = bestAnswer.innerText.trim();
+                      text = text.replace(/^\d{4}年\d{1,2}月\d{1,2}日\s*-\s*/, ''); 
+                      resultData = { type: 'web', title: '网络搜索结果', content: text, url: searchUrl };
+                      success = true;
+                  }
+              }
+          } catch(err) {
+              console.warn("Web Search parse failed", err);
+          }
+
+          /* 2. 回退到百科抓取 */
+          if (!success) {
+               const wikiUrl = 'https://baike.baidu.com/item/' + encodeURIComponent(queryTerm);
+               const proxyWikiUrl = '/api/proxy?url=' + encodeURIComponent(wikiUrl);
+               
+               const res2 = await fetch(proxyWikiUrl, { signal: controller.signal });
+               if(res2.ok) {
+                   const html2 = await res2.text();
+                   const doc2 = new DOMParser().parseFromString(html2, 'text/html');
+                   const summaryEl = doc2.querySelector('.lemma-summary') || doc2.querySelector('.summary-content') || doc2.querySelector('meta[name="description"]');
+                   
+                   if (summaryEl) {
+                       let content = summaryEl.tagName === 'META' ? summaryEl.content : summaryEl.innerText;
+                       content = content.replace(/\[\d+\]/g, '').trim();
+                       if(content.length > 10) {
+                           resultData = { type: 'wiki', title: '百科知识库', content: content, url: wikiUrl };
+                           success = true;
+                       }
+                   }
+               }
+          }
+
+          clearTimeout(timeoutId);
+
+          if (success && resultData) {
+              const displayContent = resultData.content.length > 400 ? resultData.content.substring(0, 400) + '...' : resultData.content;
+
+              dropdown.innerHTML = `
+                  <div class="dd-item expanded" style="background:rgba(2,25,40,0.95); border:1px solid #4cc9f0; cursor:default; display:block; padding:15px;">
+                      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:8px;">
+                           <div style="font-size:14px; color:#F5D061; font-weight:bold;">🚀 ${resultData.title}: ${queryTerm}</div>
+                           <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,0.1);color:#888;">AI/WEB FETCH</span>
+                      </div>
+                      <div style="font-size:14px; color:#e0fbfc; line-height:1.7; white-space:normal; max-height:300px; overflow-y:auto; padding-right:5px; text-align:justify;">${displayContent}</div>
+                      <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+                           <a href="${resultData.url}" target="_blank" style="font-size:12px; color:#4cc9f0; text-decoration:none; display:flex; align-items:center; background:rgba(76,201,240,0.1); padding:4px 10px; border-radius:4px;">查看来源网页 -></a>
+                      </div>
+                  </div>
+              `;
+          } else {
+              throw new Error('No valid summary found');
+          }
+
+      } catch(e) {
+          console.warn('Search failed:', e);
+          dropdown.innerHTML = `<div class="dd-item" style="color:#ff9999; padding:15px; text-align:center;"><div style="font-size:24px;margin-bottom:8px;">😕</div><div>抱歉，自动抓取未能提取有效答案。</div><a href="https://www.baidu.com/s?wd=${encodeURIComponent(queryTerm)}" target="_blank" style="color:#F5D061;text-decoration:underline;">点击此处跳转百度搜索 &gt;</a></div>`;
+      }
+  }
+
+  // 辅助：高亮本地卡片
+  function highlightLocalCard(text) {
+      // 简单匹配 title
+      const cards = document.querySelectorAll('.info-card');
+      let found = false;
+      cards.forEach(card => {
+          if(card.innerText.includes(text)) {
+              card.scrollIntoView({behavior:'smooth', block:'center'});
+              card.style.transition = '0.5s';
+              card.style.borderColor = '#F5D061';
+              card.style.boxShadow = '0 0 20px rgba(245, 208, 97, 0.4)';
+              setTimeout(() => {
+                  card.style.borderColor = '';
+                  card.style.boxShadow = '';
+              }, 2000);
+              found = true;
+          }
+      });
+  }
+
+  // 点击外部关闭下拉
+  document.addEventListener('click', (e) => {
+      if(!e.target.closest('.search-container')) {
+          dropdown.classList.add('hidden');
+      }
+  });
+
+})();
+
+// 返回主页标志：顶部链接写入 sessionStorage
+;(function initBackHomeFlag(){
+  const link=document.querySelector('a.back-link.only-home');
+  if(!link) return; 
+  link.addEventListener('click',(e)=>{ 
+    try{ sessionStorage.setItem('fromHelp','1'); }catch(e){ console.warn('[BackFlag] 写入失败',e); } 
+    // 移除智能返回逻辑，强制使用 href 跳转以确保可靠性
+  });
+})();
+</script>
+
+<!-- 右侧污染对策侧边栏 -->
+<aside class="pollution-sidebar" id="pollutionSidebar">
+  <div class="pollution-sidebar-toggle" id="psToggle" title="切换面板">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+  </div>
+  <div class="pollution-sidebar-header">
+    <h3>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      常见污染与对策
+    </h3>
+  </div>
+  <div class="pollution-list" id="pollutionList">
+    <!-- Dynamic Content -->
+  </div>
+</aside>
+
+<script>
+(function initPollutionSidebar(){
+  const sidebar = document.getElementById('pollutionSidebar');
+  const list = document.getElementById('pollutionList');
+  const toggle = document.getElementById('psToggle');
+  
+  // Toggle Logic
+  toggle.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    toggle.innerHTML = isCollapsed 
+      ? '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>'
+      : '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>';
+  });
+
+  // Populate Data
+  function render(){
+    const data = window.__HELP_POLLUTION_DATA__;
+    if(!data || !data.length) {
+      // Retry if data not ready
+      setTimeout(render, 100);
+      return;
+    }
+    
+    list.innerHTML = data.map(item => `
+      <div class="ps-item">
+        <div class="ps-title">${item.type.split('(')[0]}</div>
+        <div class="ps-desc">${item.desc}</div>
+        <div class="ps-tags">
+          ${item.strategies.slice(0,3).map(s => `<span class="ps-tag">${s}</span>`).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+  
+  // Initial render attempt
+  render();
+})();
+</script>
+
+
+<a href="./dashboard.html" class="floating-home-btn" title="返回主页">
+  <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+</a>
+</body>
+</html>
+

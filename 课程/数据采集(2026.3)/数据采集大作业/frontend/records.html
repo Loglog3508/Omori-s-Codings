@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>大连市近10年天气数据分析 · 历史明细</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <nav class="floating-nav" aria-label="页面导航">
+      <a href="./index.html"><span class="nav-icon">总</span><span class="nav-text">总览</span></a>
+      <a href="./charts.html"><span class="nav-icon">趋</span><span class="nav-text">趋势</span></a>
+      <a class="active" href="./records.html"><span class="nav-icon">明</span><span class="nav-text">明细</span></a>
+      <a href="./weather.html"><span class="nav-icon">天</span><span class="nav-text">天气</span></a>
+      <a href="./source.html"><span class="nav-icon">数</span><span class="nav-text">数据</span></a>
+    </nav>
+
+    <header class="topbar">
+      <div>
+        <h1>每日天气明细</h1>
+        <p id="sourceNote">正在加载数据...</p>
+      </div>
+      <div class="top-actions">
+        <button id="resetBtn" type="button">重置筛选</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="filters" aria-label="筛选条件">
+        <label>
+          搜索
+          <input id="keywordInput" type="search" placeholder="日期、季节、天气" />
+        </label>
+        <label>
+          年份
+          <select id="yearSelect"></select>
+        </label>
+        <label>
+          季节
+          <select id="seasonSelect"></select>
+        </label>
+        <label>
+          天气
+          <select id="weatherSelect"></select>
+        </label>
+        <label>
+          最高温不低于
+          <input id="tempRange" type="range" min="-30" max="40" value="-30" />
+          <span id="tempValue">-30°C+</span>
+        </label>
+      </section>
+
+      <section class="table-panel" aria-label="天气明细">
+        <div class="table-head">
+          <h2>历史天气记录</h2>
+          <span id="tableCount">0 天</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>日期</th>
+                <th>天气</th>
+                <th>最高/最低</th>
+                <th>平均气温</th>
+                <th>降水</th>
+                <th>最大风速</th>
+                <th>标签</th>
+              </tr>
+            </thead>
+            <tbody id="weatherTable"></tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <button id="prevPage" type="button">上一页</button>
+          <span id="pageInfo">第 1 页</span>
+          <button id="nextPage" type="button">下一页</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="./data/weather_data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

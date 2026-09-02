@@ -1,0 +1,879 @@
+{
+  "generated_at": "2026-06-21T18:27:11+08:00",
+  "topic": "大连市近10年天气数据分析",
+  "location": {
+    "name": "大连市",
+    "latitude": 38.914,
+    "longitude": 121.6147,
+    "timezone": "Asia/Shanghai"
+  },
+  "source": "open-meteo",
+  "source_url": "https://archive-api.open-meteo.com/v1/archive?latitude=38.914&longitude=121.6147&start_date=2016-06-15&end_date=2026-06-14&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Ctemperature_2m_mean%2Capparent_temperature_max%2Capparent_temperature_min%2Cprecipitation_sum%2Crain_sum%2Csnowfall_sum%2Cprecipitation_hours%2Cwind_speed_10m_max%2Cwind_gusts_10m_max%2Cshortwave_radiation_sum&timezone=Asia%2FShanghai&temperature_unit=celsius&wind_speed_unit=kmh&precipitation_unit=mm&cell_selection=land",
+  "total_days": 3652,
+  "date_start": "2016-06-15",
+  "date_end": "2026-06-14",
+  "avg_temp": 12.06,
+  "max_temp": 35.8,
+  "min_temp": -15.1,
+  "total_precipitation": 6883.2,
+  "rainy_days": 1157,
+  "hot_days": 61,
+  "cold_days": 347,
+  "yearly": [
+    {
+      "year": 2016,
+      "avg_temp": 16.48,
+      "precipitation": 309.4,
+      "hot_days": 3,
+      "cold_days": 3,
+      "rainy_days": 55
+    },
+    {
+      "year": 2017,
+      "avg_temp": 12.27,
+      "precipitation": 404.8,
+      "hot_days": 5,
+      "cold_days": 34,
+      "rainy_days": 104
+    },
+    {
+      "year": 2018,
+      "avg_temp": 11.57,
+      "precipitation": 520.9,
+      "hot_days": 16,
+      "cold_days": 44,
+      "rainy_days": 109
+    },
+    {
+      "year": 2019,
+      "avg_temp": 12.26,
+      "precipitation": 407.8,
+      "hot_days": 9,
+      "cold_days": 28,
+      "rainy_days": 93
+    },
+    {
+      "year": 2020,
+      "avg_temp": 11.65,
+      "precipitation": 723.2,
+      "hot_days": 1,
+      "cold_days": 28,
+      "rainy_days": 110
+    },
+    {
+      "year": 2021,
+      "avg_temp": 11.74,
+      "precipitation": 730.0,
+      "hot_days": 0,
+      "cold_days": 36,
+      "rainy_days": 152
+    },
+    {
+      "year": 2022,
+      "avg_temp": 11.37,
+      "precipitation": 1119.7,
+      "hot_days": 2,
+      "cold_days": 55,
+      "rainy_days": 129
+    },
+    {
+      "year": 2023,
+      "avg_temp": 12.18,
+      "precipitation": 631.3,
+      "hot_days": 5,
+      "cold_days": 35,
+      "rainy_days": 106
+    },
+    {
+      "year": 2024,
+      "avg_temp": 12.42,
+      "precipitation": 881.7,
+      "hot_days": 10,
+      "cold_days": 31,
+      "rainy_days": 112
+    },
+    {
+      "year": 2025,
+      "avg_temp": 12.74,
+      "precipitation": 919.9,
+      "hot_days": 10,
+      "cold_days": 26,
+      "rainy_days": 139
+    },
+    {
+      "year": 2026,
+      "avg_temp": 7.49,
+      "precipitation": 234.5,
+      "hot_days": 0,
+      "cold_days": 27,
+      "rainy_days": 48
+    }
+  ],
+  "monthly": [
+    {
+      "month": "2016-06",
+      "avg_temp": 22.23,
+      "precipitation": 49.7,
+      "days": 16
+    },
+    {
+      "month": "2016-07",
+      "avg_temp": 24.75,
+      "precipitation": 124.1,
+      "days": 31
+    },
+    {
+      "month": "2016-08",
+      "avg_temp": 25.91,
+      "precipitation": 83.4,
+      "days": 31
+    },
+    {
+      "month": "2016-09",
+      "avg_temp": 21.26,
+      "precipitation": 21.1,
+      "days": 30
+    },
+    {
+      "month": "2016-10",
+      "avg_temp": 14.82,
+      "precipitation": 15.0,
+      "days": 31
+    },
+    {
+      "month": "2016-11",
+      "avg_temp": 6.94,
+      "precipitation": 12.8,
+      "days": 30
+    },
+    {
+      "month": "2016-12",
+      "avg_temp": 2.08,
+      "precipitation": 3.3,
+      "days": 31
+    },
+    {
+      "month": "2017-01",
+      "avg_temp": -1.61,
+      "precipitation": 13.4,
+      "days": 31
+    },
+    {
+      "month": "2017-02",
+      "avg_temp": 0.12,
+      "precipitation": 7.3,
+      "days": 28
+    },
+    {
+      "month": "2017-03",
+      "avg_temp": 4.82,
+      "precipitation": 0.6,
+      "days": 31
+    },
+    {
+      "month": "2017-04",
+      "avg_temp": 12.25,
+      "precipitation": 26.7,
+      "days": 30
+    },
+    {
+      "month": "2017-05",
+      "avg_temp": 16.74,
+      "precipitation": 46.6,
+      "days": 31
+    },
+    {
+      "month": "2017-06",
+      "avg_temp": 21.54,
+      "precipitation": 31.9,
+      "days": 30
+    },
+    {
+      "month": "2017-07",
+      "avg_temp": 25.69,
+      "precipitation": 56.8,
+      "days": 31
+    },
+    {
+      "month": "2017-08",
+      "avg_temp": 25.01,
+      "precipitation": 161.5,
+      "days": 31
+    },
+    {
+      "month": "2017-09",
+      "avg_temp": 22.04,
+      "precipitation": 19.6,
+      "days": 30
+    },
+    {
+      "month": "2017-10",
+      "avg_temp": 13.91,
+      "precipitation": 31.5,
+      "days": 31
+    },
+    {
+      "month": "2017-11",
+      "avg_temp": 6.34,
+      "precipitation": 7.1,
+      "days": 30
+    },
+    {
+      "month": "2017-12",
+      "avg_temp": -0.35,
+      "precipitation": 1.8,
+      "days": 31
+    },
+    {
+      "month": "2018-01",
+      "avg_temp": -3.96,
+      "precipitation": 3.8,
+      "days": 31
+    },
+    {
+      "month": "2018-02",
+      "avg_temp": -2.13,
+      "precipitation": 3.6,
+      "days": 28
+    },
+    {
+      "month": "2018-03",
+      "avg_temp": 4.38,
+      "precipitation": 6.2,
+      "days": 31
+    },
+    {
+      "month": "2018-04",
+      "avg_temp": 10.01,
+      "precipitation": 22.5,
+      "days": 30
+    },
+    {
+      "month": "2018-05",
+      "avg_temp": 15.59,
+      "precipitation": 100.1,
+      "days": 31
+    },
+    {
+      "month": "2018-06",
+      "avg_temp": 20.55,
+      "precipitation": 83.4,
+      "days": 30
+    },
+    {
+      "month": "2018-07",
+      "avg_temp": 24.63,
+      "precipitation": 32.1,
+      "days": 31
+    },
+    {
+      "month": "2018-08",
+      "avg_temp": 26.81,
+      "precipitation": 203.0,
+      "days": 31
+    },
+    {
+      "month": "2018-09",
+      "avg_temp": 20.78,
+      "precipitation": 19.1,
+      "days": 30
+    },
+    {
+      "month": "2018-10",
+      "avg_temp": 13.96,
+      "precipitation": 16.5,
+      "days": 31
+    },
+    {
+      "month": "2018-11",
+      "avg_temp": 7.7,
+      "precipitation": 11.1,
+      "days": 30
+    },
+    {
+      "month": "2018-12",
+      "avg_temp": -0.38,
+      "precipitation": 19.5,
+      "days": 31
+    },
+    {
+      "month": "2019-01",
+      "avg_temp": -1.24,
+      "precipitation": 0.0,
+      "days": 31
+    },
+    {
+      "month": "2019-02",
+      "avg_temp": -0.99,
+      "precipitation": 3.8,
+      "days": 28
+    },
+    {
+      "month": "2019-03",
+      "avg_temp": 5.23,
+      "precipitation": 13.8,
+      "days": 31
+    },
+    {
+      "month": "2019-04",
+      "avg_temp": 10.17,
+      "precipitation": 27.4,
+      "days": 30
+    },
+    {
+      "month": "2019-05",
+      "avg_temp": 17.83,
+      "precipitation": 18.3,
+      "days": 31
+    },
+    {
+      "month": "2019-06",
+      "avg_temp": 20.59,
+      "precipitation": 15.5,
+      "days": 30
+    },
+    {
+      "month": "2019-07",
+      "avg_temp": 25.31,
+      "precipitation": 17.2,
+      "days": 31
+    },
+    {
+      "month": "2019-08",
+      "avg_temp": 25.12,
+      "precipitation": 201.4,
+      "days": 31
+    },
+    {
+      "month": "2019-09",
+      "avg_temp": 21.23,
+      "precipitation": 51.7,
+      "days": 30
+    },
+    {
+      "month": "2019-10",
+      "avg_temp": 14.77,
+      "precipitation": 8.1,
+      "days": 31
+    },
+    {
+      "month": "2019-11",
+      "avg_temp": 7.15,
+      "precipitation": 34.3,
+      "days": 30
+    },
+    {
+      "month": "2019-12",
+      "avg_temp": 1.03,
+      "precipitation": 16.3,
+      "days": 31
+    },
+    {
+      "month": "2020-01",
+      "avg_temp": -1.01,
+      "precipitation": 7.2,
+      "days": 31
+    },
+    {
+      "month": "2020-02",
+      "avg_temp": 0.33,
+      "precipitation": 18.1,
+      "days": 29
+    },
+    {
+      "month": "2020-03",
+      "avg_temp": 5.33,
+      "precipitation": 6.6,
+      "days": 31
+    },
+    {
+      "month": "2020-04",
+      "avg_temp": 10.26,
+      "precipitation": 10.9,
+      "days": 30
+    },
+    {
+      "month": "2020-05",
+      "avg_temp": 14.57,
+      "precipitation": 162.9,
+      "days": 31
+    },
+    {
+      "month": "2020-06",
+      "avg_temp": 20.42,
+      "precipitation": 66.0,
+      "days": 30
+    },
+    {
+      "month": "2020-07",
+      "avg_temp": 22.76,
+      "precipitation": 90.5,
+      "days": 31
+    },
+    {
+      "month": "2020-08",
+      "avg_temp": 24.69,
+      "precipitation": 216.2,
+      "days": 31
+    },
+    {
+      "month": "2020-09",
+      "avg_temp": 20.89,
+      "precipitation": 46.2,
+      "days": 30
+    },
+    {
+      "month": "2020-10",
+      "avg_temp": 14.26,
+      "precipitation": 10.1,
+      "days": 31
+    },
+    {
+      "month": "2020-11",
+      "avg_temp": 7.7,
+      "precipitation": 79.7,
+      "days": 30
+    },
+    {
+      "month": "2020-12",
+      "avg_temp": -0.7,
+      "precipitation": 8.8,
+      "days": 31
+    },
+    {
+      "month": "2021-01",
+      "avg_temp": -2.92,
+      "precipitation": 13.5,
+      "days": 31
+    },
+    {
+      "month": "2021-02",
+      "avg_temp": 0.56,
+      "precipitation": 14.6,
+      "days": 28
+    },
+    {
+      "month": "2021-03",
+      "avg_temp": 4.5,
+      "precipitation": 35.2,
+      "days": 31
+    },
+    {
+      "month": "2021-04",
+      "avg_temp": 9.93,
+      "precipitation": 64.6,
+      "days": 30
+    },
+    {
+      "month": "2021-05",
+      "avg_temp": 15.21,
+      "precipitation": 45.8,
+      "days": 31
+    },
+    {
+      "month": "2021-06",
+      "avg_temp": 19.58,
+      "precipitation": 89.1,
+      "days": 30
+    },
+    {
+      "month": "2021-07",
+      "avg_temp": 24.05,
+      "precipitation": 118.5,
+      "days": 31
+    },
+    {
+      "month": "2021-08",
+      "avg_temp": 24.64,
+      "precipitation": 55.3,
+      "days": 31
+    },
+    {
+      "month": "2021-09",
+      "avg_temp": 21.76,
+      "precipitation": 180.8,
+      "days": 30
+    },
+    {
+      "month": "2021-10",
+      "avg_temp": 13.89,
+      "precipitation": 61.9,
+      "days": 31
+    },
+    {
+      "month": "2021-11",
+      "avg_temp": 7.41,
+      "precipitation": 45.1,
+      "days": 30
+    },
+    {
+      "month": "2021-12",
+      "avg_temp": 1.56,
+      "precipitation": 5.6,
+      "days": 31
+    },
+    {
+      "month": "2022-01",
+      "avg_temp": -2.75,
+      "precipitation": 3.8,
+      "days": 31
+    },
+    {
+      "month": "2022-02",
+      "avg_temp": -1.92,
+      "precipitation": 5.5,
+      "days": 28
+    },
+    {
+      "month": "2022-03",
+      "avg_temp": 4.44,
+      "precipitation": 70.0,
+      "days": 31
+    },
+    {
+      "month": "2022-04",
+      "avg_temp": 10.98,
+      "precipitation": 14.7,
+      "days": 30
+    },
+    {
+      "month": "2022-05",
+      "avg_temp": 16.28,
+      "precipitation": 28.8,
+      "days": 31
+    },
+    {
+      "month": "2022-06",
+      "avg_temp": 19.74,
+      "precipitation": 195.2,
+      "days": 30
+    },
+    {
+      "month": "2022-07",
+      "avg_temp": 24.24,
+      "precipitation": 236.8,
+      "days": 31
+    },
+    {
+      "month": "2022-08",
+      "avg_temp": 24.34,
+      "precipitation": 191.2,
+      "days": 31
+    },
+    {
+      "month": "2022-09",
+      "avg_temp": 20.56,
+      "precipitation": 202.8,
+      "days": 30
+    },
+    {
+      "month": "2022-10",
+      "avg_temp": 13.03,
+      "precipitation": 77.2,
+      "days": 31
+    },
+    {
+      "month": "2022-11",
+      "avg_temp": 8.55,
+      "precipitation": 74.8,
+      "days": 30
+    },
+    {
+      "month": "2022-12",
+      "avg_temp": -1.89,
+      "precipitation": 18.9,
+      "days": 31
+    },
+    {
+      "month": "2023-01",
+      "avg_temp": -2.15,
+      "precipitation": 8.2,
+      "days": 31
+    },
+    {
+      "month": "2023-02",
+      "avg_temp": -0.04,
+      "precipitation": 3.6,
+      "days": 28
+    },
+    {
+      "month": "2023-03",
+      "avg_temp": 5.49,
+      "precipitation": 6.2,
+      "days": 31
+    },
+    {
+      "month": "2023-04",
+      "avg_temp": 10.51,
+      "precipitation": 57.6,
+      "days": 30
+    },
+    {
+      "month": "2023-05",
+      "avg_temp": 16.39,
+      "precipitation": 67.2,
+      "days": 31
+    },
+    {
+      "month": "2023-06",
+      "avg_temp": 21.4,
+      "precipitation": 90.9,
+      "days": 30
+    },
+    {
+      "month": "2023-07",
+      "avg_temp": 24.66,
+      "precipitation": 146.7,
+      "days": 31
+    },
+    {
+      "month": "2023-08",
+      "avg_temp": 25.13,
+      "precipitation": 130.4,
+      "days": 31
+    },
+    {
+      "month": "2023-09",
+      "avg_temp": 22.56,
+      "precipitation": 29.8,
+      "days": 30
+    },
+    {
+      "month": "2023-10",
+      "avg_temp": 16.82,
+      "precipitation": 18.7,
+      "days": 31
+    },
+    {
+      "month": "2023-11",
+      "avg_temp": 6.22,
+      "precipitation": 43.8,
+      "days": 30
+    },
+    {
+      "month": "2023-12",
+      "avg_temp": -1.68,
+      "precipitation": 28.2,
+      "days": 31
+    },
+    {
+      "month": "2024-01",
+      "avg_temp": -2.19,
+      "precipitation": 6.6,
+      "days": 31
+    },
+    {
+      "month": "2024-02",
+      "avg_temp": -1.91,
+      "precipitation": 12.9,
+      "days": 29
+    },
+    {
+      "month": "2024-03",
+      "avg_temp": 4.51,
+      "precipitation": 34.0,
+      "days": 31
+    },
+    {
+      "month": "2024-04",
+      "avg_temp": 11.76,
+      "precipitation": 40.3,
+      "days": 30
+    },
+    {
+      "month": "2024-05",
+      "avg_temp": 17.2,
+      "precipitation": 71.9,
+      "days": 31
+    },
+    {
+      "month": "2024-06",
+      "avg_temp": 21.96,
+      "precipitation": 44.6,
+      "days": 30
+    },
+    {
+      "month": "2024-07",
+      "avg_temp": 24.51,
+      "precipitation": 404.5,
+      "days": 31
+    },
+    {
+      "month": "2024-08",
+      "avg_temp": 26.31,
+      "precipitation": 155.1,
+      "days": 31
+    },
+    {
+      "month": "2024-09",
+      "avg_temp": 21.32,
+      "precipitation": 39.6,
+      "days": 30
+    },
+    {
+      "month": "2024-10",
+      "avg_temp": 14.47,
+      "precipitation": 45.9,
+      "days": 31
+    },
+    {
+      "month": "2024-11",
+      "avg_temp": 9.58,
+      "precipitation": 26.3,
+      "days": 30
+    },
+    {
+      "month": "2024-12",
+      "avg_temp": 1.13,
+      "precipitation": 0.0,
+      "days": 31
+    },
+    {
+      "month": "2025-01",
+      "avg_temp": -0.96,
+      "precipitation": 6.6,
+      "days": 31
+    },
+    {
+      "month": "2025-02",
+      "avg_temp": -0.95,
+      "precipitation": 6.2,
+      "days": 28
+    },
+    {
+      "month": "2025-03",
+      "avg_temp": 6.25,
+      "precipitation": 4.4,
+      "days": 31
+    },
+    {
+      "month": "2025-04",
+      "avg_temp": 11.2,
+      "precipitation": 39.1,
+      "days": 30
+    },
+    {
+      "month": "2025-05",
+      "avg_temp": 15.48,
+      "precipitation": 69.7,
+      "days": 31
+    },
+    {
+      "month": "2025-06",
+      "avg_temp": 21.93,
+      "precipitation": 97.9,
+      "days": 30
+    },
+    {
+      "month": "2025-07",
+      "avg_temp": 26.24,
+      "precipitation": 294.5,
+      "days": 31
+    },
+    {
+      "month": "2025-08",
+      "avg_temp": 26.04,
+      "precipitation": 239.3,
+      "days": 31
+    },
+    {
+      "month": "2025-09",
+      "avg_temp": 22.67,
+      "precipitation": 72.7,
+      "days": 30
+    },
+    {
+      "month": "2025-10",
+      "avg_temp": 13.64,
+      "precipitation": 72.4,
+      "days": 31
+    },
+    {
+      "month": "2025-11",
+      "avg_temp": 9.41,
+      "precipitation": 4.0,
+      "days": 30
+    },
+    {
+      "month": "2025-12",
+      "avg_temp": 1.05,
+      "precipitation": 13.1,
+      "days": 31
+    },
+    {
+      "month": "2026-01",
+      "avg_temp": -3.75,
+      "precipitation": 1.1,
+      "days": 31
+    },
+    {
+      "month": "2026-02",
+      "avg_temp": 1.24,
+      "precipitation": 1.4,
+      "days": 28
+    },
+    {
+      "month": "2026-03",
+      "avg_temp": 5.24,
+      "precipitation": 15.1,
+      "days": 31
+    },
+    {
+      "month": "2026-04",
+      "avg_temp": 12.17,
+      "precipitation": 26.1,
+      "days": 30
+    },
+    {
+      "month": "2026-05",
+      "avg_temp": 16.62,
+      "precipitation": 164.7,
+      "days": 31
+    },
+    {
+      "month": "2026-06",
+      "avg_temp": 19.58,
+      "precipitation": 26.1,
+      "days": 14
+    }
+  ],
+  "weather_counts": [
+    {
+      "name": "阴",
+      "value": 1782
+    },
+    {
+      "name": "小雨",
+      "value": 682
+    },
+    {
+      "name": "多云",
+      "value": 380
+    },
+    {
+      "name": "晴",
+      "value": 330
+    },
+    {
+      "name": "中雨",
+      "value": 243
+    },
+    {
+      "name": "小雪",
+      "value": 98
+    },
+    {
+      "name": "大雨",
+      "value": 65
+    },
+    {
+      "name": "中雪",
+      "value": 60
+    },
+    {
+      "name": "大雪",
+      "value": 12
+    }
+  ],
+  "note": "历史天气数据来自 Open-Meteo Archive API；若 source 为 demo-weather，则表示当前环境网络采集失败，使用本地生成的结构一致数据。"
+}

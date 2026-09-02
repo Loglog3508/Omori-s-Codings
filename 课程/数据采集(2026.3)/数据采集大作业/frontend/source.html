@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>大连市近10年天气数据分析 · 数据说明</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <nav class="floating-nav" aria-label="页面导航">
+      <a href="./index.html"><span class="nav-icon">总</span><span class="nav-text">总览</span></a>
+      <a href="./charts.html"><span class="nav-icon">趋</span><span class="nav-text">趋势</span></a>
+      <a href="./records.html"><span class="nav-icon">明</span><span class="nav-text">明细</span></a>
+      <a href="./weather.html"><span class="nav-icon">天</span><span class="nav-text">天气</span></a>
+      <a class="active" href="./source.html"><span class="nav-icon">数</span><span class="nav-text">数据</span></a>
+    </nav>
+
+    <header class="topbar">
+      <div>
+        <h1>数据采集与处理说明</h1>
+        <p id="sourceNote">正在加载数据...</p>
+      </div>
+      <div class="top-actions">
+        <a class="primary-link" href="./records.html">查看明细</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="source-grid" id="sourceStats" aria-label="数据统计"></section>
+
+      <section class="doc-panel">
+        <h2>采集字段</h2>
+        <ol>
+          <li>日期、最高气温、最低气温、平均气温、体感温度。</li>
+          <li>降水量、降雨量、降雪量、降水小时数。</li>
+          <li>最大风速、最大阵风、短波辐射、天气代码。</li>
+          <li>清洗后新增年份、月份、季节、天气中文标签、温差和极端天气标记。</li>
+        </ol>
+      </section>
+
+      <section class="doc-panel">
+        <h2>数据来源</h2>
+        <p>真实采集使用 Open-Meteo Archive API 获取大连市坐标附近的历史逐日天气数据。若当前网络无法访问 API，一键脚本会生成结构一致的本地演示数据；页面顶部会显示当前 source。</p>
+      </section>
+    </main>
+
+    <script src="./data/weather_data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

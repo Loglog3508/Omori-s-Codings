@@ -1,0 +1,54 @@
+﻿*** Begin Patch
+*** Update File: C:\Users\Administrator\Desktop\数据采集\frontend\styles.css
+@@   .floating-nav::after {
+-    top: auto;
+-    right: auto;
+-    bottom: 9px;
+-    left: calc(50% - 126px);
+-    width: 5px;
+-    height: 5px;
+-    box-shadow: 11px 0 0 rgba(255, 255, 255, 0.34), 22px 0 0 rgba(255, 255, 255, 0.22);
+-    transition:
+-      left 190ms var(--ease),
+-      box-shadow 190ms var(--ease);
++    top: auto;
++    right: auto;
++    bottom: 8px;
++    left: 27px;
++    width: 24px;
++    height: 3px;
++    border-radius: 999px;
++    background: rgba(255, 255, 255, 0.72);
++    box-shadow: none;
++    transition: left 190ms var(--ease);
+@@   .floating-nav:has(a:nth-child(1).active)::after {
+-    left: calc(50% - 126px);
++    left: 27px;
+@@   .floating-nav:has(a:nth-child(2).active)::after {
+-    left: calc(50% - 64px);
++    left: 89px;
+@@   .floating-nav:has(a:nth-child(3).active)::after {
+-    left: calc(50% - 2px);
++    left: 151px;
+@@   .floating-nav:has(a:nth-child(4).active)::after {
+-    left: calc(50% + 60px);
++    left: 213px;
+@@   .floating-nav:has(a:nth-child(5).active)::after {
+-    left: calc(50% + 122px);
++    left: 275px;
+@@   .floating-nav:has(a:nth-child(1):hover)::after {
+-    left: calc(50% - 126px);
++    left: 27px;
+@@   .floating-nav:has(a:nth-child(2):hover)::after {
+-    left: calc(50% - 64px);
++    left: 89px;
+@@   .floating-nav:has(a:nth-child(3):hover)::after {
+-    left: calc(50% - 2px);
++    left: 151px;
+@@   .floating-nav:has(a:nth-child(4):hover)::after {
+-    left: calc(50% + 60px);
++    left: 213px;
+@@   .floating-nav:has(a:nth-child(5):hover)::after {
+-    left: calc(50% + 122px);
++    left: 275px;
+*** End Patch

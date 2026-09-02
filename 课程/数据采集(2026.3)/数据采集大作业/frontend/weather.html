@@ -1,0 +1,42 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>大连市近10年天气数据分析 · 天气类型</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+  </head>
+  <body>
+    <nav class="floating-nav" aria-label="页面导航">
+      <a href="./index.html"><span class="nav-icon">总</span><span class="nav-text">总览</span></a>
+      <a href="./charts.html"><span class="nav-icon">趋</span><span class="nav-text">趋势</span></a>
+      <a href="./records.html"><span class="nav-icon">明</span><span class="nav-text">明细</span></a>
+      <a class="active" href="./weather.html"><span class="nav-icon">天</span><span class="nav-text">天气</span></a>
+      <a href="./source.html"><span class="nav-icon">数</span><span class="nav-text">数据</span></a>
+    </nav>
+
+    <header class="topbar">
+      <div>
+        <h1>天气类型与极端天气</h1>
+        <p id="sourceNote">正在加载数据...</p>
+      </div>
+      <div class="top-actions">
+        <a class="secondary-link" href="./charts.html">查看趋势</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="chart-grid compact" aria-label="天气类型图表">
+        <div class="panel wide"><h2>天气类型占比</h2><div id="weatherChart" class="chart"></div></div>
+        <div class="panel wide"><h2>极端天气日统计</h2><div id="extremeChart" class="chart"></div></div>
+        <div class="panel full chart-contained"><h2>季节降水量</h2><div id="seasonRainChart" class="chart"></div></div>
+      </section>
+
+      <section class="keyword-grid" id="weatherList" aria-label="天气类型列表"></section>
+    </main>
+
+    <script src="./data/weather_data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

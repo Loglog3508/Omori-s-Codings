@@ -1,0 +1,19 @@
+digraph Tree {
+    node [shape=box, style=filled,rounded, color=black];
+    edge [fontname=Microsoft YaHei];
+    n1 [label="outlook", fillcolor="#3498db", fontcolor="white"];
+    n2 [label="yes", fillcolor="#2ecc71", fontcolor="white"];
+    n1 -> n2 [label="overcast"];
+    n3 [label="windy", fillcolor="#3498db", fontcolor="white"];
+    n1 -> n3 [label="rainy"];
+    n4 [label="yes", fillcolor="#2ecc71", fontcolor="white"];
+    n3 -> n4 [label="FALSE"];
+    n5 [label="no", fillcolor="#2ecc71", fontcolor="white"];
+    n3 -> n5 [label="TRUE"];
+    n6 [label="humidity", fillcolor="#3498db", fontcolor="white"];
+    n1 -> n6 [label="sunny"];
+    n7 [label="yes", fillcolor="#2ecc71", fontcolor="white"];
+    n6 -> n7 [label="<=70.0"];
+    n8 [label="no", fillcolor="#2ecc71", fontcolor="white"];
+    n6 -> n8 [label=">70.0"];
+}

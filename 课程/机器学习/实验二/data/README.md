@@ -1,25 +1,10 @@
 # 实验二数据文件说明
 
-本文件夹存放机器学习实验二（聚类 / K-Means）所使用到的数据集，均为 UTF-8 带 BOM 的 CSV，可直接用 Excel 打开。
+本文件夹存放机器学习实验二（聚类 / K-Means）任务 3 所使用的自选数据集。
 
 | 文件名 | 数据集 | 样本数 | 特征数 | 类别数 | 说明 |
 | --- | --- | --- | --- | --- | --- |
-| seeds.csv | 小麦种子数据集（UCI Seeds） | 210 | 7 | 3 | 类别为 Kama / Rosa / Canadian 三个小麦品种，每类 70 个 |
 | digits.csv | 手写数字数据集（sklearn digits） | 1797 | 64 | 10 | 类别为数字 0~9，每个数字约 180 个样本 |
-
-## seeds.csv 字段
-
-| 列名 | 含义 |
-| --- | --- |
-| Area | 籽粒面积 |
-| Perimeter | 籽粒周长 |
-| Compactness | 紧密度 C = 4πA / P² |
-| Kernel_Length | 籽粒长度 |
-| Kernel_Width | 籽粒宽度 |
-| Asymmetry | 不对称系数 |
-| Groove_Length | 腹沟长度 |
-| class | 类别编号（1 = Kama，2 = Rosa，3 = Canadian） |
-| class_name | 类别名称 |
 
 ## digits.csv 字段
 
@@ -29,10 +14,14 @@
 
 ## 对应任务
 
-- `seeds.csv`  → 实验任务 2：用纯 Python 代码（自实现 K-Means）对种子数据集进行聚类。
 - `digits.csv` → 实验任务 3：自选数据集，用 K-Means 算法解决手写数字聚类问题。
 
 ## 数据来源
 
-- Seeds 数据集：UCI Machine Learning Repository，*Seeds* 数据集（210 条记录）。
 - Digits 数据集：`sklearn.datasets.load_digits()` 内置数据，导出为 CSV 便于离线使用。
+
+## 说明
+
+任务 2 使用的种子数据集由老师提供，放在 `纯python代码1/seeds_dataset.txt`（制表符分隔，
+前 7 列是特征、最后一列是类别编号 1/2/3），本文件夹不再重复存放。
+任务 1 使用脚本里现场生成的合成高斯簇数据，不需要数据文件。

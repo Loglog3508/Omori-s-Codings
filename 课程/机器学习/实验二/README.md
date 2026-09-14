@@ -11,12 +11,12 @@
 
 ## 二、实验内容概览
 根据实验目的和要求，编写相应的 Python 脚本，并将主要设计代码写在报告中（可附图）。
-老师提供的原始代码与数据放在 `纯python代码1/`、`纯python代码2/` 两个文件夹中，**未做改动**，各任务脚本直接复用其中的函数。
+老师提供的原始代码与数据放在 `KMeans/纯python代码1/`、`KMeans/纯python代码2/` 两个文件夹中，**未做改动**，各任务脚本直接复用其中的函数。
 
 | 任务 | 内容 | 对应脚本 | 使用的数据 |
 | --- | --- | --- | --- |
 | 任务 1 | 理解纯 Python 代码 1 中实现 K-Means 的方法，并对其进行改进 | `task1_KMeans改进与自测.py`（自测与改进验证）、`纯python代码1_KMeans改进版.py`（改进实现） | 合成的高斯簇数据 |
-| 任务 2 | 用纯 Python 代码对种子数据集进行聚类 | `task2_种子数据集聚类.py` | `纯python代码1/seeds_dataset.txt` |
+| 任务 2 | 用纯 Python 代码对种子数据集进行聚类 | `task2_种子数据集聚类.py` | `KMeans/纯python代码1/seeds_dataset.txt` |
 | 任务 3 | 自选数据集，用 K-Means 算法解决一个聚类问题 | `task3_自选数据集_手写数字聚类.py` | 手写数字数据集 `data/digits.csv` |
 
 ## 三、核心原理
@@ -35,12 +35,12 @@ J = Σ_j Σ_{x∈C_j} || x - μ_j ||²
 K-Means 通过反复“分配—更新”单调地降低 SSE，直到收敛到某个局部最优。
 
 ### 3. 老师提供的两份纯 Python 代码
-- **纯python代码1（`kmeans.py`）**：面向对象写法，`class KMeans(k_clusters, tol, max_iter, n_init)`。
+- **KMeans/纯python代码1（`kmeans.py`）**：面向对象写法，`class KMeans(k_clusters, tol, max_iter, n_init)`。
   - `_init_centers_kpp()`：k-means++ 初始化，让初始中心彼此远离；
   - `_kmeans()`：核心算法，分配标签 → 计算重心 → 用中心位移判断收敛；
     发现空簇时返回 `None`（整次运行作废）；
   - `predict()`：运行 `n_init` 次，取 SSE 最小的一次，结果放在 `km.centers_`、`km.sse_`。
-- **纯python代码2（`kmeans_utils.py` + 3 个 demo）**：函数式写法，
+- **KMeans/纯python代码2（`kmeans_utils.py` + 3 个 demo）**：函数式写法，
   `init_centroids()` 随机选初始质心、`e_step()` 计算样本归属并累加代价 J、`m_step()` 求均值得到新质心；
   `kmeans_demo1.py` 可视化二维数据的迭代过程与 J 曲线，`kmeans_demo2.py` 用 K-Means 做图像压缩，
   `kmeans_demo3.py` 画 K 与 J 的关系曲线（肘部法）。
@@ -69,14 +69,15 @@ K-Means 通过反复“分配—更新”单调地降低 SSE，直到收敛到�
 ## 四、文件结构
 ```
 实验二/
-├── 纯python代码1/                     # 老师提供的代码1与数据（原始文件，未改动）
-│   ├── kmeans.py                     # 面向对象 K-Means：k-means++ 初始化 + n_init 次重启
-│   └── seeds_dataset.txt             # 小麦种子数据集（210 个样本、7 个特征、3 类）
-├── 纯python代码2/                     # 老师提供的代码2（原始文件，未改动）
-│   ├── kmeans_utils.py               # 函数式 K-Means：init_centroids / e_step / m_step
-│   ├── kmeans_demo1.py               # 示例1：二维数据上可视化迭代过程与 J 曲线
-│   ├── kmeans_demo2.py               # 示例2：用 K-Means 做图像压缩（需要自备 child.png）
-│   └── kmeans_demo3.py               # 示例3：画 K 与 J 的关系曲线（肘部法选 K）
+├── KMeans/                           # 老师提供的代码与数据（原始文件，未改动）
+│   ├── 纯python代码1/
+│   │   ├── kmeans.py                 # 面向对象 K-Means：k-means++ 初始化 + n_init 次重启
+│   │   └── seeds_dataset.txt         # 小麦种子数据集（210 个样本、7 个特征、3 类）
+│   └── 纯python代码2/
+│       ├── kmeans_utils.py           # 函数式 K-Means：init_centroids / e_step / m_step
+│       ├── kmeans_demo1.py           # 示例1：二维数据上可视化迭代过程与 J 曲线
+│       ├── kmeans_demo2.py           # 示例2：用 K-Means 做图像压缩（需要自备 child.png）
+│       └── kmeans_demo3.py           # 示例3：画 K 与 J 的关系曲线（肘部法选 K）
 ├── 纯python代码1_KMeans改进版.py        # 任务1：继承老师 KMeans 的改进版（5 点改进）
 ├── task1_KMeans改进与自测.py           # 任务1：老师代码自测、问题演示、改进效果对比
 ├── task2_种子数据集聚类.py             # 任务2：用老师代码1、代码2 对种子数据集聚类并对比
@@ -111,10 +112,10 @@ python task3_自选数据集_手写数字聚类.py
 ```
 
 运行后脚本会自动在 `结果图/` 目录保存图片，并在控制台输出 SSE、轮廓系数、聚类准确率、ARI、NMI 等结果。
-任务 2、任务 3 需要读取老师提供的代码，脚本已经自动把 `纯python代码1/`、`纯python代码2/` 加入搜索路径。
+任务 2、任务 3 需要读取老师提供的代码，脚本已经自动把 `KMeans/纯python代码1/`、`KMeans/纯python代码2/` 加入搜索路径。
 
 ## 六、数据集说明
-- `纯python代码1/seeds_dataset.txt`：老师提供的种子数据集（任务 2），210 个样本、7 个特征、3 个类别
+- `KMeans/纯python代码1/seeds_dataset.txt`：老师提供的种子数据集（任务 2），210 个样本、7 个特征、3 个类别
   （Kama / Rosa / Canadian 三个小麦品种，每类 70 个），制表符分隔、最后一列是类别编号 1/2/3。
 - `data/digits.csv`：任务 3 的自选数据集（手写数字，1797 个样本、64 个特征、10 个类别），详见 `data/README.md`。
 - 任务 1 使用脚本里现场生成的合成高斯簇数据，不需要额外文件。

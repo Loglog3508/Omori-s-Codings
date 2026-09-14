@@ -1,7 +1,7 @@
 """
 实验二 纯python代码1（改进版）：在老师提供的 kmeans.py 基础上改进 K-Means 聚类算法
 
-老师提供的原始代码：纯python代码1/kmeans.py（原文件未做任何改动）
+老师提供的原始代码：KMeans/纯python代码1/kmeans.py（原文件未做任何改动）
     其中已经实现了 K-Means 的核心流程，而且做得不错：
         - _init_centers_kpp()：k-means++ 初始化簇中心；
         - predict()：n_init 次重启，取 SSE 最小的一次；

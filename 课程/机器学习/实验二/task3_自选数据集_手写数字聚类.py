@@ -10,7 +10,7 @@
 
 按照实验要求“可以使用原生python代码或sklearn等机器学习框架”，本任务三种实现都用上并互相验证：
     1. sklearn 的 KMeans（框架实现，作为标准答案）；
-    2. 老师提供的纯python代码1（纯python代码1/kmeans.py，面向对象实现）；
+    2. 老师提供的纯python代码1（KMeans/纯python代码1/kmeans.py，面向对象实现）；
     3. 实验任务1 里的改进版（纯python代码1_KMeans改进版.py）。
 最后比较三者的 SSE 与聚类指标，验证纯 Python 实现是否正确。
 """
@@ -34,7 +34,7 @@ BASE = os.path.dirname(os.path.abspath(__file__))
 IMG_DIR = os.path.join(BASE, "结果图")
 os.makedirs(IMG_DIR, exist_ok=True)
 
-sys.path.insert(0, os.path.join(BASE, "纯python代码1"))
+sys.path.insert(0, os.path.join(BASE, "KMeans", "纯python代码1"))
 # 兼容补丁：老师代码用了 np.int 与 np.object，这两个别名在 NumPy 2.x 中已被移除
 np.int, np.object = int, object
 from kmeans import KMeans as TeacherKMeans            # noqa: E402  老师提供的代码1

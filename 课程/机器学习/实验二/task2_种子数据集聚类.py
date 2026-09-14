@@ -1,15 +1,15 @@
 """
 实验二 任务2：用纯python代码对种子数据集进行聚类
 
-数据集（老师提供）：纯python代码1/seeds_dataset.txt —— UCI 小麦种子数据集（Seeds）
+数据集（老师提供）：KMeans/纯python代码1/seeds_dataset.txt —— UCI 小麦种子数据集（Seeds）
     - 样本数：210
     - 特征数：7（面积、周长、紧密度、籽粒长度、籽粒宽度、不对称系数、腹沟长度）
     - 类别数：3（Kama / Rosa / Canadian 三个小麦品种，每类 70 个样本）
     - 文件格式：制表符分隔，前 7 列是特征，最后一列是品种编号 1/2/3
 
 用到的两份老师提供的纯python代码：
-    代码1：纯python代码1/kmeans.py（面向对象写法 KMeans + k-means++ + 多次重启）
-    代码2：纯python代码2/kmeans_utils.py（函数式写法 init_centroids / e_step / m_step）
+    代码1：KMeans/纯python代码1/kmeans.py（面向对象写法 KMeans + k-means++ + 多次重启）
+    代码2：KMeans/纯python代码2/kmeans_utils.py（函数式写法 init_centroids / e_step / m_step）
 
 流程：
     1. 读取 seeds_dataset.txt；
@@ -36,8 +36,8 @@ IMG_DIR = os.path.join(BASE, "结果图")
 os.makedirs(IMG_DIR, exist_ok=True)
 
 # 把老师提供的两份纯python代码加入搜索路径，直接复用其中的函数
-sys.path.insert(0, os.path.join(BASE, "纯python代码1"))
-sys.path.insert(0, os.path.join(BASE, "纯python代码2"))
+sys.path.insert(0, os.path.join(BASE, "KMeans", "纯python代码1"))
+sys.path.insert(0, os.path.join(BASE, "KMeans", "纯python代码2"))
 # 兼容补丁：老师代码用了 np.int 与 np.object，这两个别名在 NumPy 2.x 中已被移除
 np.int, np.object = int, object
 from kmeans import KMeans as TeacherKMeans            # noqa: E402  老师提供的代码1
@@ -115,7 +115,7 @@ def run_utils_kmeans(X, k, max_iters=100, seed=42):
 
 def main():
     # ---------------------------------------------------------- 1. 读取数据
-    X_raw, y = load_seeds(os.path.join(BASE, "纯python代码1", "seeds_dataset.txt"))
+    X_raw, y = load_seeds(os.path.join(BASE, "KMeans", "纯python代码1", "seeds_dataset.txt"))
     print("种子数据集（老师提供）：", X_raw.shape, "，类别：", CLASS_NAMES)
     print("每类样本数：", np.bincount(y).tolist())
 
@@ -123,7 +123,7 @@ def main():
     k = 3
 
     # ------------------------------------ 2. 用老师代码1（面向对象写法）聚类
-    print("\n【代码1】纯python代码1/kmeans.py —— KMeans 类（k-means++ + n_init 次重启）")
+    print("\n【代码1】KMeans/纯python代码1/kmeans.py —— KMeans 类（k-means++ + n_init 次重启）")
     np.random.seed(42)                         # 老师代码用 np.random，固定种子以便复现
     km1 = TeacherKMeans(k_clusters=k, n_init=10)
     labels1 = km1.predict(X)
@@ -133,7 +133,7 @@ def main():
           {f"簇{c}": CLASS_NAMES[v] for c, v in sorted(mapping1.items())})
 
     # ------------------------------------ 3. 用老师代码2（函数式写法）聚类
-    print("\n【代码2】纯python代码2/kmeans_utils.py —— init_centroids / e_step / m_step")
+    print("\n【代码2】KMeans/纯python代码2/kmeans_utils.py —— init_centroids / e_step / m_step")
     labels2, centers2, sse2, j_hist2 = run_utils_kmeans(X, k, seed=42)
     print("  SSE = %.4f，各簇样本数 = %s，迭代轮数 = %d"
           % (sse2, np.bincount(labels2, minlength=k).tolist(), len(j_hist2) - 1))

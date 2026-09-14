@@ -1,7 +1,7 @@
 """
 实验二 任务1：理解纯python代码1中实现 K-Means 的方法，并对其进行改进
 
-老师提供的纯python代码1：纯python代码1/kmeans.py（原文件未做改动）
+老师提供的纯python代码1：KMeans/纯python代码1/kmeans.py（原文件未做改动）
     接口：KMeans(k_clusters, tol, max_iter, n_init)
         _init_centers_kpp()  k-means++ 初始化簇中心（让初始中心彼此远离）
         _kmeans(X)           核心算法：分配标签 → 计算重心 → 判断收敛
@@ -39,7 +39,7 @@ IMG_DIR = os.path.join(BASE, "结果图")
 os.makedirs(IMG_DIR, exist_ok=True)
 
 # 把老师提供的“纯python代码1”目录加入搜索路径，直接复用其中的 KMeans
-sys.path.insert(0, os.path.join(BASE, "纯python代码1"))
+sys.path.insert(0, os.path.join(BASE, "KMeans", "纯python代码1"))
 # 兼容补丁：老师代码用了 np.int 与 np.object，这两个别名在 NumPy 2.x 中已被移除
 np.int, np.object = int, object
 from kmeans import KMeans as TeacherKMeans          # noqa: E402

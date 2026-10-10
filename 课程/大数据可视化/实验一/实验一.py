@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib import patheffects as pe
+import matplotlib.patches as mpatches
 
 BASE = r"C:\Users\omori\Omori-s-Codings\课程\大数据可视化"
 sys.path.insert(0, BASE)
@@ -126,7 +128,7 @@ fig.tight_layout()
 save(fig, "实验一_任务3_地区饼图.png")
 
 # ============ 实验一 任务4 堆积百分比柱状图 + 旭日图 ============
-pivot = ca.pivot_table(index="AreaName", columns="DevName", values="tot", aggfunc="sum")
+pivot = ca.pivot_table(index="AreaName", columns="DevName", values="tot", aggfunc="sum").fillna(0)
 pivot = pivot.reindex(area_order)[dev_order]
 pct = pivot.div(pivot.sum(axis=1), axis=0) * 100
 
@@ -146,31 +148,82 @@ ax.legend(title="发展地区", loc="upper right")
 fig.tight_layout()
 save(fig, "实验一_任务4_堆积百分比柱状图.png")
 
-# 旭日图（双层同心环）
-inner_vals = [area_sum[a] for a in area_order]
-outer_vals, outer_labels = [], []
+# 旭日图（子母饼图：大段保留，小份额合并为“其他”，右侧展开明细）
+AREA_SUN = {
+    "Asia": "亚洲", "Europe": "欧洲",
+    "Latin America and the Caribbean": "拉美加勒比",
+    "Africa": "非洲", "Northern America": "北美洲", "Oceania": "大洋洲",
+}
+DEV_SUN = {"Developed regions": "发达", "Developing regions": "发展中"}
+total_mig = area_sum.sum()
+area_colors = plt.cm.tab10(np.linspace(0, 1, len(area_order)))
+
+
+def sun_combo_color(a, d):
+    i = area_order.index(a)
+    return area_colors[i] * (1.0 if d == "Developed regions" else 0.5)
+
+
+big_rows, small_rows = [], []
 for a in area_order:
     for d in dev_order:
         v = pivot.loc[a, d]
-        if v > 0:
-            outer_vals.append(v)
-            outer_labels.append(f"{AREA_CN[a]}·{DEV_CN[d]}")
-area_colors = plt.cm.tab10(np.linspace(0, 1, len(area_order)))
-outer_colors = []
-for i, a in enumerate(area_order):
-    for d in dev_order:
-        if pivot.loc[a, d] > 0:
-            shade = 0.75 if d == "Developed regions" else 0.45
-            outer_colors.append(area_colors[i] * shade)
-fig, ax = plt.subplots(figsize=(9.5, 9.5))
-ax.pie(inner_vals, radius=0.62, labels=[AREA_CN[a] for a in area_order],
-       colors=area_colors, labeldistance=0.38,
+        if v <= 0:
+            continue
+        pct_v = v / total_mig * 100
+        row = (a, d, v, pct_v, sun_combo_color(a, d))
+        if pct_v >= 3:
+            big_rows.append(row)
+        else:
+            small_rows.append(row)
+small_total = sum(r[2] for r in small_rows)
+
+inner_vals = [area_sum[a] for a in area_order]
+inner_labels = [AREA_SUN[a] if a != "Oceania" else "" for a in area_order]
+outer_vals = [r[2] for r in big_rows] + [small_total]
+outer_labels = [DEV_SUN[r[1]] for r in big_rows] + ["其他"]
+outer_colors = [r[4] for r in big_rows] + [(0.55, 0.55, 0.55)]
+
+fig = plt.figure(figsize=(19, 9.5))
+ax = fig.add_axes([0.0, 0.18, 0.60, 0.78])
+ax.set_aspect("equal")
+wedges_in, texts_in = ax.pie(
+    inner_vals, radius=0.62, labels=inner_labels, colors=area_colors,
+    labeldistance=0.40, textprops=dict(color="white", weight="bold"),
+    wedgeprops=dict(width=0.34, edgecolor="white"))
+for i, t in enumerate(texts_in):
+    if t.get_text() == "":
+        continue
+    t.set_ha("center")
+    t.set_va("center")
+    t.set_fontsize(10 if inner_vals[i] / total_mig < 0.05 else 13)
+    t.set_path_effects([pe.withStroke(linewidth=2.2, foreground="#1a1a1a")])
+wedges_out, texts_out = ax.pie(outer_vals, radius=1.0, labels=outer_labels,
+       colors=outer_colors, labeldistance=1.08, textprops=dict(fontsize=12, color="#222222"),
        wedgeprops=dict(width=0.34, edgecolor="white"))
-ax.pie(outer_vals, radius=1.0, labels=outer_labels, colors=outer_colors,
-       labeldistance=1.06, rotatelabels=False,
-       wedgeprops=dict(width=0.34, edgecolor="white"))
-ax.set_title("加拿大移民来源大洲 × 发展地区 旭日图")
-fig.tight_layout()
+for t in texts_out:
+    t.set_ha("center")
+    t.set_va("center")
+ax.set_title("加拿大移民来源大洲 × 发展地区 旭日图（灰色“其他”=小份额，见右侧明细）", fontsize=14)
+
+handles = [mpatches.Patch(color=area_colors[i], label=f"{AREA_SUN[a]} {inner_vals[i]/total_mig*100:.1f}%")
+           for i, a in enumerate(area_order)]
+ax.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, -0.22),
+          ncol=3, fontsize=12, frameon=False, columnspacing=1.6, handletextpad=0.6)
+
+ax2 = fig.add_axes([0.67, 0.22, 0.32, 0.60])
+ax2.set_aspect("equal")
+small_vals = [r[2] for r in small_rows]
+small_labels = [f"{AREA_SUN[r[0]]}·{DEV_SUN[r[1]]}" for r in small_rows]
+small_colors = [r[4] for r in small_rows]
+sum_small = sum(small_vals)
+wedges2, texts2, autotexts2 = ax2.pie(
+    small_vals, colors=small_colors, startangle=90, counterclock=False,
+    autopct=lambda p: f"{p:.1f}%\n({int(p/100*sum_small):,})",
+    pctdistance=0.70, textprops=dict(fontsize=12, color="white", weight="bold"))
+ax2.legend(wedges2, [f"{l}  {v:,.0f}人" for l, v in zip(small_labels, small_vals)],
+           loc="lower center", bbox_to_anchor=(0.5, -0.20), fontsize=11, frameon=False)
+ax2.set_title(f"『其他』小份额明细（合计 {sum_small/total_mig*100:.1f}%）", fontsize=14)
 save(fig, "实验一_任务4_旭日图.png")
 
 # ============ 实验一 任务5 对比 ============

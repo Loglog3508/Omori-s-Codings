@@ -1,0 +1,408 @@
+粙岻粙岻
+《机器学习》实验指导书实验一实验题目：逻辑回归实验目的和要求：能够理解逻辑回归的特点、使用方法和使用场景。掌握使用原生python代码和sklearn实现逻辑回归算法。实验条件：每名同学使用一台计算机。小组同学相邻，方便讨论。 实验内容：根据实验目的和要求进行，编写相应的python文件，并将文件的主要设计代码写在报告中，附图也可。1.使用python代码实现阶跃函数和sigmod函数，并将其可视化。
+2. 理解纯python代码1和2中实现逻辑回归的方法。
+3. 用纯python代码1对下面的红酒数据集进行分类。
+4. 用纯python代码2对下面的数据集进行分类。
+5.自己找一个合适的数据集，使用逻辑回归解决一个分类问题，把解决思路和代码写在下面，可以使用原生python代码或sklearn等机器学习框架。
+实验二实验题目：聚类实验目的和要求：能够理解K-Means算法的特点、使用方法和使用场景。掌握使用原生python代码和sklearn实现K-Means算法。实验条件：每名同学使用一台计算机。小组同学相邻，方便讨论。 实验内容：根据实验目的和要求进行，编写相应的python文件，并将文件的主要设计代码写在报告中，附图也可。1.理解纯python代码1中实现K-Means的方法，并对其进行改进。
+2. 用纯python代码对种子数据集进行聚类。
+3.自己找一个合适的数据集，使用K-Means算法解决一个聚类问题，把解决思路和代码写在下面，可以使用原生python代码或sklearn等机器学习框架。
+实验三实验题目：决策树实验目的和要求：能够理解ID3和C4.5算法的特点、使用方法和使用场景。掌握使用原生python代码和sklearn实现决策树算法。初步掌握CART算法的原理，并能够应用到实际问题中实验条件：每名同学使用一台计算机。小组同学相邻，方便讨论。 实验内容：根据实验目的和要求进行，编写相应的python文件，并将文件的主要设计代码写在报告中，附图也可。1.理解纯python代码2中实现ID3和C4.5算法。
+2. 用纯python中的代码对种子数据集进行分类。
+3.自己找一个合适的数据集，使用决策树算法解决分类和回归问题，把解决思路和代码写在下面，可以使用原生python代码或sklearn等机器学习框架。
+使用graphviz对决策树进行可视化：https://blog.csdn.net/qq_42294351/article/details/119754109https://blog.csdn.net/qq_36206070/article/details/83343603实验四实验题目：深度学习初步实验目的和要求：能够理解感知机的原理，特点，了解神经网络的使用方法和场景。使用原生python代码实现二层神经网络。初步掌握误差反向传播算法的原理，并能够应用到实际问题中实验条件：每名同学使用一台计算机。小组同学相邻，方便讨论。 实验内容：根据实验目的和要求进行，编写相应的python文件，并将文件的主要设计代码写在报告中，附图也可。1.理解下面二层神经网络的算法。	  # coding: utf-8import sys, ossys.path.append(os.pardir)  # 为了导入父目录的文件而进行的设定import numpy as npfrom common.layers import *from common.gradient import numerical_gradientfrom collections import OrderedDictclass TwoLayerNet:    def __init__(self, input_size, hidden_size, output_size, weight_init_std = 0.01):        # 初始化权重        self.pa慲獭
+††††敳晬瀮牡浡孳圧
+⁝‽敷杩瑨楟楮彴瑳⁤‪灮爮湡潤
+湩異彴楳敺‬楨摤湥獟穩
+‍†††猠汥
+慰慲獭
+楨摤湥獟穩
+‍†††猠汥
+慰慲獭
+眠楥桧彴湩瑩獟摴
+慲摮浯爮湡湤栨摩敤彮楳敺‬畯灴瑵獟穩
+††††敳晬瀮牡浡孳戧
+⁝‽灮種牥獯漨瑵異彴楳敺
+# 生成层        self.layers = OrderedDict()        self.layers['Affine1'] = Affine(self.params['W1'], self.params['b1'])        self.layers['Relu1'] = Relu()        self.layers['Affine2'] = Affine(self.params['W2'], self.params['b2'])        self.lastLayer = SoftmaxWithLoss()            def predict(self, x):        for layer in self.layers.values():            x = layer.forward(x)                return x            # x:输入数据, t:监督数据    def loss(self, x, t):        y = self.predict(x)   ††爠瑥牵⁮敳晬氮獡
+祡牥昮牯慷摲礨‬
+††敤⁦捡畣慲祣猨汥
+††††
+‽敳晬瀮敲楤瑣砨
+††††
+‽灮愮杲慭
+‍†††椠⁦
+‽‱›
+‽灮愮杲慭
+‍†††
+††††捡畣慲祣
+琠  汦慯
+桳灡孥崰
+††††敲畴湲愠捣牵捡
+††††
+# x:输入数据, t:监督数据    def numerical_gradient(self, x, t):        loss_W = lambda W: self.loss(x, t)                grads = {}        grads['W1'] = numerical_gradient(loss_W, self.params['W1'])        grads['b1'] = numerical_gradient(loss_W, self.pa慲獭
+††††牧摡孳圧
+⁝‽畮敭楲慣彬牧摡敩瑮氨獯彳
+慰慲獭
+††††牧摡孳戧
+⁝‽畮敭楲慣彬牧摡敩瑮氨獯彳
+慰慲獭
+††††‍†††爠瑥牵⁮牧摡
+††††‍†搠晥朠慲楤湥
+敳晬‬
+‍†††
+映牯慷摲‍†††猠汥
+潬獳砨‬
+††††‣慢正慷摲‍†††搠畯
+††††潤瑵
+慬瑳慌敹
+慢正慷摲搨畯
+‍†††
+††††慬敹獲
+敳晬氮祡牥
+慶畬獥
+††††慬敹獲爮癥牥敳
+‍†††映牯氠祡牥椠⁮慬敹獲
+††††††潤瑵
+氠祡牥戮捡睫牡
+钜讥讥窂讂芥譺讥讥熼慩宼³
+颩莌莌
+摧煑´
+摧牞0
+摧煑´
+摧牞0攀
+瑹煑´
+5礑鐁
+摧牞0攀
+瑹煑´
+摧竱y
+摧媓:
+摧媓:
+摧媓:
+摧竱y
+摧媓:攀
+瑹竱y
+5礑鐁
+愀$摧竱y
+摧媓:攀
+瑹竱y
+摧桌Ï
+摧桌Ï
+摧桌Ï
+摧媓:c欀
+瑹竱y
+摧桌Ï攀
+5礑鐁
+愀$摧
+摧桌Ï攀
+緪汵幦幕幕幕幕幕U
+摧桌Ïc欀
+# 设定        grads = {}        grads['W1'], grads['b1'] = self.layers['Affine1'].dW, self.layers['Affine1'].db        grads['W2'], grads['b2'] = self.layers['Affine2'].dW, self.layers['Affine2'].db        return grads
+2. 工具上面的代码写成三层神经网络的代码。
+3.使用神经网络解决一个分类或回归问题。
+实验五实验题目：sklearn的使用实验目的和要求：能够掌握sklearn的基础使用方法、模型选择。掌握交叉验证、数据预处理原理，并能够应用到实际问题中实验条件：每名同学使用一台计算机。小组同学相邻，方便讨论。 实验内容：根据实验目的和要求进行，编写相应的python文件，并将文件的主要设计代码写在报告中，附图也可。1.理解下面代码中的文本相关模型选择和特征抽取的方法。	  #coding=GBK
+from sklearn.datasets import load_iris
+# from sklearn.datasets import load_boston
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction import DictVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
+def count_demo():
+datas = ["i like playing football", "you like playing basketball", 'he likes music']
+transfer = CountVectorizer()
+data_new = transfer.fit_transform(datas)
+print(data_new, data_new.toarray())
+print(transfer.get_feature_names())
+def text_demo():
+datas = [{
+'course': 'python程序设计', 'hours': 40
+}, {
+'course': 'java', 'hours': 56
+}, {
+'course': '机器学习', 'hours': 64
+}, {
+'course': 'python程序设计', 'hours': 640
+}]
+transfer = DictVectorizer(sparse=False)
+data_new = transfer.fit_transform(datas)
+print(transfer.get_feature_names)
+print(data_new, type(data_new))
+def dataset_demo():
+iris = load_iris()
+x_train, x_test, y_train, y_test = train_test_split(iris.data, iris.target, test_size=0.2, random_state=20)
+print(x_train, x_train.shape, x_test, y_train, y_test)
+import jieba
+def cut_word(text):
+text=" ".join(jieba.cut(text))
+return text
+def count_demo2():
+datas = ["身处大别山腹地的大湾村曾经和安徽其他的贫困村一样，交通不便，发展滞后，贫困发生率居高不下。老区人民生活怎么样，习近平总书记一直牵挂于心。党的十八大以来，习近平总书记两次到安徽考察调研，要求安徽强化目标责任，全力做好脱贫攻坚工作，以行动兑现对人民的承诺。殷殷嘱托化作前行动力，安徽把大别山革命老区作为脱贫攻坚主战场，不断加大政策、项目、资金等方面的帮扶力度，2020年，大别山革命老区127.3万建档立卡贫困人口全部脱贫、954个贫困村全部出列，全面建成小康社会目标如期实现。"]
+data_new = []
+for sent in datas:
+data_new.append(cut_word(sent))
+transfer = CountVectorizer(stop_words=['的'])
+data_new = transfer.fit_transform(data_new)
+print(data_new, data_new.toarray())
+print(data_new.toarray())
+print(transfer.get_feature_names())
+from sklearn.feature_extraction.text import TfidfVectorizer
+def count_demo3():
+datas = ["贫困村小康社会全部出列，全面建成小康社会目标如期实现。"]
+data_new = []
+for sent in datas:
+data_new.append(cut_word(sent))
+transfer = TfidfVectorizer(stop_words=['的'])
+data_new = transfer.fit_transform(data_new)
+print(data_new, data_new.toarray())
+print(data_new.toarray())
+print(transfer.get_feature_names())
+if __name__ == '__main__':
+count_demo3()
+2. 用sklearn实现交叉验证。
+3. 用sklearn实现数据预处理。
+实验六实验题目：综合练习实验目的和要求：从目前所学算法中选取一种或多种算法解决实际中的问题，并写清处理处理流程和核心算法。
+5礑鐁
+愀$摧
+蒘蒘蒘蒘蒘蒘
+桰倗ë
+桰戀z
+珃蟃蟃
+桰戀z
+桰倗ë
+鮯鮯鮯鮯
+桰戀z
+硾杰噢M
+愀$摧
+蚏虺虺虺潺
+5礑鐁
+愀$摧
+#c欀穤
+摧牞0
+5礑鐁
+愀$摧
+摧牞0
+阁ﾔ瘡
+阁ﾔ瘡
+阁ﾔ瘡
+瑹煑´x
+阁ﾔ瘡
+瑹煑´m
+阁ﾔ瘡
+瑹竱yx
+阁ﾔ瘡
+阁ﾔ瘡
+阁ﾔ瘡
+阁ﾔ瘡
+阁ﾔ瘡
+阁ﾔ瘡
+标题 1
+尀脈V
+标题 2
+岁脈J
+标题 3
+岁脈V
+标题 4
+岁脈J
+标题 5
+默认段落字体
+普通表格
+无列表
+页脚 Char
+页眉 Char
+目录 1
+HTML 预设格式
+HTML 预设格式 Char1
+网格型
+超链接
+txt
+article1
+论文标题4
+论文正文
+È萑È葠È
+论文标题 2
+H尀脈n
+论文标题 3
+H尀脈p
+论文标题
+论文标题5
+È萑È葠È
+token
+HTML 预设格式 Char
+湯整瑮呟灹獥
+肇襉劚箥烦
+粎帶仌￁怔
+爮汥葳
+蠏俙劼
+戴缤醧影
+渄鐷楌拤
+欀陹茖
+琀敨敭琯敨敭琯敨敭慍慮敧
+樤謽均
+砮汭姬譝
+戶葉鰄
+亸厵哩缲耊
+浝讗帆忳
+吔噃牝
+这龯焽
+緡愒峮
+磦礿謻衾溈賑
+葈鈶妽
+‮揓饌
+氎眾挑
+†蒆餶
+猇騈蒅愻
+嗙糉馗
+蚓舻织谸倦尻祮
+鋌莫鲬爵璐
+俭贱郦
+鹢闂枔
+敉渃繢
+鮗鳝滗狕
+琀敨敭琯敨敭弯敲獬琯敨敭慍慮敧
+敲獬辄
+軬剀世搻悰躂
+崖凾獁藙
+湯整瑮呟灹獥
+开敲獬
+湡条牥砮汭
+湡条牥砮汭爮汥偳
+砿汭瘠牥楳湯
+攠据摯湩
+•瑳湡慤潬敮
+愼挺牬慍
+捳敨慭
+灯湥浸晬牯慭獴漮杲搯慲楷杮汭
+慭湩•杢
+•捡散瑮
+愢捣湥
+•捡散瑮
+愢捣湥
+•捡散瑮
+愢捣湥
+•捡散瑮
+愢捣湥
+•捡散瑮
+愢捣湥
+•捡散瑮
+愢捣湥
+•汨湩
+栢楬歮•潦
+S縀W
+`舀c吀d砀d
+昀
+Q阀c
+c一d昀d砀d
+＀耀肀
+伀	眀	褀	鴀
+儀
+吀
+眀
+茀
+錀
+鰀
+夀崀樀渀焀蠀褀贀
+＄／／／／／／／／
+Ｅ／／／／／／／／
+ｐ／／／／／／／／
+态傄俾J倀J儀J帀J洀
+還币梄怆還漁
+帆肄怄肄濻
+怅悄濺
+态岄俾
+怄岄俾
+怈岄俾
+帆粄怋岄俾
+怎岄俾
+犨甝
+!嗩"晍"縡"
+$〝&扁'
+(礱(
+)丯)磓+
+-曢/
+0牞0
+1宗2
+4搐6
+8漖8
+9挶9灍9瞳9媓:
+;寙;
+<帒<泴<挶>攈@僂A幂A梃C
+G價H
+I唰I
+L窿M劒N榿N煘N睒N
+Q愇Q粏Q
+U嵲V
+Z姴Z
+[粰\
+]槐^
+`嚰`
+a皦a
+c漗d+e
+e亮e秩fÍg
+k焺l嶱m
+u吉u狢w
+x慍y洢y矔y竱y筚|
+¢曄¢湙£朗¥
+¨簫¨
+©垍©浊©浥ª怆¬
+­极­
+²啡³抋³溰³
+´崼´憫´楥´煑´
+µ啳µ
+·甊¸
+¹瀟¾
+¿抁¿
+Â礖Â
+Ã瘓Ã
+Æ垧Æ
+Ë墭Ì
+Í攥Ï桌Ï捒Ð並Ñ珨Ñ
+Ö搌Ö
+Û璋Û
+ã栿ã
+ä凜å
+æ晛è
+ê扨ê竡ê
+ë礓í渂î瓫ï
+ñ哅ñ
+ò咟ò
+÷琚ø
+偧朷嵗
+撴匎楅碆每
+唀渀欀渀漀眀渀＀
+＄.寠x
+吀椀洀攀猀 一攀眀 刀漀洀愀渀
+匀礀洀戀漀氀
+＄.寠x
+爀椀愀氀
+厞O匀椀洀
+暖N伀逞老
+夀甀
+椀渀挀栀漀
+漀琀栀椀挀
+＀譎彛
+＀譎[儀逰
+爀愀椀渀猀
+漀渀漀
+爀椀愀氀
+謀卛O匀椀洀匀甀渀
+漀甀爀椀攀爀 一攀眀
+圀椀渀最搀椀渀最猀
+￠$B
+愀洀戀爀椀愀
+愀琀栀
+椀瘀礀
+搀洀椀渀椀猀琀爀愀琀漀爀
+潎浲污搮瑯m
+摁業楮瑳慲潴r
+楍牣獯景
+晏楦散圠牯d
+汤汩i
+卋偏潲畤瑣畂汩噤牥
+Root Entry
+Data
+1Table
+WordDocument
+SummaryInformation
+DocumentSummaryInformation
+CompObj
+楍牣獯景
+卍潗摲潄c
+捯浵湥

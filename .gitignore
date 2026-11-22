@@ -1,4 +1,4 @@
-﻿# Python
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
@@ -20,3 +20,16 @@ Desktop.ini
 
 # 独立比赛仓库
 protein_function_prediction/
+
+# 本地临时/分析目录（不上传）
+.temp/
+SNA/
+人才库/
+.dsh-office-*/
+
+# 计量经济分析：SSC 下载的第三方 ado 包，可用 ado_work/fetch_pkgs.py 重新获取
+课程/计量经济分析/ado_work/*/
+
+# 构建产物与临时备份
+*.bak
+*.log
